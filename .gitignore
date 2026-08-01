@@ -1,0 +1,46 @@
+# --- data (never committed) ---
+data/
+!data/.gitkeep
+
+# --- environments ---
+.venv/
+venv/
+env/
+.pipcache/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- model artefacts ---
+*.ckpt
+*.pt
+*.pth
+*.joblib
+*.pkl
+
+# --- green-ai / codecarbon ---
+emissions.csv
+.codecarbon.config
+
+# --- secrets ---
+.env
+*.key
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- scratch notebooks (exploration only, not the pipeline) ---
+notebooks/scratch/

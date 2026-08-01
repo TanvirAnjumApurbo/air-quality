@@ -1,0 +1,506 @@
+# =============================================================================
+# Short-Horizon PM2.5 Forecasting for Dhaka
+# A Lightweight Sequence Model on Fused OpenAQ and NASA POWER Data
+# -----------------------------------------------------------------------------
+# SINGLE SOURCE OF TRUTH. No hyperparameter, path, date, seed, threshold or
+# horizon may be hardcoded in any script -- everything is read from here.
+#
+# Fields whose value must be backed by a citation carry an explicit
+# `_status: VERIFIED | PENDING_VERIFICATION` marker. A PENDING field must never
+# be silently used to produce a paper number: the pipeline raises instead.
+# =============================================================================
+
+project:
+  name: dhaka-pm25-shortterm
+  title: >-
+    Short-Horizon PM2.5 Forecasting for Dhaka: A Lightweight Sequence Model on
+    Fused OpenAQ and NASA POWER Data
+  timezone_local: Asia/Dhaka        # UTC+06:00, no DST
+  timezone_data: UTC                # all merges happen in UTC
+
+# -----------------------------------------------------------------------------
+# Paths (all relative to repo root unless absolute)
+# -----------------------------------------------------------------------------
+paths:
+  data_raw: data/raw
+  data_interim: data/interim
+  data_processed: data/processed
+  results: results
+  tables: results/tables
+  figures: results/figures
+  logs: results/logs
+  results_json: results/results.json
+  reports: reports
+  checkpoints: data/interim/checkpoints    # gitignored; *.ckpt also ignored
+  cache: data/interim/cache                # memmap / feather tensor cache
+
+# -----------------------------------------------------------------------------
+# Reproducibility
+# -----------------------------------------------------------------------------
+seeds:
+  primary: 42
+  # Every stochastic model is run with ALL of these. Reported as mean +/- std.
+  # A single-seed deep-learning number is not a result.
+  multi: [42, 1337, 2024, 7, 31415]
+
+determinism:
+  torch_deterministic: true
+  cudnn_benchmark: false        # set true only for fixed-shape speed runs
+  # PyTorch needs this env var for deterministic CUDA matmul reductions
+  cublas_workspace_config: ":4096:8"
+
+# -----------------------------------------------------------------------------
+# Machine / runtime constraints for this box
+#   RTX 5060 Ti 8 GB (Blackwell, sm_120) -- requires the cu128 PyTorch build
+# -----------------------------------------------------------------------------
+runtime:
+  device: auto                  # auto | cuda | cpu
+  min_free_disk_gb: 5.0         # every writing script asserts this first
+  max_minutes_per_run: 10       # thermal ceiling; trainer aborts + warns past this
+  # ---- host RAM cache (box has 23.7 GB total, ~8.5 GB typically free) ------
+  ram_cache:
+    enabled: true
+    budget_gb: 8.0              # hard ceiling for the in-RAM tensor cache
+    # Measured headroom, not total RAM: the trainer clamps the cache to
+    # min(budget_gb, max_frac_of_available * psutil available RAM) at start-up,
+    # so a busy desktop degrades to a smaller cache instead of swapping.
+    max_frac_of_available: 0.6
+    # The whole windowed dataset is materialised once as float32 and pinned;
+    # falls back to on-the-fly windowing if even the clamped budget is exceeded.
+    # Worst case here (~50k windows x 168 h x ~60 features x 4 B) is ~2 GB, so
+    # the full dataset is expected to fit comfortably.
+    pin_memory: true
+    persist_to_disk: true       # reuse across runs via .npy memmap in paths.cache
+  dataloader:
+    num_workers: 0              # 0 is fastest when the dataset is already in RAM
+    prefetch_factor: null
+    persistent_workers: false
+    drop_last: false
+  amp:
+    enabled: true               # mixed precision
+    dtype: bf16                 # bf16 is safe on Blackwell; falls back to fp32 on CPU
+  compile:
+    enabled: false              # torch.compile: big warmup cost, tiny models -> off
+  # ---- checkpointing / resume ---------------------------------------------
+  checkpointing:
+    enabled: true
+    save_every_epoch: true      # atomic write: last.ckpt + best.ckpt
+    keep_last_n: 1
+    resume: auto                # auto | never | always  (auto = resume if ckpt found)
+  progress:
+    enabled: true
+    backend: tqdm               # tqdm | plain  (plain = one line per epoch, log-safe)
+    log_every_n_steps: 50
+
+# =============================================================================
+# DATA
+# =============================================================================
+data:
+  # --- study location -------------------------------------------------------
+  site:
+    city: Dhaka
+    country_iso: BD
+    latitude: 23.8103
+    longitude: 90.4125
+    discovery_radius_m: 25000
+
+  # --- OpenAQ (target variable) --------------------------------------------
+  openaq:
+    # Discovery only (needs free key in .env as OPENAQ_API_KEY)
+    api_base: https://api.openaq.org/v3
+    api_key_env: OPENAQ_API_KEY
+    # Bulk download (no credentials, unsigned S3)
+    s3_bucket: openaq-data-archive
+    s3_prefix_template: records/csv.gz/locationid={location_id}/year={year}/month={month:02d}/
+    s3_region: us-east-1
+    parameter: pm25
+    target_units: "ug/m3"       # anything else is converted or rejected, and logged
+    # location_ids stays EMPTY until the discovery table is reviewed and a site
+    # is chosen by the operator. Scripts refuse to bulk-download without it.
+    location_ids: []
+    request:
+      max_retries: 5
+      backoff_base_s: 1.5
+      sleep_between_calls_s: 0.2
+      timeout_s: 60
+
+  # --- NASA POWER (meteorological drivers) ---------------------------------
+  # No key required. Hourly point endpoint. Values are UTC.
+  power:
+    endpoint: https://power.larc.nasa.gov/api/temporal/hourly/point
+    community: RE
+    # Verified against the live /system/manager/parameters response before use.
+    parameters:
+      - T2M              # temperature at 2 m (C)
+      - T2MDEW           # dew point at 2 m (C)
+      - RH2M             # relative humidity at 2 m (%)
+      - WS10M            # wind speed at 10 m (m/s)
+      - WD10M            # wind direction at 10 m (deg)
+      - PS               # surface pressure (kPa)
+      - PRECTOTCORR      # bias-corrected total precipitation (mm/hour)
+      - ALLSKY_SFC_SW_DWN  # all-sky downward shortwave irradiance (W/m^2)
+    fill_value: -999.0   # POWER missing sentinel -- treated as NaN, never as data
+    chunk_by: year       # one request per calendar year, cached to data/raw
+    request:
+      max_retries: 5
+      backoff_base_s: 2.0
+      sleep_between_calls_s: 3.0
+      timeout_s: 180
+
+  # --- UCI Beijing Multi-Site (fallback + cross-city generalisation) -------
+  uci:
+    repo_id: 501        # ucimlrepo.fetch_ucirepo(id=501)
+    name: Beijing Multi-Site Air-Quality Data
+    # Beijing local time = Asia/Shanghai (UTC+8), no DST. Source columns are
+    # year/month/day/hour in local time.
+    timezone_local: Asia/Shanghai
+    target_column: "PM2.5"
+    # Station used as the Beijing analogue of a single Dhaka monitor.
+    # null => the station with the most complete PM2.5 record is chosen and logged.
+    station: null
+
+  # --- date range requested from every source ------------------------------
+  # Actual usable range is decided by the Phase-1 audit and written back here.
+  range:
+    start: "2017-01-01"
+    end: "2025-12-31"
+
+# -----------------------------------------------------------------------------
+# Quality control. Every filter logs the number of rows it removed.
+# -----------------------------------------------------------------------------
+qc:
+  pm25:
+    drop_negative: true
+    # Physically implausible upper cap for a 1-hour PM2.5 mean.
+    # Dhaka hourly peaks exceed 500 ug/m3 in winter, so the cap is deliberately
+    # loose; it is a sanity guard against sensor faults, not an outlier filter.
+    sanity_cap_ugm3: 1000.0
+    # Repeated identical values usually mean a stuck sensor, not still air.
+    flatline_max_repeats: 12       # >12 consecutive identical hourly values -> drop
+    drop_exact_zero: true          # exact 0.000 PM2.5 for an hour is a sensor fault
+  resample:
+    freq: "1h"
+    # An hourly bin needs at least this many sub-hourly obs to count as observed.
+    min_obs_per_hour: 1
+    aggregation: mean
+  meteorology:
+    # Ranges used only to flag absurd values, applied after fill_value -> NaN.
+    plausible:
+      T2M: [-10.0, 55.0]
+      T2MDEW: [-20.0, 40.0]
+      RH2M: [0.0, 100.0]
+      WS10M: [0.0, 60.0]
+      WD10M: [0.0, 360.0]
+      PS: [80.0, 110.0]
+      PRECTOTCORR: [0.0, 200.0]
+      ALLSKY_SFC_SW_DWN: [0.0, 1400.0]
+
+# -----------------------------------------------------------------------------
+# Missing-data handling. Leakage rule 3: imputation must be backward-looking
+# only, or fitted per-split. Linear interpolation across a split boundary is
+# leakage and is forbidden.
+# -----------------------------------------------------------------------------
+impute:
+  method: ffill_limited          # ffill_limited | per_split_interpolate | none
+  max_ffill_hours: 3             # gaps longer than this stay NaN and are excluded
+  # Rows whose target is NaN are never imputed -- they are dropped from
+  # supervision (but still break window contiguity, see features.gap_aware).
+
+# =============================================================================
+# FEATURES
+# =============================================================================
+features:
+  target: pm25
+  # Calendar features are derived in Asia/Dhaka so the diurnal cycle is physical.
+  calendar_tz: Asia/Dhaka
+
+  pm25_lags_h: [1, 2, 3, 6, 12, 24, 48, 168]
+  rolling_windows_h: [3, 6, 12, 24, 168]
+  rolling_stats: [mean, std, min, max]
+  diff_horizons_h: [1, 3, 24]        # differences and rate-of-change
+
+  met_vars: [T2M, T2MDEW, RH2M, WS10M, WD10M, PS, PRECTOTCORR, ALLSKY_SFC_SW_DWN]
+  met_lags_h: [1, 3, 6, 12, 24]
+  # Wind speed+direction -> u/v components. Meteorological convention:
+  # WD10M is the direction the wind blows FROM, degrees clockwise from north.
+  wind_uv_from: {speed: WS10M, direction: WD10M}
+
+  cyclical:
+    hour_of_day: {period: 24}
+    day_of_week: {period: 7}
+    day_of_year: {period: 365.25}
+
+  # Season indicator. Bangladesh monsoon month boundaries -- see citations.season.
+  season:
+    monsoon_months: [6, 7, 8, 9]
+    dry_months: [11, 12, 1, 2]
+    _status: PENDING_VERIFICATION
+
+  gap_aware:
+    enabled: true
+    # A window is valid only if its internal timestamps are strictly contiguous
+    # at qc.resample.freq. Rejected windows are counted and reported.
+    require_contiguous: true
+    max_internal_nan_frac: 0.0     # 0.0 = no NaNs allowed inside a kept window
+
+# =============================================================================
+# FORECASTING TASK
+# =============================================================================
+task:
+  # Direct multi-horizon: one head/model per h. No recursive rollout.
+  horizons_h: [1, 3, 6, 12, 24]
+  headline_horizon_h: 24
+  # Leakage rule 1: to predict t+h only information up to and including t is
+  # available. `oracle_met` is an explicitly-labelled upper bound, never headline.
+  allow_future_meteorology: false
+  oracle_met_variant:
+    enabled: true
+    label: "Oracle-Met (upper bound, NOT a forecast)"
+
+split:
+  method: chronological_fraction     # chronological_fraction | explicit
+  train_frac: 0.70
+  val_frac: 0.15
+  test_frac: 0.15
+  shuffle: false                     # never. any true value raises.
+  # Resolved from the audited coverage in Phase 2 and written back here so that
+  # every table caption can print the exact boundary dates.
+  explicit_boundaries:
+    train_end: null
+    val_end: null
+  _status: PENDING_VERIFICATION      # filled once real coverage is known
+
+scaling:
+  method: standard                   # fitted on TRAIN ONLY, then applied to val/test
+  target_transform: log1p            # PM2.5 is right-skewed; metrics reported in ug/m3
+  clip_sigma: null
+
+# =============================================================================
+# MODELS
+# =============================================================================
+models:
+  # ---- Tier 1: honest baselines -------------------------------------------
+  baselines:
+    persistence:      {enabled: true}
+    seasonal_naive:   {enabled: true, period_h: 24}
+    climatology:      {enabled: true, by: [hour_of_day, month]}   # train-set means
+    sarimax:
+      enabled: true
+      order: [2, 0, 1]
+      seasonal_order: [1, 0, 1, 24]
+      trend: c
+      # SARIMAX on 50k+ hourly points is slow; fit on a capped recent train tail.
+      max_train_hours: 8760
+      enforce_stationarity: false
+      enforce_invertibility: false
+
+  # ---- Tier 2: classical ML -----------------------------------------------
+  trees:
+    tuning:
+      cv: TimeSeriesSplit
+      n_splits: 4
+      # Tuning uses TRAIN+VAL only. Test is never touched during tuning.
+      scoring: neg_root_mean_squared_error
+      n_iter: 20                     # RandomizedSearchCV budget
+    ridge:
+      enabled: true
+      alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
+    random_forest:
+      enabled: true
+      grid:
+        n_estimators: [300]
+        max_depth: [10, 20, null]
+        min_samples_leaf: [1, 5, 20]
+        max_features: [0.3, 0.6, 1.0]
+      n_jobs: -1
+    xgboost:
+      enabled: true
+      grid:
+        n_estimators: [400, 800]
+        max_depth: [4, 6, 8]
+        learning_rate: [0.03, 0.06, 0.1]
+        subsample: [0.8, 1.0]
+        colsample_bytree: [0.6, 0.8, 1.0]
+        min_child_weight: [1, 5]
+      early_stopping_rounds: 50
+      tree_method: hist
+      device: auto                   # 'cuda' when available
+    lightgbm:
+      enabled: true                  # skipped with a logged note if import fails
+      grid:
+        n_estimators: [400, 800]
+        num_leaves: [31, 63, 127]
+        learning_rate: [0.03, 0.06, 0.1]
+        min_child_samples: [10, 30]
+        subsample: [0.8, 1.0]
+        colsample_bytree: [0.6, 0.8, 1.0]
+      early_stopping_rounds: 50
+
+  # ---- Tier 3: sequence models (the contribution) -------------------------
+  # HARD CONSTRAINT: every sequence model stays under max_params. This IS the
+  # green-AI story -- it is not relaxed to chase RMSE.
+  sequence:
+    max_params: 100000
+    input_windows_h: [24, 48, 168]
+    architectures:
+      gru:
+        enabled: true
+        hidden_sizes: [32, 64, 128]
+        num_layers: [1, 2]
+      lstm:
+        enabled: true
+        hidden_sizes: [32, 64, 128]
+        num_layers: [1, 2]
+      gru_attention:
+        # Only after tiers 1 and 2 are committed. First thing cut if time runs out.
+        enabled: false
+        hidden_sizes: [64]
+        num_layers: [1]
+        attention_dim: 32
+    train:
+      epochs: 60
+      batch_size: 256
+      lr: 0.001
+      optimizer: adamw
+      weight_decay: 0.0001
+      dropout: 0.2
+      grad_clip_norm: 1.0
+      loss: huber                    # robust to PM2.5 spikes
+      huber_delta: 1.0
+      scheduler:
+        name: reduce_on_plateau
+        factor: 0.5
+        patience: 4
+        min_lr: 0.00001
+      early_stopping:
+        monitor: val_loss
+        patience: 10
+        min_delta: 0.0001
+        mode: min
+
+# ---- Secondary task: AQI-category classification ---------------------------
+classification:
+  enabled: true
+  horizon_h: 24                      # next-day health advisory
+  class_weight: balanced             # imbalance handled explicitly and reported
+  # Breakpoints MUST come from a published standard. Values below are filled in
+  # and marked VERIFIED only after being read from the cited source document.
+  breakpoints:
+    scheme: null                     # e.g. us_epa_pm25_2024 | bangladesh_doe
+    source_url: null
+    source_title: null
+    source_year: null
+    edges_ugm3: null                 # ordered upper bounds, ug/m3 (24-h basis)
+    labels: null
+    _status: PENDING_VERIFICATION
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  metrics: [rmse, mae, r2, smape]    # sMAPE, not MAPE: PM2.5 approaches zero
+  # Headline column. Most air-quality papers omit it.
+  skill_score:
+    reference: persistence
+    formula: "1 - RMSE_model / RMSE_reference"
+  stratify:
+    by_season: true                  # monsoon vs dry, per features.season
+    by_pollution_level:
+      enabled: true
+      # Threshold on OBSERVED PM2.5. See citations.pm25_standard -- the operative
+      # Bangladesh national 24-h standard is being verified; 35 ug/m3 is the US
+      # EPA 24-h PM2.5 NAAQS. The discrepancy is flagged, not silently resolved.
+      threshold_ugm3: 35.0
+      _status: PENDING_VERIFICATION
+  diebold_mariano:
+    enabled: true
+    # Compares best deep model vs best classical baseline.
+    loss: squared
+    h: null                          # defaults to the forecast horizon under test
+    alternative: two-sided
+  bootstrap_ci:
+    enabled: true
+    n_resamples: 1000
+    block_size_h: 24                 # moving-block bootstrap for autocorrelation
+    alpha: 0.05
+
+# =============================================================================
+# GREEN AI
+# =============================================================================
+green:
+  complexity:
+    macs_backend: thop               # thop | ptflops
+    latency:
+      n_warmup: 100
+      n_runs: 1000                   # single-sample latency, mean over >=1000
+      batch_size: 1
+    measure_peak_gpu_memory: true
+  energy:
+    tracker: codecarbon
+    # CodeCarbon reports ESTIMATES, not metered values, and falls back to modelled
+    # numbers when Intel RAPL is unreadable (always the case on Windows without
+    # admin). This limitation is stated in RESULTS.md and the paper.
+    measure_power_secs: 15
+    log_level: warning
+    output_file: emissions.csv       # gitignored
+    country_iso_code: BGD
+  grid_carbon_intensity:
+    # DO NOT INVENT THIS NUMBER. Filled from a citable source (Ember / IEA /
+    # Electricity Maps) with year recorded. Until then the gCO2e column is left
+    # blank and flagged rather than fabricated.
+    value_gco2_per_kwh: null
+    year: null
+    source_name: null
+    source_url: null
+    _status: PENDING_VERIFICATION
+
+# =============================================================================
+# CITATIONS -- every externally-sourced constant is registered here.
+# Anything still PENDING_VERIFICATION blocks the number that depends on it.
+# =============================================================================
+citations:
+  season:
+    claim: "Bangladesh monsoon and dry season month boundaries"
+    source_name: null
+    source_url: null
+    _status: PENDING_VERIFICATION
+  aqi_breakpoints:
+    claim: "PM2.5 AQI category breakpoints"
+    source_name: null
+    source_url: null
+    _status: PENDING_VERIFICATION
+  pm25_standard:
+    claim: "Operative national 24-hour PM2.5 standard used for high-pollution stratification"
+    source_name: null
+    source_url: null
+    _status: PENDING_VERIFICATION
+  grid_carbon_intensity:
+    claim: "Bangladesh electricity grid carbon intensity (gCO2e/kWh)"
+    source_name: null
+    source_url: null
+    _status: PENDING_VERIFICATION
+
+# =============================================================================
+# OUTPUT / FIGURES
+# =============================================================================
+output:
+  figures:
+    dpi: 300
+    formats: [png, pdf]
+    # Okabe-Ito colourblind-safe qualitative palette.
+    palette: [
+      "#0072B2", "#D55E00", "#009E73", "#CC79A7",
+      "#E69F00", "#56B4E9", "#F0E442", "#000000"
+    ]
+    style: seaborn-v0_8-whitegrid
+    font_size: 11
+    figsize_single: [6.0, 4.0]
+    figsize_wide: [10.0, 4.0]
+  tables:
+    formats: [csv, tex]
+    tex_style: booktabs
+    float_fmt: "%.3f"
+  report:
+    results_md: reports/RESULTS.md
+    data_audit_md: reports/DATA_AUDIT.md
+    abstract_facts_json: reports/abstract_facts.json

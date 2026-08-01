@@ -1,0 +1,56 @@
+[project]
+name = "dhaka-pm25-shortterm"
+version = "0.1.0"
+description = "Short-horizon PM2.5 forecasting for Dhaka on fused OpenAQ and NASA POWER data"
+requires-python = ">=3.11,<3.13"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "scripts", "tests"]
+exclude = [".venv", "data", "results", ".git", "__pycache__"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # unused arguments
+    "SIM",  # simplify
+    "PTH",  # use pathlib
+    "RUF",  # ruff-specific
+    "D",    # pydocstyle -- docstrings on public functions are required
+    "ANN",  # type annotations
+    "NPY",  # numpy-specific
+    "PD",   # pandas-vet
+]
+ignore = [
+    "D203",    # conflicts with D211
+    "D213",    # conflicts with D212
+    "ANN401",  # allow Any in deliberately generic helpers
+    "E501",    # line length handled by the formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D103", "ANN201", "ANN001"]
+"scripts/*" = ["D103"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "leakage: methodological leakage guards (must never be skipped)",
+    "slow: takes more than a few seconds",
+    "network: requires network access",
+]

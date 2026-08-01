@@ -1,0 +1,49 @@
+# Pinned to the versions this pipeline was built and run on.
+# Python 3.12.10 on Windows 11, NVIDIA RTX 5060 Ti (Blackwell, sm_120).
+#
+# torch is NOT listed here: it must come from the CUDA 12.8 index, because a
+# default-index wheel installs cleanly and then fails at the first kernel launch
+# on Blackwell with "no kernel image is available for execution on the device".
+# Install it first, separately:
+#
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+#
+# Verified working: torch 2.11.0+cu128, CUDA 12.8, cuDNN 91900,
+# compiled arch list includes sm_120.
+
+# --- core numerics / data ---
+numpy==2.4.6
+pandas==3.0.5
+scipy==1.18.0
+pyarrow==25.0.0
+
+# --- modelling ---
+scikit-learn==1.9.0
+statsmodels==0.14.6
+xgboost==3.3.0
+lightgbm==4.7.0
+shap==0.52.0
+
+# --- data acquisition ---
+requests==2.34.2
+boto3==1.43.62
+ucimlrepo==0.0.7
+python-dotenv==1.2.2
+
+# --- green AI: energy and complexity ---
+codecarbon==3.2.9
+thop==0.1.1.post2209072238
+
+# --- visualisation / reporting ---
+matplotlib==3.11.1
+seaborn==0.13.2
+tabulate==0.10.0
+
+# --- runtime / config ---
+PyYAML==6.0.3
+tqdm==4.70.0
+psutil==7.2.2
+
+# --- dev ---
+pytest==9.1.1
+ruff==0.16.1
