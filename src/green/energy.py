@@ -46,22 +46,34 @@ class EnergyTracker:
         self.energy_kwh: float | None = None
         self.emissions_kg: float | None = None
         self.error: str | None = None
-        self.rapl_available: bool | None = None
+        self.cpu_kwh: float | None = None
+        self.gpu_kwh: float | None = None
+        self.ram_kwh: float | None = None
+        self.cpu_model: str | None = None
+        self.gpu_model: str | None = None
+        self.cpu_power_mode: str | None = None
 
     def __enter__(self) -> EnergyTracker:
         """Start tracking."""
         self._started = time.perf_counter()
         spec = self.cfg.get("green.energy", {})
         try:
-            from codecarbon import EmissionsTracker
+            # OfflineEmissionsTracker, not EmissionsTracker: only the offline
+            # variant accepts country_iso_code (the online one geolocates by IP,
+            # which would make the run depend on network conditions and could
+            # silently attribute a Bangladesh study to another grid). Passing
+            # country_iso_code to the online tracker raises TypeError, which was
+            # previously swallowed into a timing-only fallback -- so the whole
+            # green-AI measurement was quietly producing nothing.
+            from codecarbon import OfflineEmissionsTracker
 
-            self._tracker = EmissionsTracker(
-                project_name=self.cfg.get("project.name", "pipeline"),
+            self._tracker = OfflineEmissionsTracker(
+                project_name=str(self.cfg.get("project.name", "pipeline")),
                 experiment_id=self.run_name,
                 measure_power_secs=int(spec.get("measure_power_secs", 15)),
                 output_dir=str(self.cfg.path_for("logs")),
                 output_file=str(spec.get("output_file", "emissions.csv")),
-                log_level=str(spec.get("log_level", "warning")),
+                log_level=str(spec.get("log_level", "error")),
                 country_iso_code=str(spec.get("country_iso_code", "BGD")),
                 save_to_file=True,
                 allow_multiple_runs=True,
@@ -84,9 +96,21 @@ class EnergyTracker:
             data = getattr(self._tracker, "final_emissions_data", None)
             if data is not None:
                 self.energy_kwh = float(getattr(data, "energy_consumed", 0.0)) or None
-                # CodeCarbon reports zero CPU energy when it cannot read RAPL.
-                cpu_energy = float(getattr(data, "cpu_energy", 0.0) or 0.0)
-                self.rapl_available = cpu_energy > 0.0
+                self.cpu_kwh = float(getattr(data, "cpu_energy", 0.0) or 0.0)
+                self.gpu_kwh = float(getattr(data, "gpu_energy", 0.0) or 0.0)
+                self.ram_kwh = float(getattr(data, "ram_energy", 0.0) or 0.0)
+                self.cpu_model = getattr(data, "cpu_model", None)
+                self.gpu_model = getattr(data, "gpu_model", None)
+
+            # Ask the tracker how it actually obtained CPU power rather than
+            # inferring it. A non-zero cpu_energy does NOT imply a hardware
+            # reading: mode "cpu_load" means CodeCarbon modelled the draw from
+            # utilisation and a TDP constant, which is what happens on Windows
+            # where RAPL counters are unreadable.
+            for hardware in getattr(self._tracker, "_hardware", []):
+                if type(hardware).__name__ == "CPU":
+                    self.cpu_power_mode = getattr(hardware, "_mode", None)
+                    break
         except Exception as exc:
             self.error = f"{type(exc).__name__}: {exc}"
             self.logger.warning("CodeCarbon stop failed (%s)", self.error)
@@ -97,17 +121,27 @@ class EnergyTracker:
         Returns:
             Mapping recorded alongside the run in results.json.
         """
+        cpu_measured = self.cpu_power_mode in {"intel_rapl", "intel_power_gadget", "powermetrics"}
         out: dict[str, Any] = {
             "duration_s": round(self.duration_s, 3),
             "energy_kwh": self.energy_kwh,
+            "cpu_kwh": self.cpu_kwh,
+            "gpu_kwh": self.gpu_kwh,
+            "ram_kwh": self.ram_kwh,
             "co2e_kg_codecarbon": self.emissions_kg,
-            "tracker": "codecarbon" if self._tracker is not None else "unavailable",
-            "rapl_available": self.rapl_available,
+            "tracker": "codecarbon-offline" if self._tracker is not None else "unavailable",
+            "cpu_model": self.cpu_model,
+            "gpu_model": self.gpu_model,
+            "cpu_power_mode": self.cpu_power_mode,
+            "cpu_energy_is_measured": cpu_measured,
             "is_estimate": True,
             "note": (
-                "CodeCarbon reports modelled estimates, not metered measurements. "
-                "When Intel RAPL counters are unreadable (the usual case on Windows) "
-                "the CPU component is fully modelled."
+                "CodeCarbon reports estimates, not metered measurements. The CPU term "
+                f"was obtained in mode {self.cpu_power_mode!r}; 'cpu_load' means it was "
+                "modelled from processor utilisation and a thermal-design-power "
+                "constant rather than read from hardware counters. GPU energy comes "
+                "from NVML, which is a device-reported figure. RAM energy is modelled "
+                "from installed capacity."
             ),
         }
         if self.error:

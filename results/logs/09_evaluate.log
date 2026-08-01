@@ -1,0 +1,13 @@
+17:20:36 | INFO    | 09_evaluate | ======================================================================
+17:20:36 | INFO    | 09_evaluate | HORIZON h=1
+17:20:36 | INFO    | 09_evaluate | best sequence model at h=1: gru_h32_l1_w24_H1_s1337 (val loss 0.04269, seed 1337)
+17:20:36 | INFO    | 09_evaluate | ======================================================================
+17:20:36 | INFO    | 09_evaluate | HORIZON h=3
+17:20:36 | INFO    | 09_evaluate | ======================================================================
+17:20:36 | INFO    | 09_evaluate | HORIZON h=6
+17:20:36 | INFO    | 09_evaluate | ======================================================================
+17:20:36 | INFO    | 09_evaluate | HORIZON h=12
+17:20:36 | INFO    | 09_evaluate | ======================================================================
+17:20:36 | INFO    | 09_evaluate | HORIZON h=24
+17:20:37 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l1_w48_H24_s42 (val loss 0.10103, seed 42)
+17:20:37 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json

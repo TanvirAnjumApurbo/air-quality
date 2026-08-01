@@ -1,0 +1,13 @@
+17:20:11 | INFO    | 07_train_classifier | breakpoints: [9.0, 35.4, 55.4, 125.4, 225.4] (us_epa_pm25_2024, 2024 revision, effective 2024-05-06)
+17:20:11 | INFO    | 07_train_classifier | target basis: rolling_24h_mean
+17:20:11 | INFO    | 07_train_classifier | rows: train=25787 val=5955 test=9083
+17:20:11 | INFO    | 07_train_classifier | class distribution (test):
+ class_index                          label  count  share_pct split
+           0                           Good      0       0.00  test
+           1                       Moderate    846       9.31  test
+           2 Unhealthy for Sensitive Groups   1075      11.84  test
+           3                      Unhealthy   3076      33.87  test
+           4                 Very Unhealthy   3241      35.68  test
+           5                      Hazardous    845       9.30  test
+17:20:14 | WARNING | 07_train_classifier | CodeCarbon unavailable (TypeError: BaseEmissionsTracker.__init__() got an unexpected keyword argument 'country_iso_code'); timing only
+17:20:14 | INFO    | 07_train_classifier | classifier: 31742 rows, 6 of 6 classes present in train+val, weighting=balanced

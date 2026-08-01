@@ -67,3 +67,53 @@
 17:18:17 | INFO    | 05_run_baselines | sarimax h=3 took 25.4 s
 17:18:17 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
 17:18:18 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+17:19:50 | INFO    | 05_run_baselines | device: cuda
+17:19:51 | INFO    | 05_run_baselines | ======================================================================
+17:19:51 | INFO    | 05_run_baselines | HORIZON h=1
+17:19:51 | INFO    | 05_run_baselines | ======================================================================
+17:19:51 | INFO    | 05_run_baselines | rows: train=27186 val=6160 test=9334
+17:19:51 | INFO    | 05_run_baselines | SARIMAX h=1: longest contiguous training stretch 1651 h (2021-10-11 22:00:00+00:00 to 2021-12-19 16:00:00+00:00)
+17:19:51 | INFO    | 05_run_baselines | SARIMAX h=1: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 1651 points
+17:20:01 | INFO    | 05_run_baselines | SARIMAX h=1: fitted, applying to 9334 evaluation rows
+17:20:01 | INFO    | 05_run_baselines | sarimax h=1 took 10.0 s
+17:20:02 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+17:20:02 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+17:22:52 | INFO    | 05_run_baselines | device: cuda
+17:22:53 | INFO    | 05_run_baselines | ======================================================================
+17:22:53 | INFO    | 05_run_baselines | HORIZON h=24
+17:22:53 | INFO    | 05_run_baselines | ======================================================================
+17:22:53 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+17:22:53 | INFO    | 05_run_baselines | SARIMAX h=24: longest contiguous training stretch 2173 h (2019-07-10 00:00:00+00:00 to 2019-10-08 12:00:00+00:00)
+17:22:53 | INFO    | 05_run_baselines | SARIMAX h=24: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 2173 points
+17:23:06 | INFO    | 05_run_baselines | SARIMAX h=24: fitted, applying to 9083 evaluation rows
+17:23:07 | INFO    | 05_run_baselines | sarimax h=24 took 13.5 s
+17:23:07 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:23:07 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:23:07 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+17:23:07 | INFO    | 05_run_baselines |   sarimax          RMSE   41.23  MAE   25.07  R2  0.801  sMAPE  21.73  skill +0.4411
+17:26:14 | INFO    | 05_run_baselines | device: cuda
+17:26:15 | INFO    | 05_run_baselines | ======================================================================
+17:26:15 | INFO    | 05_run_baselines | HORIZON h=24
+17:26:15 | INFO    | 05_run_baselines | ======================================================================
+17:26:15 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+17:26:15 | INFO    | 05_run_baselines | SARIMAX h=24: longest contiguous training stretch 2173 h (2019-07-10 00:00:00+00:00 to 2019-10-08 12:00:00+00:00)
+17:26:15 | INFO    | 05_run_baselines | SARIMAX h=24: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 2173 points
+17:26:29 | INFO    | 05_run_baselines | SARIMAX h=24: fitted, applying to 9083 evaluation rows
+17:26:29 | INFO    | 05_run_baselines | sarimax h=24 took 13.7 s
+17:26:29 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:26:29 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:26:29 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+17:26:29 | INFO    | 05_run_baselines |   sarimax          RMSE   85.07  MAE   54.73  R2  0.149  sMAPE  46.14  skill -0.1532
+17:27:42 | INFO    | 05_run_baselines | device: cuda
+17:27:43 | INFO    | 05_run_baselines | ======================================================================
+17:27:43 | INFO    | 05_run_baselines | HORIZON h=24
+17:27:43 | INFO    | 05_run_baselines | ======================================================================
+17:27:43 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+17:27:43 | INFO    | 05_run_baselines | SARIMAX h=24: training tail 8760 h (2021-05-30 to 2022-05-30), 3643 observed (41.6%), gaps kept as NaN
+17:27:43 | INFO    | 05_run_baselines | SARIMAX h=24: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+17:27:58 | INFO    | 05_run_baselines | SARIMAX h=24: fitted, applying to 9083 evaluation rows
+17:27:58 | INFO    | 05_run_baselines | sarimax h=24 took 15.5 s
+17:27:59 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:27:59 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:27:59 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+17:27:59 | INFO    | 05_run_baselines |   sarimax          RMSE   81.36  MAE   55.76  R2  0.221  sMAPE  48.89  skill -0.1030

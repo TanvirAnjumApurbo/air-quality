@@ -157,37 +157,38 @@ def fit_predict_sarimax(
     spec = cfg.get("models.baselines.sarimax")
     max_hours = int(spec.get("max_train_hours", 8760))
 
-    # Reconstruct a regular hourly series from the training rows.
+    # Reconstruct a regular hourly series from the training rows, keeping gaps
+    # as NaN on the regular grid.
+    #
+    # The grid must stay evenly spaced: a seasonal order of (.,.,.,24) assumes a
+    # regular hourly interval, so calling .dropna() would compress the series
+    # across gaps and leave the seasonal term modelling a periodicity the data
+    # does not have. Restricting instead to the longest contiguous stretch keeps
+    # the spacing honest but is also wrong here for a different reason -- the
+    # longest run in this record falls in July-October 2019, entirely inside a
+    # monsoon, so the model would be fitted on low-season behaviour and applied
+    # to a test period spanning both seasons.
+    #
+    # Neither compromise is necessary. A state-space SARIMAX handles missing
+    # observations natively through the Kalman filter, so the full tail is used
+    # with its gaps left in place.
     history = pd.Series(train.persistence, index=train.index).sort_index()
     history = history[~history.index.duplicated(keep="first")]
-    full = history.asfreq("1h")
-    tail = full.iloc[-max_hours:].ffill(limit=int(cfg.get("impute.max_ffill_hours", 3)))
+    full = history.asfreq("1h").ffill(limit=int(cfg.get("impute.max_ffill_hours", 3)))
+    tail = full.iloc[-max_hours:]
 
-    # Fit on the longest CONTIGUOUS stretch, not on the non-null rows.
-    # Calling .dropna() here would compress the series across gaps, silently
-    # changing the sampling interval -- and a seasonal order of (·,·,·,24)
-    # assumes a regular hourly spacing, so the seasonal term would then be
-    # modelling something that does not exist in the data.
-    present = tail.notna()
-    blocks = (present != present.shift()).cumsum()
-    runs = tail[present].groupby(blocks[present])
-    if runs.ngroups == 0:
-        logger.warning("SARIMAX: no usable contiguous training stretch; skipping")
-        return np.full(len(test), np.nan)
-    longest_key = max(runs.groups, key=lambda k: len(runs.groups[k]))
-    tail = tail.loc[runs.groups[longest_key]]
-
-    if len(tail) < 500:
-        logger.warning(
-            "SARIMAX: longest contiguous training stretch is only %d hours; skipping", len(tail)
-        )
+    n_observed = int(tail.notna().sum())
+    if n_observed < 500:
+        logger.warning("SARIMAX: only %d observed hours in the training tail; skipping", n_observed)
         return np.full(len(test), np.nan)
     logger.info(
-        "SARIMAX h=%d: longest contiguous training stretch %d h (%s to %s)",
+        "SARIMAX h=%d: training tail %d h (%s to %s), %d observed (%.1f%%), gaps kept as NaN",
         horizon,
         len(tail),
-        tail.index.min(),
-        tail.index.max(),
+        tail.index.min().date(),
+        tail.index.max().date(),
+        n_observed,
+        100.0 * n_observed / len(tail),
     )
 
     logger.info(
@@ -227,16 +228,91 @@ def fit_predict_sarimax(
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             applied = fitted.apply(eval_filled.to_numpy(dtype=float), refit=False)
-            # In-sample h-step-ahead predictions across the evaluation window.
-            forecasts = applied.get_prediction(
-                start=0, end=len(eval_filled) - 1, dynamic=False
-            ).predicted_mean
+            forecasts = h_step_ahead_from_filtered_state(applied, horizon)
         anchor = pd.Series(forecasts, index=eval_filled.index)
-        # The value stamped at t+h is the forecast for that time; align it back
-        # to the row anchored at t.
-        aligned = anchor.reindex(test.index + pd.Timedelta(hours=horizon))
-        preds = aligned.to_numpy(dtype=float)
+        # anchor[t] is yhat(t+h | data up to t), so it aligns directly to the row
+        # stamped at t. Reindexing onto t+h -- the previous behaviour -- is what
+        # leaked future observations into the forecast.
+        preds = anchor.reindex(test.index).to_numpy(dtype=float)
     except Exception as exc:
         logger.warning("SARIMAX h=%d: apply failed (%s); returning NaN", horizon, exc)
 
     return np.clip(preds, 0.0, None)
+
+
+def h_step_ahead_from_filtered_state(results: Any, horizon: int) -> np.ndarray:
+    """Compute genuine h-step-ahead forecasts at every anchor time.
+
+    This exists because the obvious approach is wrong. ``get_prediction(...,
+    dynamic=False)`` returns *one-step-ahead* in-sample predictions: the value at
+    index ``t`` conditions on observations through ``t-1``. Stamping those onto
+    ``t+h`` and calling the result an h-step forecast hands the model ``h-1``
+    hours of future data. That mistake inflated SARIMAX's skill against
+    persistence at h=24 from roughly 0.06 to 0.44 -- a result that looked good
+    precisely because it was not a forecast.
+
+    Instead this uses the state-space form directly. The Kalman filter's filtered
+    state ``a_{t|t}`` conditions on data up to and including ``t``. Propagating it
+    ``h`` steps through the transition matrix and reading it out through the
+    design matrix gives
+
+        yhat(t+h | t) = Z (T^h a_{t|t} + sum_j T^j c) + d
+
+    with ``c`` the state intercept and ``d`` the observation intercept. Exact for
+    a linear Gaussian state-space model, and it costs one matrix power rather
+    than a re-forecast at every timestep.
+
+    Args:
+        results: A fitted statsmodels state-space results object.
+        horizon: Forecast horizon in steps.
+
+    Returns:
+        h-step-ahead forecasts aligned to the anchor time ``t``.
+    """
+    filtered = results.filter_results
+    state = np.asarray(filtered.filtered_state)  # (k_states, n)
+    n = state.shape[1]
+
+    k = state.shape[0]
+
+    def _static(matrix: Any, expected_cols: int, default_shape: tuple[int, ...]) -> np.ndarray:
+        """Reduce a possibly time-varying system matrix to a single slice.
+
+        statsmodels stores system matrices with a trailing time axis whenever the
+        matrix varies, and drops it to length 1 when it does not. Intercepts
+        arrive as ``(k, n)`` rather than ``(k, 1, n)``, so the reduction has to
+        be driven by the expected column count rather than by dimensionality
+        alone.
+        """
+        if matrix is None:
+            return np.zeros(default_shape)
+        arr = np.asarray(matrix, dtype=float)
+        if arr.ndim == 3:
+            return arr[..., -1]
+        if arr.ndim == 2 and arr.shape[1] != expected_cols:
+            return arr[:, -1:]
+        return arr
+
+    transition = _static(filtered.transition, k, (k, k))
+    design = _static(filtered.design, k, (1, k))
+    state_intercept = _static(getattr(filtered, "state_intercept", None), 1, (k, 1))
+    obs_intercept = _static(getattr(filtered, "obs_intercept", None), 1, (1, 1))
+
+    power = np.linalg.matrix_power(transition, int(horizon))
+
+    # Deterministic drift accumulated over the h propagation steps.
+    intercept = np.asarray(state_intercept, dtype=float).reshape(-1)
+    drift = np.zeros(k, dtype=float)
+    if np.any(intercept):
+        for _ in range(int(horizon)):
+            drift = transition @ drift + intercept
+
+    projected = power @ state + drift[:, None]
+    out = (np.asarray(design, dtype=float).reshape(1, k) @ projected).reshape(-1)
+    out = out + float(np.asarray(obs_intercept, dtype=float).reshape(-1)[0])
+
+    # The first `horizon` anchors have too little filtered history behind them to
+    # be meaningful; leave them missing rather than reporting a warm-up artefact.
+    if int(horizon) < n:
+        out[: int(horizon)] = np.nan
+    return out

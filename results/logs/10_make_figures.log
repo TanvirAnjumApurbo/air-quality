@@ -1,0 +1,6 @@
+17:20:41 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+17:20:41 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+17:20:41 | INFO    | 10_make_figures | wrote fig07_feature_importance
+17:20:41 | WARNING | 10_make_figures | no green table; skipping Pareto figure
+17:20:41 | WARNING | 10_make_figures | no classification record; skipping confusion matrix
+17:20:42 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum

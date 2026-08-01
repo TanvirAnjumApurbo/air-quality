@@ -593,3 +593,63 @@ def test_explicit_boundaries_outside_span_raise(cfg, synthetic):
     )
     with pytest.raises(ConfigError, match="strictly increasing"):
         resolve_boundaries(pm.index, cfg)
+
+
+@pytest.mark.leakage
+def test_sarimax_h_step_forecast_uses_no_future_data():
+    """The vectorised h-step forecast must match a strictly causal reference.
+
+    `get_prediction(dynamic=False)` returns ONE-step-ahead in-sample values;
+    stamping those onto t+h silently hands the model h-1 steps of future data.
+    This checks the state-space projection against a reference that can only see
+    data up to the anchor, so a regression to the leaky form fails here.
+    """
+    import warnings
+
+    from src.models.baselines import h_step_ahead_from_filtered_state
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+    rng = np.random.default_rng(0)
+    n = 400
+    y = np.zeros(n)
+    for t in range(2, n):
+        y[t] = (
+            0.7 * y[t - 1] - 0.2 * y[t - 2] + 0.5 * np.sin(2 * np.pi * t / 24) + rng.normal(0, 0.4)
+        )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        fitted = SARIMAX(
+            y[:250],
+            order=(2, 0, 1),
+            seasonal_order=(1, 0, 1, 24),
+            trend="c",
+            enforce_stationarity=False,
+            enforce_invertibility=False,
+        ).fit(disp=False, maxiter=40)
+        applied = fitted.apply(y, refit=False)
+
+        for h in (1, 3, 24):
+            fast = h_step_ahead_from_filtered_state(applied, h)
+            for anchor in (150, 250, 350):
+                if anchor + h >= n:
+                    continue
+                # Reference sees data only up to `anchor`.
+                causal = fitted.apply(y[: anchor + 1], refit=False).forecast(steps=h)[-1]
+                assert np.isclose(fast[anchor], causal, atol=1e-6), (
+                    f"h={h} anchor={anchor}: {fast[anchor]} != causal {causal}"
+                )
+
+
+@pytest.mark.leakage
+def test_predictions_are_bounded_to_physical_range(cfg):
+    """Inverted predictions must respect the same physical bounds as QC."""
+    from src.models.data import invert
+
+    cap = float(cfg.get("qc.pm25.sanity_cap_ugm3"))
+    # log1p-scale values that expm1 would blow far past any real concentration.
+    extreme = np.array([-5.0, 0.0, 3.0, 20.0, 50.0, np.inf, np.nan])
+    out = invert(cfg, extreme)
+    assert np.all(np.isfinite(out))
+    assert out.min() >= 0.0
+    assert out.max() <= cap

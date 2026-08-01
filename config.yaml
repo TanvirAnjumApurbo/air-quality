@@ -513,7 +513,10 @@ green:
     # CodeCarbon reports ESTIMATES, not metered values, and falls back to modelled
     # numbers when Intel RAPL is unreadable (always the case on Windows without
     # admin). This limitation is stated in RESULTS.md and the paper.
-    measure_power_secs: 15
+    # Sampling interval. Individual sequence runs finish in tens of seconds, so a
+    # 15 s interval would capture barely one sample per run; 5 s gives usable
+    # resolution without meaningful overhead.
+    measure_power_secs: 5
     log_level: warning
     output_file: emissions.csv       # gitignored
     country_iso_code: BGD

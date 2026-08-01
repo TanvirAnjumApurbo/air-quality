@@ -1,0 +1,3 @@
+17:20:43 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+17:20:43 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+17:20:43 | WARNING | 11_make_report | abstract_facts.json has null sections: ['classification', 'significance']
