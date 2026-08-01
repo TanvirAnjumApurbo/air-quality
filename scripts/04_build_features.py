@@ -81,15 +81,26 @@ def write_back_boundaries(config_path: Path, boundaries: dict[str, str]) -> None
         if n != 1:
             raise ConfigError(f"could not locate {pattern!r} in {config_path}")
 
-    text, n = re.subn(
-        r"^(\s*)_status: PENDING_VERIFICATION(\s*# filled once real coverage is known)$",
+    # Mark only the split block's own status. Several blocks carry a `_status`
+    # key, and matching on a trailing comment is brittle -- it tied this to one
+    # config's exact wording and broke the moment a second config existed. Scope
+    # the edit to the `split:` section instead, and only if it is still pending.
+    split_block = re.search(r"^split:\n(?:[ \t].*\n|\n)*", text, flags=re.MULTILINE)
+    if split_block is None:
+        raise ConfigError(f"could not locate the `split:` block in {config_path}")
+
+    block_text = split_block.group(0)
+    patched_block, n = re.subn(
+        r"^(\s*)_status: PENDING_VERIFICATION.*$",
         r"\g<1>_status: VERIFIED   # resolved by scripts/04_build_features.py",
-        text,
+        block_text,
         count=1,
         flags=re.MULTILINE,
     )
-    if n != 1:
-        raise ConfigError("could not locate the split _status marker in config.yaml")
+    if n == 1:
+        text = text[: split_block.start()] + patched_block + text[split_block.end() :]
+    elif "_status: VERIFIED" not in block_text:
+        raise ConfigError(f"could not locate the split `_status` marker in {config_path}")
 
     config_path.write_text(text, encoding="utf-8")
 
@@ -115,8 +126,8 @@ def main() -> int:
     processed.mkdir(parents=True, exist_ok=True)
     tables_dir = cfg.path_for("tables")
 
-    pm = pd.read_parquet(interim / "openaq_pm25_hourly.parquet")
-    met = pd.read_parquet(interim / "power_hourly.parquet")
+    pm = pd.read_parquet(interim / str(cfg.get("data.files.target")))
+    met = pd.read_parquet(interim / str(cfg.get("data.files.meteorology")))
     log.info("loaded PM2.5 %s and meteorology %s", pm.shape, met.shape)
 
     frame, report = build_features(pm, met, cfg, log)

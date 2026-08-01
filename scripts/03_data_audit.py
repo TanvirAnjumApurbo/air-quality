@@ -76,10 +76,12 @@ def main() -> int:
     tables_dir = cfg.path_for("tables")
     tables_dir.mkdir(parents=True, exist_ok=True)
 
-    pm = pd.read_parquet(interim / "openaq_pm25_hourly.parquet")
-    met = pd.read_parquet(interim / "power_hourly.parquet")
-    units = json.loads((interim / "power_units.json").read_text(encoding="utf-8"))
-    ledger = json.loads((interim / "openaq_qc_ledger.json").read_text(encoding="utf-8"))
+    pm = pd.read_parquet(interim / str(cfg.get("data.files.target")))
+    met = pd.read_parquet(interim / str(cfg.get("data.files.meteorology")))
+    units = json.loads((interim / str(cfg.get("data.files.met_units"))).read_text(encoding="utf-8"))
+    ledger = json.loads(
+        (interim / str(cfg.get("data.files.qc_ledger"))).read_text(encoding="utf-8")
+    )
 
     beijing_path = interim / "uci_beijing_hourly.parquet"
     beijing = pd.read_parquet(beijing_path) if beijing_path.exists() else None

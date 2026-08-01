@@ -4,3 +4,6 @@
 13:12:06 | INFO    | 03_data_audit | loaded PM2.5 (79216 rows) and meteorology (87672 rows)
 13:12:09 | INFO    | 03_data_audit | figures written
 13:12:09 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md
+00:50:18 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
+00:50:21 | INFO    | 03_data_audit | figures written
+00:50:21 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md

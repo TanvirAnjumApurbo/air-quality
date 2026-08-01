@@ -32,3 +32,36 @@
 13:25:06 | INFO    | 04_build_features | scaler fitted on 55451 training rows over 102 predictors
 13:25:07 | INFO    | 04_build_features | wrote F:\BUP\data\processed\features.parquet (79216 rows, 169 cols)
 13:25:07 | INFO    | 04_build_features | wrote resolved boundaries back into config.yaml
+00:50:22 | INFO    | 04_build_features | loaded PM2.5 (35064, 1) and meteorology (35064, 7)
+00:50:22 | INFO    | 04_build_features | contiguity: 28 runs after 3h ffill, longest 7942 h
+00:50:22 | INFO    | 04_build_features | h=  1:  30679 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 22, target-imputed 240)
+00:50:22 | INFO    | 04_build_features | h=  3:  30635 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 66, target-imputed 240)
+00:50:22 | INFO    | 04_build_features | h=  6:  30569 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 132, target-imputed 240)
+00:50:22 | INFO    | 04_build_features | h= 12:  30438 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 264, target-imputed 239)
+00:50:22 | INFO    | 04_build_features | h= 24:  30174 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 528, target-imputed 239)
+00:50:22 | INFO    | 04_build_features | built 96 predictor columns (max backward dependency 168 h)
+00:50:22 | INFO    | 04_build_features | split: train 2013-02-28 to 2015-12-18, val to 2016-07-24, test to 2017-02-28 (chronological, no shuffling)
+00:50:22 | INFO    | 04_build_features | h=  1: boundary purge removed 332 rows (30679 -> 30347)
+00:50:22 | INFO    | 04_build_features | h=  3: boundary purge removed 336 rows (30635 -> 30299)
+00:50:22 | INFO    | 04_build_features | h=  6: boundary purge removed 342 rows (30569 -> 30227)
+00:50:22 | INFO    | 04_build_features | h= 12: boundary purge removed 354 rows (30438 -> 30084)
+00:50:22 | INFO    | 04_build_features | h= 24: boundary purge removed 378 rows (30174 -> 29796)
+00:50:22 | INFO    | 04_build_features | scaler fitted on 24545 training rows over 96 predictors
+00:50:22 | INFO    | 04_build_features | wrote F:\BUP\data\processed\beijing\features.parquet (35064 rows, 158 cols)
+00:51:03 | INFO    | 04_build_features | loaded PM2.5 (35064, 1) and meteorology (35064, 7)
+00:51:03 | INFO    | 04_build_features | contiguity: 28 runs after 3h ffill, longest 7942 h
+00:51:03 | INFO    | 04_build_features | h=  1:  30679 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 22, target-imputed 240)
+00:51:03 | INFO    | 04_build_features | h=  3:  30635 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 66, target-imputed 240)
+00:51:03 | INFO    | 04_build_features | h=  6:  30569 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 132, target-imputed 240)
+00:51:03 | INFO    | 04_build_features | h= 12:  30438 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 264, target-imputed 239)
+00:51:03 | INFO    | 04_build_features | h= 24:  30174 valid rows  (rejected: no-run 117, short-history 4006, target-past-run-end 528, target-imputed 239)
+00:51:03 | INFO    | 04_build_features | built 96 predictor columns (max backward dependency 168 h)
+00:51:03 | INFO    | 04_build_features | split: train 2013-02-28 to 2015-12-18, val to 2016-07-24, test to 2017-02-28 (chronological, no shuffling)
+00:51:03 | INFO    | 04_build_features | h=  1: boundary purge removed 332 rows (30679 -> 30347)
+00:51:03 | INFO    | 04_build_features | h=  3: boundary purge removed 336 rows (30635 -> 30299)
+00:51:03 | INFO    | 04_build_features | h=  6: boundary purge removed 342 rows (30569 -> 30227)
+00:51:03 | INFO    | 04_build_features | h= 12: boundary purge removed 354 rows (30438 -> 30084)
+00:51:03 | INFO    | 04_build_features | h= 24: boundary purge removed 378 rows (30174 -> 29796)
+00:51:03 | INFO    | 04_build_features | scaler fitted on 24545 training rows over 96 predictors
+00:51:04 | INFO    | 04_build_features | wrote F:\BUP\data\processed\beijing\features.parquet (35064 rows, 158 cols)
+00:51:04 | INFO    | 04_build_features | wrote resolved boundaries back into config_beijing.yaml

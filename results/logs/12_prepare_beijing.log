@@ -1,0 +1,9 @@
+00:50:05 | INFO    | 12_prepare_beijing | loaded uci_beijing_hourly.parquet: (35064, 12), 2013-02-28 16:00:00+00:00 to 2017-02-28 15:00:00+00:00
+00:50:05 | INFO    | 12_prepare_beijing | QC raw records                                       34682
+00:50:05 | INFO    | 12_prepare_beijing | QC negative value               removed       0  remaining   34682 
+00:50:05 | INFO    | 12_prepare_beijing | QC exact zero (sensor fault)    removed       0  remaining   34682 
+00:50:05 | INFO    | 12_prepare_beijing | QC above sanity cap 1000        removed       0  remaining   34682 
+00:50:05 | INFO    | 12_prepare_beijing | QC flatline run > 12            removed       0  remaining   34682 (consecutive identical values = stuck sensor)
+00:50:05 | INFO    | 12_prepare_beijing | meteorology: 7 drivers (T2M, T2MDEW, RH2M, WS10M, WD10M, PS, PRECTOTCORR). No shortwave-irradiance equivalent exists in this record, so Beijing carries one driver fewer than Dhaka.
+00:50:05 | INFO    | 12_prepare_beijing | PM2.5 observed 34682 of 35064 hours (98.9%)
+00:50:05 | INFO    | 12_prepare_beijing | wrote prepared Beijing frames to F:\BUP\data\interim\beijing
