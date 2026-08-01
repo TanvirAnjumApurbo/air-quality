@@ -4,3 +4,9 @@
 17:20:41 | WARNING | 10_make_figures | no green table; skipping Pareto figure
 17:20:41 | WARNING | 10_make_figures | no classification record; skipping confusion matrix
 17:20:42 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+18:36:21 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+18:36:21 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+18:36:21 | INFO    | 10_make_figures | wrote fig07_feature_importance
+18:36:21 | WARNING | 10_make_figures | no green table; skipping Pareto figure
+18:36:21 | WARNING | 10_make_figures | no classification record; skipping confusion matrix
+18:36:21 | WARNING | 10_make_figures | no stratified metrics; skipping stratum figure

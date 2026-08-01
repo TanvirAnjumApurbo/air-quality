@@ -38,38 +38,89 @@
   "headline_horizon_h": 24,
   "best_model": {
     "name": "gru_h64_l1",
-    "input_window_h": 48,
+    "input_window_h": 24,
     "n_parameters": 32321,
-    "n_seeds": 1,
+    "n_seeds": 5,
     "parameter_budget": 100000
   },
   "per_horizon": {
     "1": {
-      "model": "gru_h32_l1",
-      "rmse": 42.074,
-      "rmse_std_across_seeds": 0.908,
-      "mae": 22.705,
-      "r2": 0.7906,
-      "smape": 19.733,
-      "skill_vs_persistence": -0.1501
+      "model": "gru_h32_l2",
+      "rmse": 37.543,
+      "rmse_std_across_seeds": 0.777,
+      "mae": 20.474,
+      "r2": 0.8333,
+      "smape": 18.464,
+      "skill_vs_persistence": -0.0263
+    },
+    "3": {
+      "model": "gru_h64_l1",
+      "rmse": 50.959,
+      "rmse_std_across_seeds": 0.561,
+      "mae": 30.534,
+      "r2": 0.693,
+      "smape": 26.688,
+      "skill_vs_persistence": 0.1564
+    },
+    "6": {
+      "model": "gru_h64_l1",
+      "rmse": 59.069,
+      "rmse_std_across_seeds": 0.975,
+      "mae": 36.521,
+      "r2": 0.587,
+      "smape": 31.537,
+      "skill_vs_persistence": 0.2855
+    },
+    "12": {
+      "model": "gru_h64_l1",
+      "rmse": 60.003,
+      "rmse_std_across_seeds": 1.082,
+      "mae": 37.181,
+      "r2": 0.574,
+      "smape": 32.543,
+      "skill_vs_persistence": 0.3918
     },
     "24": {
       "model": "gru_h64_l1",
-      "rmse": 59.624,
-      "rmse_std_across_seeds": null,
-      "mae": 37.536,
-      "r2": 0.5822,
-      "smape": 33.24,
-      "skill_vs_persistence": 0.1917
+      "rmse": 60.824,
+      "rmse_std_across_seeds": 1.292,
+      "mae": 37.844,
+      "r2": 0.5651,
+      "smape": 33.395,
+      "skill_vs_persistence": 0.1754
     }
   },
   "persistence_rmse_by_horizon": {
+    "1": 36.582,
+    "3": 60.407,
+    "6": 82.671,
+    "12": 98.655,
     "24": 73.764
   },
   "green": {},
   "classification": null,
   "significance": null,
   "best_classical_by_horizon": {
+    "1": {
+      "model": "lightgbm",
+      "rmse": 33.463,
+      "skill_vs_persistence": 0.0853
+    },
+    "3": {
+      "model": "lightgbm",
+      "rmse": 48.746,
+      "skill_vs_persistence": 0.193
+    },
+    "6": {
+      "model": "lightgbm",
+      "rmse": 56.079,
+      "skill_vs_persistence": 0.3217
+    },
+    "12": {
+      "model": "lightgbm",
+      "rmse": 56.94,
+      "skill_vs_persistence": 0.4228
+    },
     "24": {
       "model": "random_forest",
       "rmse": 58.5,

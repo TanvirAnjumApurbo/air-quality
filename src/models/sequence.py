@@ -19,6 +19,7 @@ Training is engineered for the operating constraints of the target machine:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import time
@@ -418,20 +419,50 @@ class TrainResult:
     checkpoint_dir: str
 
 
-def _atomic_save(payload: dict[str, Any], path: Path) -> None:
-    """Write a checkpoint atomically.
+def _atomic_save(payload: dict[str, Any], path: Path, logger: Any = None) -> None:
+    """Write a checkpoint atomically, tolerating transient Windows file locks.
 
     A direct ``torch.save`` to the final path leaves a truncated file if the
-    process dies mid-write, which then poisons the next resume.
+    process dies mid-write, which then poisons the next resume -- hence the
+    write-then-rename.
+
+    The rename itself needs guarding on Windows. ``os.replace`` raises
+    ``PermissionError`` (WinError 5) whenever another process holds a handle to
+    the destination, which real-time antivirus scanning does routinely and
+    briefly for a freshly written multi-megabyte file. That is a transient
+    condition, but unguarded it killed a 675-run sweep at run 191. Retrying with
+    a short backoff clears it; if every retry fails the checkpoint is skipped
+    with a warning rather than aborting a training run that is otherwise fine.
 
     Args:
         payload: Checkpoint contents.
         path: Destination path.
+        logger: Optional logger for retry and failure reporting.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     torch.save(payload, tmp)
-    tmp.replace(path)
+
+    delay = 0.2
+    for attempt in range(6):
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:
+            # A stale destination sometimes has to go before the rename lands.
+            if attempt >= 2:
+                with contextlib.suppress(OSError):
+                    path.unlink(missing_ok=True)
+            time.sleep(delay)
+            delay *= 2
+
+    if logger is not None:
+        logger.warning(
+            "could not replace %s after 6 attempts (file locked, most likely by "
+            "antivirus); leaving the previous checkpoint in place and continuing",
+            path.name,
+        )
+    tmp.unlink(missing_ok=True)
 
 
 def _make_loss(cfg: Config) -> nn.Module:
@@ -664,6 +695,7 @@ def train_one(
             _atomic_save(
                 {"model": best_state, "epoch": epoch, "val_loss": val_loss, "spec": asdict(spec)},
                 best_path,
+                logger,
             )
         else:
             epochs_without_improvement += 1
@@ -681,6 +713,7 @@ def train_one(
                     "spec": asdict(spec),
                 },
                 last_path,
+                logger,
             )
 
         if bar is not None:
