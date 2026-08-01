@@ -28,3 +28,9 @@
 20:41:37 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
 20:41:38 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
 20:41:38 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+02:51:24 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+02:51:25 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+02:51:25 | INFO    | 10_make_figures | wrote fig07_feature_importance
+02:51:25 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+02:51:26 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+02:51:27 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum

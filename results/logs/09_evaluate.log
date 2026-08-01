@@ -69,3 +69,29 @@
 20:39:05 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l2_w48_H24_s7 (val loss 0.09652, seed 7)
 20:39:06 | INFO    | 09_evaluate | DM h=24: gru_h64_l2 vs random_forest  stat 3.498  p 0.0004712  better=random_forest
 20:39:06 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json
+02:51:19 | INFO    | 09_evaluate | ======================================================================
+02:51:19 | INFO    | 09_evaluate | HORIZON h=1
+02:51:19 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=1
+02:51:19 | INFO    | 09_evaluate | best sequence model at h=1: lstm_h64_l1_w168_H1_s7 (val loss 0.05371, seed 7)
+02:51:19 | INFO    | 09_evaluate | DM h=1: lstm_h64_l1 vs sarimax  stat 3.118  p 0.001833  better=sarimax
+02:51:19 | INFO    | 09_evaluate | ======================================================================
+02:51:19 | INFO    | 09_evaluate | HORIZON h=3
+02:51:19 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=3
+02:51:19 | INFO    | 09_evaluate | best sequence model at h=3: lstm_h64_l1_w168_H3_s1337 (val loss 0.12029, seed 1337)
+02:51:19 | INFO    | 09_evaluate | DM h=3: lstm_h64_l1 vs sarimax  stat 0.879  p 0.3794  better=sarimax
+02:51:19 | INFO    | 09_evaluate | ======================================================================
+02:51:19 | INFO    | 09_evaluate | HORIZON h=6
+02:51:19 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=6
+02:51:20 | INFO    | 09_evaluate | best sequence model at h=6: gru_h128_l1_w48_H6_s1337 (val loss 0.20289, seed 1337)
+02:51:20 | INFO    | 09_evaluate | DM h=6: gru_h128_l1 vs sarimax  stat 1.579  p 0.1145  better=sarimax
+02:51:20 | INFO    | 09_evaluate | ======================================================================
+02:51:20 | INFO    | 09_evaluate | HORIZON h=12
+02:51:20 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=12
+02:51:20 | INFO    | 09_evaluate | best sequence model at h=12: gru_h128_l1_w48_H12_s2024 (val loss 0.32541, seed 2024)
+02:51:20 | INFO    | 09_evaluate | DM h=12: gru_h128_l1 vs sarimax  stat 0.879  p 0.3797  better=sarimax
+02:51:20 | INFO    | 09_evaluate | ======================================================================
+02:51:20 | INFO    | 09_evaluate | HORIZON h=24
+02:51:20 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=24
+02:51:20 | INFO    | 09_evaluate | best sequence model at h=24: lstm_h64_l1_w168_H24_s7 (val loss 0.46899, seed 7)
+02:51:20 | INFO    | 09_evaluate | DM h=24: lstm_h64_l1 vs sarimax  stat 1.943  p 0.0521  better=sarimax
+02:51:20 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results_beijing.json

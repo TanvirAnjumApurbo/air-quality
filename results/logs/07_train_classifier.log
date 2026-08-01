@@ -88,3 +88,24 @@
 20:06:39 | INFO    | 07_train_classifier | seed 7: macro-F1 0.5120 (0.6144 over 5 non-empty classes)  weighted-F1 0.6710  accuracy 0.6698  balanced-acc 0.6211
 20:06:41 | INFO    | 07_train_classifier | classifier: 31742 rows, 6 of 6 classes present in train+val, weighting=balanced
 20:06:56 | INFO    | 07_train_classifier | seed 31415: macro-F1 0.5168 (0.6202 over 5 non-empty classes)  weighted-F1 0.6754  accuracy 0.6743  balanced-acc 0.6281
+02:49:52 | INFO    | 07_train_classifier | breakpoints: [9.0, 35.4, 55.4, 125.4, 225.4] (us_epa_pm25_2024, 2024 revision, effective 2024-05-06)
+02:49:52 | INFO    | 07_train_classifier | target basis: rolling_24h_mean
+02:49:52 | INFO    | 07_train_classifier | rows: train=21732 val=4251 test=3813
+02:49:52 | INFO    | 07_train_classifier | class distribution (test):
+ class_index                          label  count  share_pct split
+           0                           Good    167       4.38  test
+           1                       Moderate    965      25.31  test
+           2 Unhealthy for Sensitive Groups    524      13.74  test
+           3                      Unhealthy   1293      33.91  test
+           4                 Very Unhealthy    583      15.29  test
+           5                      Hazardous    281       7.37  test
+02:49:58 | INFO    | 07_train_classifier | classifier: 25983 rows, 6 of 6 classes present in train+val, weighting=balanced
+02:50:09 | INFO    | 07_train_classifier | seed 42: macro-F1 0.4264 (0.4264 over 6 non-empty classes)  weighted-F1 0.4774  accuracy 0.4852  balanced-acc 0.4313
+02:50:10 | INFO    | 07_train_classifier | classifier: 25983 rows, 6 of 6 classes present in train+val, weighting=balanced
+02:50:22 | INFO    | 07_train_classifier | seed 1337: macro-F1 0.4304 (0.4304 over 6 non-empty classes)  weighted-F1 0.4836  accuracy 0.4920  balanced-acc 0.4333
+02:50:23 | INFO    | 07_train_classifier | classifier: 25983 rows, 6 of 6 classes present in train+val, weighting=balanced
+02:50:35 | INFO    | 07_train_classifier | seed 2024: macro-F1 0.4262 (0.4262 over 6 non-empty classes)  weighted-F1 0.4771  accuracy 0.4844  balanced-acc 0.4267
+02:50:36 | INFO    | 07_train_classifier | classifier: 25983 rows, 6 of 6 classes present in train+val, weighting=balanced
+02:50:48 | INFO    | 07_train_classifier | seed 7: macro-F1 0.4303 (0.4303 over 6 non-empty classes)  weighted-F1 0.4816  accuracy 0.4883  balanced-acc 0.4357
+02:50:49 | INFO    | 07_train_classifier | classifier: 25983 rows, 6 of 6 classes present in train+val, weighting=balanced
+02:51:01 | INFO    | 07_train_classifier | seed 31415: macro-F1 0.4400 (0.4400 over 6 non-empty classes)  weighted-F1 0.4898  accuracy 0.4975  balanced-acc 0.4458

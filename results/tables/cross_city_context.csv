@@ -1,0 +1,8 @@
+Quantity,Dhaka,Beijing
+Usable years,7.439,3.956
+Hourly coverage (%),82.320,98.910
+Distinct gaps,2074.000,180.000
+Longest gap (h),2712.000,23.000
+PM2.5 mean (ug/m3),93.680,83.370
+PM2.5 median (ug/m3),66.000,59.000
+Hours > 65 ug/m3 (%),50.400,46.140

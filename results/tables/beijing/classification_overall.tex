@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\caption{Overall AQI-classification performance at 24 hours. Macro-F1 is the headline because the categories are severely imbalanced; accuracy alone would be dominated by the majority classes. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:classification_overall}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Macro-F1 (all 6 defined classes) & 0.4307 ± 0.0056 \\
+Macro-F1 (6 classes present in test) & 0.4307 ± 0.0056 \\
+Weighted-F1 & 0.4819 ± 0.0052 \\
+Accuracy & 0.4895 ± 0.0054 \\
+Balanced accuracy & 0.4346 ± 0.0071 \\
+\bottomrule
+\end{tabular}
+\end{table}

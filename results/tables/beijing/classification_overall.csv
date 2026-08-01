@@ -1,0 +1,6 @@
+Metric,Value
+Macro-F1 (all 6 defined classes),0.4307 ± 0.0056
+Macro-F1 (6 classes present in test),0.4307 ± 0.0056
+Weighted-F1,0.4819 ± 0.0052
+Accuracy,0.4895 ± 0.0054
+Balanced accuracy,0.4346 ± 0.0071

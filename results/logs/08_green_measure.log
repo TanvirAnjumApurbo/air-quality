@@ -54,3 +54,31 @@
 20:07:22 | INFO    | 08_green_measure | complexity: 76353 params, 3,711,040 MACs, 0.2970 ms/sample (p95 0.4407), peak 25.0 MB
 20:07:23 | INFO    | 08_green_measure | complexity: 76353 params, 12,988,480 MACs, 0.3416 ms/sample (p95 0.3825), peak 26.5 MB
 20:07:23 | INFO    | 08_green_measure | wrote green measurements to F:\BUP\results\results.json
+02:51:05 | INFO    | 08_green_measure | complexity: 12513 params, 304,928 MACs, 0.2324 ms/sample (p95 0.2651), peak 16.3 MB
+02:51:05 | INFO    | 08_green_measure | complexity: 12513 params, 609,824 MACs, 0.2498 ms/sample (p95 0.3387), peak 16.4 MB
+02:51:06 | INFO    | 08_green_measure | complexity: 12513 params, 2,134,304 MACs, 0.2501 ms/sample (p95 0.3038), peak 16.7 MB
+02:51:06 | INFO    | 08_green_measure | complexity: 18849 params, 462,368 MACs, 0.2963 ms/sample (p95 0.3910), peak 24.3 MB
+02:51:07 | INFO    | 08_green_measure | complexity: 18849 params, 924,704 MACs, 0.2783 ms/sample (p95 0.3683), peak 24.4 MB
+02:51:07 | INFO    | 08_green_measure | complexity: 18849 params, 3,236,384 MACs, 0.2936 ms/sample (p95 0.3786), peak 24.7 MB
+02:51:07 | INFO    | 08_green_measure | complexity: 31169 params, 757,312 MACs, 0.2501 ms/sample (p95 0.3568), peak 16.5 MB
+02:51:08 | INFO    | 08_green_measure | complexity: 31169 params, 1,514,560 MACs, 0.2602 ms/sample (p95 0.3522), peak 16.6 MB
+02:51:08 | INFO    | 08_green_measure | complexity: 31169 params, 5,300,800 MACs, 0.2633 ms/sample (p95 0.3630), peak 17.2 MB
+02:51:08 | INFO    | 08_green_measure | complexity: 56129 params, 1,367,104 MACs, 0.2907 ms/sample (p95 0.3823), peak 24.7 MB
+02:51:09 | INFO    | 08_green_measure | complexity: 56129 params, 2,734,144 MACs, 0.2842 ms/sample (p95 0.3732), peak 24.8 MB
+02:51:09 | INFO    | 08_green_measure | complexity: 56129 params, 9,569,344 MACs, 0.3027 ms/sample (p95 0.3570), peak 25.4 MB
+02:51:09 | INFO    | 08_green_measure | complexity: 86913 params, 2,104,448 MACs, 0.3001 ms/sample (p95 0.4651), peak 17.0 MB
+02:51:10 | INFO    | 08_green_measure | complexity: 86913 params, 4,208,768 MACs, 0.2962 ms/sample (p95 0.4765), peak 17.2 MB
+02:51:10 | INFO    | 08_green_measure | complexity: 86913 params, 14,730,368 MACs, 0.2843 ms/sample (p95 0.4169), peak 18.3 MB
+02:51:11 | INFO    | 08_green_measure | complexity: 16673 params, 405,536 MACs, 0.2652 ms/sample (p95 0.3810), peak 16.3 MB
+02:51:11 | INFO    | 08_green_measure | complexity: 16673 params, 811,040 MACs, 0.2645 ms/sample (p95 0.3460), peak 16.4 MB
+02:51:12 | INFO    | 08_green_measure | complexity: 16673 params, 2,838,560 MACs, 0.2700 ms/sample (p95 0.3587), peak 16.8 MB
+02:51:12 | INFO    | 08_green_measure | complexity: 25121 params, 614,432 MACs, 0.3331 ms/sample (p95 0.5035), peak 24.4 MB
+02:51:12 | INFO    | 08_green_measure | complexity: 25121 params, 1,228,832 MACs, 0.3073 ms/sample (p95 0.4359), peak 24.5 MB
+02:51:13 | INFO    | 08_green_measure | complexity: 25121 params, 4,300,832 MACs, 0.3046 ms/sample (p95 0.4300), peak 24.9 MB
+02:51:13 | INFO    | 08_green_measure | complexity: 41537 params, 1,007,680 MACs, 0.2743 ms/sample (p95 0.3969), peak 16.6 MB
+02:51:14 | INFO    | 08_green_measure | complexity: 41537 params, 2,015,296 MACs, 0.2692 ms/sample (p95 0.4032), peak 16.7 MB
+02:51:14 | INFO    | 08_green_measure | complexity: 41537 params, 7,053,376 MACs, 0.2670 ms/sample (p95 0.3334), peak 17.5 MB
+02:51:14 | INFO    | 08_green_measure | complexity: 74817 params, 1,818,688 MACs, 0.2917 ms/sample (p95 0.4180), peak 24.8 MB
+02:51:15 | INFO    | 08_green_measure | complexity: 74817 params, 3,637,312 MACs, 0.3171 ms/sample (p95 0.4521), peak 25.0 MB
+02:51:15 | INFO    | 08_green_measure | complexity: 74817 params, 12,730,432 MACs, 0.3480 ms/sample (p95 0.3989), peak 26.5 MB
+02:51:16 | INFO    | 08_green_measure | wrote green measurements to F:\BUP\results\results_beijing.json

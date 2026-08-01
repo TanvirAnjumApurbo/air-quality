@@ -1,0 +1,6 @@
+h (hours),Deep model,Classical,N,DM statistic,p-value,Lower loss
+1,lstm_h64_l1,sarimax,3951,3.118,0.00183,sarimax
+3,lstm_h64_l1,sarimax,3939,0.879,0.379,sarimax
+6,gru_h128_l1,sarimax,3921,1.579,0.115,sarimax
+12,gru_h128_l1,sarimax,3885,0.879,0.38,sarimax
+24,lstm_h64_l1,sarimax,3813,1.943,0.0521,sarimax

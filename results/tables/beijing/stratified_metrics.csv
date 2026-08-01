@@ -1,0 +1,64 @@
+Model,Stratum,Group,N,RMSE,MAE,Bias,Skill
+persistence,overall,all,3813,97.290,67.280,0.920,0.000
+persistence,season,monsoon (wet),916,50.840,38.200,-1.510,0.000
+persistence,season,dry,2897,107.890,76.480,1.690,0.000
+persistence,pollution,observed > 65 ug/m3,1777,100.390,77.700,-48.220,0.000
+persistence,pollution,observed <= 65 ug/m3,2036,94.500,58.190,43.810,0.000
+persistence,pollution,observed > 35 ug/m3,2349,92.670,69.620,-34.470,0.000
+persistence,pollution,observed <= 35 ug/m3,1464,104.280,63.520,57.700,0.000
+seasonal_naive,overall,all,3813,97.290,67.280,0.920,0.000
+seasonal_naive,season,monsoon (wet),916,50.840,38.200,-1.510,0.000
+seasonal_naive,season,dry,2897,107.890,76.480,1.690,0.000
+seasonal_naive,pollution,observed > 65 ug/m3,1777,100.390,77.700,-48.220,0.000
+seasonal_naive,pollution,observed <= 65 ug/m3,2036,94.500,58.190,43.810,0.000
+seasonal_naive,pollution,observed > 35 ug/m3,2349,92.670,69.620,-34.470,0.000
+seasonal_naive,pollution,observed <= 35 ug/m3,1464,104.280,63.520,57.700,0.000
+climatology,overall,all,3813,94.910,71.800,5.620,0.025
+climatology,season,monsoon (wet),916,44.140,36.600,4.870,0.132
+climatology,season,dry,2897,106.010,82.940,5.860,0.017
+climatology,pollution,observed > 65 ug/m3,1777,112.990,76.370,-65.490,-0.126
+climatology,pollution,observed <= 65 ug/m3,2036,75.670,67.820,67.690,0.199
+climatology,pollution,observed > 35 ug/m3,2349,100.980,67.280,-40.150,-0.090
+climatology,pollution,observed <= 35 ug/m3,1464,84.240,79.060,79.060,0.192
+sarimax,overall,all,3789,85.150,62.630,-7.360,0.125
+sarimax,season,monsoon (wet),892,45.140,37.500,12.590,0.112
+sarimax,season,dry,2897,94.100,70.370,-13.500,0.128
+sarimax,pollution,observed > 65 ug/m3,1763,106.440,77.360,-72.550,-0.060
+sarimax,pollution,observed <= 65 ug/m3,2026,60.830,49.810,49.380,0.356
+sarimax,pollution,observed > 35 ug/m3,2334,93.870,63.870,-49.750,-0.013
+sarimax,pollution,observed <= 35 ug/m3,1455,68.900,60.640,60.640,0.339
+ridge,overall,all,3813,90.320,60.770,-30.120,0.072
+ridge,season,monsoon (wet),916,42.380,31.970,-5.820,0.166
+ridge,season,dry,2897,100.840,69.880,-37.800,0.065
+ridge,pollution,observed > 65 ug/m3,1777,125.710,96.140,-94.640,-0.252
+ridge,pollution,observed <= 65 ug/m3,2036,38.520,29.900,26.200,0.592
+ridge,pollution,observed > 35 ug/m3,2349,109.750,76.300,-71.050,-0.184
+ridge,pollution,observed <= 35 ug/m3,1464,43.820,35.850,35.550,0.580
+random_forest,overall,all,3813,93.730,60.620,-31.760,0.037
+random_forest,season,monsoon (wet),916,42.270,31.350,-4.670,0.169
+random_forest,season,dry,2897,104.870,69.880,-40.320,0.028
+random_forest,pollution,observed > 65 ug/m3,1777,131.380,96.290,-95.910,-0.309
+random_forest,pollution,observed <= 65 ug/m3,2036,37.240,29.500,24.240,0.606
+random_forest,pollution,observed > 35 ug/m3,2349,114.720,76.800,-72.670,-0.238
+random_forest,pollution,observed <= 35 ug/m3,1464,42.010,34.660,33.900,0.597
+xgboost,overall,all,3813,93.570,60.570,-31.790,0.038
+xgboost,season,monsoon (wet),916,43.250,31.860,-6.740,0.149
+xgboost,season,dry,2897,104.560,69.650,-39.720,0.031
+xgboost,pollution,observed > 65 ug/m3,1777,130.810,96.330,-95.690,-0.303
+xgboost,pollution,observed <= 65 ug/m3,2036,38.250,29.360,23.980,0.595
+xgboost,pollution,observed > 35 ug/m3,2349,114.210,76.740,-72.610,-0.233
+xgboost,pollution,observed <= 35 ug/m3,1464,43.260,34.630,33.690,0.585
+lightgbm,overall,all,3813,94.170,59.620,-32.390,0.032
+lightgbm,season,monsoon (wet),916,41.640,29.260,-5.100,0.181
+lightgbm,season,dry,2897,105.470,69.220,-41.020,0.022
+lightgbm,pollution,observed > 65 ug/m3,1777,132.120,96.220,-94.530,-0.316
+lightgbm,pollution,observed <= 65 ug/m3,2036,37.070,27.670,21.840,0.608
+lightgbm,pollution,observed > 35 ug/m3,2349,115.550,77.100,-71.660,-0.247
+lightgbm,pollution,observed <= 35 ug/m3,1464,40.900,31.570,30.610,0.608
+lstm_h64_l1,overall,all,3813,91.830,61.640,-25.210,0.056
+lstm_h64_l1,season,monsoon (wet),916,41.970,32.330,-3.770,0.174
+lstm_h64_l1,season,dry,2897,102.670,70.900,-31.990,0.048
+lstm_h64_l1,pollution,observed > 65 ug/m3,1777,125.090,91.220,-90.070,-0.246
+lstm_h64_l1,pollution,observed <= 65 ug/m3,2036,46.220,35.820,31.410,0.511
+lstm_h64_l1,pollution,observed > 35 ug/m3,2349,109.520,73.770,-66.880,-0.182
+lstm_h64_l1,pollution,observed <= 35 ug/m3,1464,52.130,42.170,41.650,0.500
