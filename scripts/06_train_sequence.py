@@ -204,7 +204,7 @@ def main() -> int:
         _, raw_preds = evaluate_sampler(model, test_sampler, loss_fn, batch_size)
         inference_seconds = time.perf_counter() - started
 
-        preds = invert(cfg, raw_preds)
+        preds = invert(cfg, raw_preds, log, spec.name)
         metrics = all_metrics(test_index.y, preds)
 
         persistence_rmse = all_metrics(test_index.y, test_index.persistence)["rmse"]

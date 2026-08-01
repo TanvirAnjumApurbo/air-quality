@@ -118,7 +118,7 @@ def main() -> int:
 
         for model in tuned:
             raw = model.estimator.predict(test.x)
-            predictions[model.name] = invert(cfg, raw)
+            predictions[model.name] = invert(cfg, raw, log, model.name)
             log.info(
                 "%s h=%d: cv=%.4f best=%s (%.1f s)",
                 model.name,

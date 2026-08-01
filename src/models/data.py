@@ -184,21 +184,54 @@ def get_split_arrays(
     )
 
 
-def invert(cfg: Config, values: np.ndarray) -> np.ndarray:
-    """Map model output back to ug/m3.
+def invert(cfg: Config, values: np.ndarray, logger: Any = None, label: str = "") -> np.ndarray:
+    """Map model output back to ug/m3, bounded to physically possible values.
+
+    Bounds are the same ones quality control applies to observations: negative
+    concentrations do not exist, and ``qc.pm25.sanity_cap_ugm3`` is already the
+    declared upper limit of physical plausibility for an hourly mean.
+
+    The upper bound matters. Under a ``log1p`` target an unbounded linear model
+    can extrapolate to a large value on the log scale, which ``expm1`` turns into
+    a concentration orders of magnitude beyond anything observable; a handful of
+    such rows then dominate a squared-error metric. Ridge at h=1 produced exactly
+    this, scoring a worse RMSE than at h=24 while its MAE stayed reasonable --
+    the signature of a few exploded predictions rather than a generally poor fit.
+
+    The bound is applied identically to every model so no model is advantaged,
+    and the number of clipped predictions is logged rather than absorbed.
 
     Args:
         cfg: Loaded configuration.
         values: Predictions on the modelling scale.
+        logger: Optional logger for the clip count.
+        label: Model name, for the log line.
 
     Returns:
-        Predictions in ug/m3, floored at zero since a negative concentration is
-        not physical.
+        Predictions in ug/m3, bounded to ``[0, sanity_cap]``.
     """
     out = inverse_transform_target(
         np.asarray(values, dtype=float), str(cfg.get("scaling.target_transform"))
     )
-    return np.clip(out, 0.0, None)
+    cap = float(cfg.get("qc.pm25.sanity_cap_ugm3", 1000.0))
+
+    n_high = int(np.sum(out > cap))
+    n_low = int(np.sum(out < 0.0))
+    n_bad = int(np.sum(~np.isfinite(out)))
+    if logger is not None and (n_high or n_low or n_bad):
+        logger.info(
+            "%s: clipped %d predictions above %.0f ug/m3, %d below zero, %d non-finite "
+            "(of %d) to the physical range used by QC",
+            label or "model",
+            n_high,
+            cap,
+            n_low,
+            n_bad,
+            out.size,
+        )
+
+    out = np.nan_to_num(out, nan=cap, posinf=cap, neginf=0.0)
+    return np.clip(out, 0.0, cap)
 
 
 # ---------------------------------------------------------------------------

@@ -76,21 +76,31 @@ same targets:
 .\make.ps1 help          # or:  make help
 ```
 
-| Phase | Command | Deliverable |
-|---|---|---|
-| 0 | `.\make.ps1 check` | environment / CUDA / disk report |
-| 1 | `.\make.ps1 discover` | OpenAQ Dhaka monitor table — **downloads nothing** |
-| 1 | `.\make.ps1 data` | OpenAQ + NASA POWER + UCI Beijing into `data/raw` |
-| 1 | `.\make.ps1 audit` | `reports/DATA_AUDIT.md` — **hard gate before modelling** |
-| 2 | `.\make.ps1 features` | features + chronological splits |
-| 2 | `.\make.ps1 test` | leakage tests (must pass) |
-| 3 | `.\make.ps1 baselines` | Tier 1 baselines + Tier 2 classical ML |
-| 4 | `.\make.ps1 deep` | Tier 3 GRU/LSTM, all seeds |
-| 5 | `.\make.ps1 classify` / `green` / `eval` | classifier, energy, stratified eval |
-| 6 | `.\make.ps1 figures` / `report` | figures, `RESULTS.md`, `abstract_facts.json` |
+| Phase | Command | Script | Deliverable |
+|---|---|---|---|
+| 0 | `.\make.ps1 check` | `00_check_env.py` | environment / CUDA / disk report |
+| 1 | `.\make.ps1 discover` | `01_discover_openaq.py` | OpenAQ Dhaka monitor table — **downloads nothing** |
+| 1 | `.\make.ps1 data` | `02_fetch_data.py` | OpenAQ + NASA POWER + UCI Beijing into `data/raw` |
+| 1 | `.\make.ps1 audit` | `03_data_audit.py` | `reports/DATA_AUDIT.md` — **hard gate before modelling** |
+| 2 | `.\make.ps1 features` | `04_build_features.py` | features + chronological splits |
+| 2 | `.\make.ps1 test` | `pytest tests` | leakage tests (must pass) |
+| 3 | `.\make.ps1 baselines` | `05_run_baselines.py` | Tier 1 baselines + Tier 2 classical ML |
+| 4 | `.\make.ps1 deep` | `06_train_sequence.py` | Tier 3 GRU/LSTM, all seeds |
+| 5 | `.\make.ps1 classify` | `07_train_classifier.py` | AQI-category classifier |
+| 5 | `.\make.ps1 green` | `08_green_measure.py` | params, MACs, latency, energy, CO₂e |
+| 5 | `.\make.ps1 eval` | `09_evaluate.py` | stratified metrics + Diebold-Mariano |
+| 6 | `.\make.ps1 figures` | `10_make_figures.py` | all figures, 300 dpi PNG + PDF |
+| 6 | `.\make.ps1 report` | `11_make_report.py` | `RESULTS.md`, `abstract_facts.json` |
 
 `make all` reproduces everything from scratch with fixed seeds. The git commit
 hash is written into `results/results.json`.
+
+### Run order matters
+
+`08_green_measure.py` and `09_evaluate.py` read the sequence-model checkpoints,
+so `06_train_sequence.py` must have run first. `11_make_report.py` reads
+`results/results.json` and writes nothing that is not already in it — if a phase
+has not run, the corresponding section is omitted rather than invented.
 
 ---
 

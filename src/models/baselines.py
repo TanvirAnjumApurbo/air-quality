@@ -161,12 +161,34 @@ def fit_predict_sarimax(
     history = pd.Series(train.persistence, index=train.index).sort_index()
     history = history[~history.index.duplicated(keep="first")]
     full = history.asfreq("1h")
-    tail = full.iloc[-max_hours:]
-    tail = tail.ffill(limit=int(cfg.get("impute.max_ffill_hours", 3))).dropna()
+    tail = full.iloc[-max_hours:].ffill(limit=int(cfg.get("impute.max_ffill_hours", 3)))
+
+    # Fit on the longest CONTIGUOUS stretch, not on the non-null rows.
+    # Calling .dropna() here would compress the series across gaps, silently
+    # changing the sampling interval -- and a seasonal order of (·,·,·,24)
+    # assumes a regular hourly spacing, so the seasonal term would then be
+    # modelling something that does not exist in the data.
+    present = tail.notna()
+    blocks = (present != present.shift()).cumsum()
+    runs = tail[present].groupby(blocks[present])
+    if runs.ngroups == 0:
+        logger.warning("SARIMAX: no usable contiguous training stretch; skipping")
+        return np.full(len(test), np.nan)
+    longest_key = max(runs.groups, key=lambda k: len(runs.groups[k]))
+    tail = tail.loc[runs.groups[longest_key]]
 
     if len(tail) < 500:
-        logger.warning("SARIMAX: only %d usable training points; skipping", len(tail))
+        logger.warning(
+            "SARIMAX: longest contiguous training stretch is only %d hours; skipping", len(tail)
+        )
         return np.full(len(test), np.nan)
+    logger.info(
+        "SARIMAX h=%d: longest contiguous training stretch %d h (%s to %s)",
+        horizon,
+        len(tail),
+        tail.index.min(),
+        tail.index.max(),
+    )
 
     logger.info(
         "SARIMAX h=%d: fitting order=%s seasonal=%s on %d points",
