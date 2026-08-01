@@ -1,0 +1,34 @@
+13:24:04 | INFO    | 04_build_features | loaded PM2.5 (79216, 1) and meteorology (87672, 8)
+13:24:04 | INFO    | 04_build_features | contiguity: 296 runs after 3h ffill, longest 4283 h
+13:24:05 | INFO    | 04_build_features | h=  1:  42732 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 89, target-imputed 1037)
+13:24:05 | INFO    | 04_build_features | h=  3:  42568 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 265, target-imputed 1025)
+13:24:05 | INFO    | 04_build_features | h=  6:  42317 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 528, target-imputed 1013)
+13:24:05 | INFO    | 04_build_features | h= 12:  41829 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 1042, target-imputed 987)
+13:24:05 | INFO    | 04_build_features | h= 24:  40877 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 2030, target-imputed 951)
+13:24:05 | INFO    | 04_build_features | built 102 predictor columns (max backward dependency 168 h)
+13:24:05 | INFO    | 04_build_features | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+13:24:05 | INFO    | 04_build_features | h=  1: boundary purge removed 52 rows (42732 -> 42680)
+13:24:05 | INFO    | 04_build_features | h=  3: boundary purge removed 52 rows (42568 -> 42516)
+13:24:05 | INFO    | 04_build_features | h=  6: boundary purge removed 52 rows (42317 -> 42265)
+13:24:05 | INFO    | 04_build_features | h= 12: boundary purge removed 52 rows (41829 -> 41777)
+13:24:05 | INFO    | 04_build_features | h= 24: boundary purge removed 52 rows (40877 -> 40825)
+13:24:05 | INFO    | 04_build_features | scaler fitted on 55451 training rows over 102 predictors
+13:24:05 | INFO    | 04_build_features | wrote F:\BUP\data\processed\features.parquet (79216 rows, 169 cols)
+13:24:05 | INFO    | 04_build_features | wrote resolved boundaries back into config.yaml
+13:25:06 | INFO    | 04_build_features | loaded PM2.5 (79216, 1) and meteorology (87672, 8)
+13:25:06 | INFO    | 04_build_features | contiguity: 296 runs after 3h ffill, longest 4283 h
+13:25:06 | INFO    | 04_build_features | h=  1:  42732 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 89, target-imputed 1037)
+13:25:06 | INFO    | 04_build_features | h=  3:  42568 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 265, target-imputed 1025)
+13:25:06 | INFO    | 04_build_features | h=  6:  42317 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 528, target-imputed 1013)
+13:25:06 | INFO    | 04_build_features | h= 12:  41829 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 1042, target-imputed 987)
+13:25:06 | INFO    | 04_build_features | h= 24:  40877 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 2030, target-imputed 951)
+13:25:06 | INFO    | 04_build_features | built 102 predictor columns (max backward dependency 168 h)
+13:25:06 | INFO    | 04_build_features | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+13:25:06 | INFO    | 04_build_features | h=  1: boundary purge removed 52 rows (42732 -> 42680)
+13:25:06 | INFO    | 04_build_features | h=  3: boundary purge removed 52 rows (42568 -> 42516)
+13:25:06 | INFO    | 04_build_features | h=  6: boundary purge removed 52 rows (42317 -> 42265)
+13:25:06 | INFO    | 04_build_features | h= 12: boundary purge removed 52 rows (41829 -> 41777)
+13:25:06 | INFO    | 04_build_features | h= 24: boundary purge removed 52 rows (40877 -> 40825)
+13:25:06 | INFO    | 04_build_features | scaler fitted on 55451 training rows over 102 predictors
+13:25:07 | INFO    | 04_build_features | wrote F:\BUP\data\processed\features.parquet (79216 rows, 169 cols)
+13:25:07 | INFO    | 04_build_features | wrote resolved boundaries back into config.yaml

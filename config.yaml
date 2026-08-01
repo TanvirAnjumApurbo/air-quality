@@ -300,9 +300,9 @@ split:
   # Resolved from the audited coverage in Phase 2 and written back here so that
   # every table caption can print the exact boundary dates.
   explicit_boundaries:
-    train_end: null
-    val_end: null
-  _status: PENDING_VERIFICATION      # filled once real coverage is known
+    train_end: "2022-07-08T08:30:00+00:00"
+    val_end: "2023-11-15T10:45:00+00:00"
+  _status: VERIFIED   # resolved by scripts/04_build_features.py
 
 scaling:
   method: standard                   # fitted on TRAIN ONLY, then applied to val/test
