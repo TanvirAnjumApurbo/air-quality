@@ -1,6 +1,7 @@
 # --- data (never committed) ---
-data/
-!data/.gitkeep
+# Anchored with a leading slash: an unanchored `data/` also matches src/data/,
+# which silently drops that package from the repository.
+/data/
 
 # --- environments ---
 .venv/
