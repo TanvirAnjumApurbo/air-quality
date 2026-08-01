@@ -19,16 +19,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import pandas as pd  # noqa: E402
-
-from src.data.fetch_openaq import (  # noqa: E402
+import pandas as pd
+from src.data.fetch_openaq import (
     OpenAQError,
     candidates_to_frame,
     discover_locations,
     get_api_key,
     probe_s3_coverage,
 )
-from src.utils import check_disk_space, load_config, setup_logging  # noqa: E402
+from src.utils import check_disk_space, load_config, setup_logging
 
 
 def parse_args() -> argparse.Namespace:
@@ -87,15 +86,24 @@ def main() -> int:
         print("OPENAQ CANDIDATE MONITORS -- PM2.5 CAPABLE")
         print("=" * 118)
         cols = [
-            "location_id", "name", "provider", "distance_km", "is_monitor",
-            "pm25_units", "api_first_utc", "api_last_utc", "s3_years",
+            "location_id",
+            "name",
+            "provider",
+            "distance_km",
+            "is_monitor",
+            "pm25_units",
+            "api_first_utc",
+            "api_last_utc",
+            "s3_years",
         ]
         print(pm25[cols].to_string(index=False) if len(pm25) else "  (none)")
 
         others = df[~df["has_pm25"]]
         if len(others):
             print("\n" + "-" * 118)
-            print(f"NON-PM2.5 LOCATIONS ({len(others)}) -- listed for completeness, not usable as targets")
+            print(
+                f"NON-PM2.5 LOCATIONS ({len(others)}) -- listed for completeness, not usable as targets"
+            )
             print("-" * 118)
             print(others[["location_id", "name", "provider", "parameters"]].to_string(index=False))
 
@@ -106,7 +114,7 @@ def main() -> int:
     print(f"  with a PM2.5 sensor             {len(pm25)}")
     print(f"  reference monitors with PM2.5   {int(pm25['is_monitor'].sum()) if len(pm25) else 0}")
     print(f"  with S3 partitions present      {int((df['s3_n_year_partitions'] > 0).sum())}")
-    units = sorted({u for u in pm25['pm25_units'].dropna().unique()})
+    units = sorted(set(pm25["pm25_units"].dropna().unique()))
     print(f"  distinct PM2.5 units reported   {units}")
     print(f"\n  candidate table written to      {out_csv}")
     print("\n  STOP: no measurement data has been downloaded.")
