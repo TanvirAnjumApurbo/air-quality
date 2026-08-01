@@ -12,13 +12,6 @@ persistence & pollution & observed > 65 ug/m3 & 6069 & 86.590 & 56.820 & -6.130 
 persistence & pollution & observed <= 65 ug/m3 & 3014 & 36.070 & 21.860 & 12.360 & 0.000 \\
 persistence & pollution & observed > 35 ug/m3 & 7952 & 77.810 & 48.710 & -2.250 & 0.000 \\
 persistence & pollution & observed <= 35 ug/m3 & 1131 & 33.560 & 20.720 & 15.880 & 0.000 \\
-climatology & overall & all & 9083 & 65.430 & 42.720 & -13.060 & 0.113 \\
-climatology & season & monsoon (wet) & 2937 & 34.870 & 22.100 & -10.760 & 0.145 \\
-climatology & season & dry & 6146 & 75.800 & 52.570 & -14.160 & 0.110 \\
-climatology & pollution & observed > 65 ug/m3 & 6069 & 76.450 & 53.220 & -26.510 & 0.117 \\
-climatology & pollution & observed <= 65 ug/m3 & 3014 & 33.670 & 21.580 & 14.030 & 0.067 \\
-climatology & pollution & observed > 35 ug/m3 & 7952 & 69.020 & 46.170 & -17.400 & 0.113 \\
-climatology & pollution & observed <= 35 ug/m3 & 1131 & 29.840 & 18.450 & 17.460 & 0.111 \\
 seasonal\_naive & overall & all & 9083 & 73.760 & 45.220 & 0.010 & 0.000 \\
 seasonal\_naive & season & monsoon (wet) & 2937 & 40.790 & 26.600 & -0.050 & 0.000 \\
 seasonal\_naive & season & dry & 6146 & 85.130 & 54.120 & 0.030 & 0.000 \\
@@ -26,13 +19,55 @@ seasonal\_naive & pollution & observed > 65 ug/m3 & 6069 & 86.590 & 56.820 & -6.
 seasonal\_naive & pollution & observed <= 65 ug/m3 & 3014 & 36.070 & 21.860 & 12.360 & 0.000 \\
 seasonal\_naive & pollution & observed > 35 ug/m3 & 7952 & 77.810 & 48.710 & -2.250 & 0.000 \\
 seasonal\_naive & pollution & observed <= 35 ug/m3 & 1131 & 33.560 & 20.720 & 15.880 & 0.000 \\
-gru\_h64\_l1 & overall & all & 9083 & 59.620 & 37.540 & -12.650 & 0.192 \\
-gru\_h64\_l1 & season & monsoon (wet) & 2937 & 32.700 & 20.360 & -9.780 & 0.198 \\
-gru\_h64\_l1 & season & dry & 6146 & 68.870 & 45.740 & -14.020 & 0.191 \\
-gru\_h64\_l1 & pollution & observed > 65 ug/m3 & 6069 & 71.120 & 48.110 & -22.680 & 0.179 \\
-gru\_h64\_l1 & pollution & observed <= 65 ug/m3 & 3014 & 22.980 & 16.240 & 7.560 & 0.363 \\
-gru\_h64\_l1 & pollution & observed > 35 ug/m3 & 7952 & 63.330 & 41.050 & -15.910 & 0.186 \\
-gru\_h64\_l1 & pollution & observed <= 35 ug/m3 & 1131 & 18.720 & 12.860 & 10.300 & 0.442 \\
+climatology & overall & all & 9083 & 65.430 & 42.720 & -13.060 & 0.113 \\
+climatology & season & monsoon (wet) & 2937 & 34.870 & 22.100 & -10.760 & 0.145 \\
+climatology & season & dry & 6146 & 75.800 & 52.570 & -14.160 & 0.110 \\
+climatology & pollution & observed > 65 ug/m3 & 6069 & 76.450 & 53.220 & -26.510 & 0.117 \\
+climatology & pollution & observed <= 65 ug/m3 & 3014 & 33.670 & 21.580 & 14.030 & 0.067 \\
+climatology & pollution & observed > 35 ug/m3 & 7952 & 69.020 & 46.170 & -17.400 & 0.113 \\
+climatology & pollution & observed <= 35 ug/m3 & 1131 & 29.840 & 18.450 & 17.460 & 0.111 \\
+sarimax & overall & all & 9059 & 81.360 & 55.760 & -25.080 & -0.103 \\
+sarimax & season & monsoon (wet) & 2937 & 43.100 & 36.450 & 25.070 & -0.057 \\
+sarimax & season & dry & 6122 & 94.360 & 65.020 & -49.140 & -0.108 \\
+sarimax & pollution & observed > 65 ug/m3 & 6046 & 95.230 & 64.390 & -56.740 & -0.100 \\
+sarimax & pollution & observed <= 65 ug/m3 & 3013 & 41.310 & 38.430 & 38.430 & -0.145 \\
+sarimax & pollution & observed > 35 ug/m3 & 7928 & 84.670 & 56.350 & -36.030 & -0.088 \\
+sarimax & pollution & observed <= 35 ug/m3 & 1131 & 52.670 & 51.620 & 51.620 & -0.569 \\
+ridge & overall & all & 9083 & 66.660 & 41.110 & -8.390 & 0.096 \\
+ridge & season & monsoon (wet) & 2937 & 34.700 & 21.720 & -13.260 & 0.149 \\
+ridge & season & dry & 6146 & 77.410 & 50.370 & -6.060 & 0.091 \\
+ridge & pollution & observed > 65 ug/m3 & 6069 & 80.040 & 53.830 & -15.530 & 0.076 \\
+ridge & pollution & observed <= 65 ug/m3 & 3014 & 22.200 & 15.490 & 6.000 & 0.385 \\
+ridge & pollution & observed > 35 ug/m3 & 7952 & 70.860 & 45.020 & -11.170 & 0.089 \\
+ridge & pollution & observed <= 35 ug/m3 & 1131 & 19.570 & 13.600 & 11.160 & 0.417 \\
+random\_forest & overall & all & 9083 & 58.500 & 36.250 & -13.790 & 0.207 \\
+random\_forest & season & monsoon (wet) & 2937 & 34.060 & 21.350 & -10.860 & 0.165 \\
+random\_forest & season & dry & 6146 & 67.110 & 43.370 & -15.190 & 0.212 \\
+random\_forest & pollution & observed > 65 ug/m3 & 6069 & 69.920 & 46.520 & -24.290 & 0.193 \\
+random\_forest & pollution & observed <= 65 ug/m3 & 3014 & 21.670 & 15.580 & 7.350 & 0.399 \\
+random\_forest & pollution & observed > 35 ug/m3 & 7952 & 62.070 & 39.420 & -17.450 & 0.202 \\
+random\_forest & pollution & observed <= 35 ug/m3 & 1131 & 19.880 & 13.990 & 11.920 & 0.408 \\
+xgboost & overall & all & 9083 & 58.700 & 36.370 & -13.140 & 0.204 \\
+xgboost & season & monsoon (wet) & 2937 & 33.580 & 21.010 & -10.290 & 0.177 \\
+xgboost & season & dry & 6146 & 67.480 & 43.710 & -14.500 & 0.207 \\
+xgboost & pollution & observed > 65 ug/m3 & 6069 & 70.200 & 46.770 & -23.420 & 0.189 \\
+xgboost & pollution & observed <= 65 ug/m3 & 3014 & 21.450 & 15.420 & 7.580 & 0.405 \\
+xgboost & pollution & observed > 35 ug/m3 & 7952 & 62.330 & 39.610 & -16.640 & 0.199 \\
+xgboost & pollution & observed <= 35 ug/m3 & 1131 & 18.890 & 13.580 & 11.470 & 0.437 \\
+lightgbm & overall & all & 9083 & 59.020 & 36.620 & -13.360 & 0.200 \\
+lightgbm & season & monsoon (wet) & 2937 & 33.720 & 21.150 & -10.710 & 0.173 \\
+lightgbm & season & dry & 6146 & 67.860 & 44.020 & -14.630 & 0.203 \\
+lightgbm & pollution & observed > 65 ug/m3 & 6069 & 70.590 & 47.150 & -23.600 & 0.185 \\
+lightgbm & pollution & observed <= 65 ug/m3 & 3014 & 21.510 & 15.440 & 7.250 & 0.404 \\
+lightgbm & pollution & observed > 35 ug/m3 & 7952 & 62.680 & 39.940 & -16.830 & 0.195 \\
+lightgbm & pollution & observed <= 35 ug/m3 & 1131 & 18.760 & 13.310 & 11.040 & 0.441 \\
+gru\_h64\_l2 & overall & all & 9083 & 60.700 & 36.960 & -16.610 & 0.177 \\
+gru\_h64\_l2 & season & monsoon (wet) & 2937 & 31.950 & 20.000 & -7.310 & 0.217 \\
+gru\_h64\_l2 & season & dry & 6146 & 70.410 & 45.070 & -21.060 & 0.173 \\
+gru\_h64\_l2 & pollution & observed > 65 ug/m3 & 6069 & 72.600 & 47.570 & -29.070 & 0.162 \\
+gru\_h64\_l2 & pollution & observed <= 65 ug/m3 & 3014 & 22.180 & 15.610 & 8.470 & 0.385 \\
+gru\_h64\_l2 & pollution & observed > 35 ug/m3 & 7952 & 64.420 & 40.220 & -20.720 & 0.172 \\
+gru\_h64\_l2 & pollution & observed <= 35 ug/m3 & 1131 & 20.420 & 14.070 & 12.290 & 0.392 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -10,3 +10,21 @@
 18:36:21 | WARNING | 10_make_figures | no green table; skipping Pareto figure
 18:36:21 | WARNING | 10_make_figures | no classification record; skipping confusion matrix
 18:36:21 | WARNING | 10_make_figures | no stratified metrics; skipping stratum figure
+20:02:19 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+20:02:19 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+20:02:19 | INFO    | 10_make_figures | wrote fig07_feature_importance
+20:02:20 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+20:02:21 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+20:02:21 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+20:39:10 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+20:39:10 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+20:39:11 | INFO    | 10_make_figures | wrote fig07_feature_importance
+20:39:11 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+20:39:12 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+20:39:12 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+20:41:36 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+20:41:37 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+20:41:37 | INFO    | 10_make_figures | wrote fig07_feature_importance
+20:41:37 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+20:41:38 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+20:41:38 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum

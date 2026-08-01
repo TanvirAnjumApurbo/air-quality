@@ -48,7 +48,29 @@ def _runs_frame(payload: dict) -> pd.DataFrame:
 
 
 def _best_per_horizon(frame: pd.DataFrame, tier: str | None = None) -> pd.DataFrame:
-    """Select the lowest-RMSE model per horizon, optionally within one tier."""
+    """Select the best model per horizon, choosing on held-out-from-test criteria.
+
+    Selection must never consult test error. Picking the model with the lowest
+    test RMSE and then reporting that RMSE as the headline is circular -- it is
+    the same mistake the Diebold-Mariano comparison deliberately avoids, and it
+    biases the reported number downward by the spread of the candidate pool.
+
+    So the ranking uses whatever genuinely held-out criterion each tier has:
+
+    * **tier3** -- mean validation loss across seeds, recorded during training;
+    * **tier2** -- the ``TimeSeriesSplit`` cross-validation score over train+val
+      (negative RMSE, so larger is better);
+    * **tier1** -- nothing, because the baselines have no hyperparameters and
+      therefore no selection step to bias. Ordering them by test RMSE simply
+      reports which fixed rule happened to do best.
+
+    Args:
+        frame: Flattened run records.
+        tier: Restrict to one tier, or None for all.
+
+    Returns:
+        One row per horizon.
+    """
     sub = frame if tier is None else frame[frame["tier"] == tier]
     if sub.empty:
         return sub
@@ -64,10 +86,23 @@ def _best_per_horizon(frame: pd.DataFrame, tier: str | None = None) -> pd.DataFr
             skill_std=("skill_vs_persistence", "std"),
             n_params=("n_params", "first"),
             n_seeds=("seed", "count"),
+            val_loss=("best_val_loss", "mean")
+            if "best_val_loss" in sub.columns
+            else ("rmse", "size"),
+            cv=("cv_score", "mean") if "cv_score" in sub.columns else ("rmse", "size"),
         )
         .reset_index()
     )
-    return grouped.sort_values("rmse").groupby("horizon_h").first().reset_index()
+
+    if "best_val_loss" in sub.columns and grouped["val_loss"].notna().any():
+        grouped["_rank"] = grouped["val_loss"]  # lower validation loss is better
+    elif "cv_score" in sub.columns and grouped["cv"].notna().any():
+        grouped["_rank"] = -grouped["cv"]  # cv_score is negative RMSE
+    else:
+        grouped["_rank"] = grouped["rmse"]  # tier 1: no selection to bias
+    grouped["_rank"] = grouped["_rank"].fillna(grouped["rmse"])
+
+    return grouped.sort_values("_rank").groupby("horizon_h").first().reset_index()
 
 
 def main() -> int:
@@ -513,6 +548,20 @@ def main() -> int:
             "n_classes": len(clf["labels"]),
             "macro_f1_mean": round(clf["macro_f1"]["mean"], 4),
             "macro_f1_std": round(clf["macro_f1"]["std"], 4),
+            "macro_f1_present_mean": round(
+                clf.get("macro_f1_present", {}).get("mean", float("nan")), 4
+            ),
+            "macro_f1_present_std": round(
+                clf.get("macro_f1_present", {}).get("std", float("nan")), 4
+            ),
+            "n_classes_defined": clf.get("n_classes_defined"),
+            "n_classes_present_in_test": clf.get("n_classes_present"),
+            "empty_classes": clf.get("empty_classes"),
+            "macro_f1_note": (
+                "Report the present-class figure alongside the all-class one. A "
+                "category with zero test support contributes a structural zero and "
+                "depresses the all-class macro-F1 regardless of model quality."
+            ),
             "accuracy_mean": round(clf["accuracy"]["mean"], 4),
             "balanced_accuracy_mean": round(clf["balanced_accuracy"]["mean"], 4),
             "breakpoint_scheme": clf["breakpoints"]["scheme"],

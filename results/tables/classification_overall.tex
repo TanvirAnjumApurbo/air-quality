@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\caption{Overall AQI-classification performance at 24 hours. Macro-F1 is the headline because the categories are severely imbalanced; accuracy alone would be dominated by the majority classes. No test hour falls in 'Good': over the held-out period the 24-hour mean never dropped to that band. Such a class contributes a structural zero to the all-class macro-F1 and depresses it by roughly $1/6$ regardless of model quality, so the macro-F1 over classes actually present is reported alongside it. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:classification_overall}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Macro-F1 (all 6 defined classes) & 0.5179 ± 0.0047 \\
+Macro-F1 (5 classes present in test) & 0.6215 ± 0.0057 \\
+Weighted-F1 & 0.6779 ± 0.0062 \\
+Accuracy & 0.6772 ± 0.0064 \\
+Balanced accuracy & 0.6281 ± 0.0053 \\
+\bottomrule
+\end{tabular}
+\end{table}

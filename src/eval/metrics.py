@@ -325,7 +325,15 @@ class ClassificationReport:
     """Metrics for the AQI-category task.
 
     Attributes:
-        macro_f1: Unweighted mean F1 across classes.
+        macro_f1: Unweighted mean F1 over **all** defined classes, including any
+            with no test support. Comparable across studies that use the same
+            breakpoint scheme.
+        macro_f1_present: Unweighted mean F1 over classes that actually occur in
+            the evaluation set. A category with zero support contributes a
+            structural zero to ``macro_f1`` and drags it down by ``1/n_classes``
+            regardless of how well the model performs, so both are reported.
+        n_classes_present: How many of the defined classes occur in the data.
+        empty_classes: Names of defined classes with zero support.
         weighted_f1: Support-weighted mean F1.
         accuracy: Overall accuracy.
         balanced_accuracy: Mean per-class recall.
@@ -335,6 +343,9 @@ class ClassificationReport:
     """
 
     macro_f1: float
+    macro_f1_present: float
+    n_classes_present: int
+    empty_classes: list[str]
     weighted_f1: float
     accuracy: float
     balanced_accuracy: float
@@ -381,8 +392,19 @@ def classification_metrics(
         }
         for i in indices
     }
+    present = [i for i in indices if support[i] > 0]
+    empty = [labels[i] for i in indices if support[i] == 0]
+    macro_present = (
+        float(f1_score(y_true, y_pred, labels=present, average="macro", zero_division=0))
+        if present
+        else float("nan")
+    )
+
     return ClassificationReport(
         macro_f1=float(f1_score(y_true, y_pred, labels=indices, average="macro", zero_division=0)),
+        macro_f1_present=macro_present,
+        n_classes_present=len(present),
+        empty_classes=empty,
         weighted_f1=float(
             f1_score(y_true, y_pred, labels=indices, average="weighted", zero_division=0)
         ),

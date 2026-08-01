@@ -1,0 +1,6 @@
+h (hours),Deep model,Classical,N,DM statistic,p-value,Lower loss
+1,lstm_h64_l1,lightgbm,9334,2.382,0.0172,lightgbm
+3,gru_h128_l1,lightgbm,9311,1.853,0.0639,lightgbm
+6,gru_h128_l1,lightgbm,9277,2.256,0.0241,lightgbm
+12,gru_h128_l1,lightgbm,9212,2.618,0.00885,lightgbm
+24,gru_h64_l2,random_forest,9083,3.498,0.000471,random_forest

@@ -327,7 +327,34 @@ def fig_skill_by_stratum(cfg, payload, palette, log) -> None:
         return
 
     groups = list(dict.fromkeys(view["group"]))
-    models = list(dict.fromkeys(view["model"]))[: len(palette)]
+
+    # Persistence is the reference, so its skill is identically zero, and at
+    # h=24 seasonal-naive reduces to persistence and is zero too. Plotting them
+    # spends palette slots and legend entries on invisible bars -- and because
+    # the palette is deliberately not cycled, that previously pushed the
+    # sequence model, the actual contribution, out of the figure. Drop any series
+    # that is flat zero everywhere, then order so the contribution is kept first.
+    candidates = []
+    for model in dict.fromkeys(view["model"]):
+        values = view.loc[view["model"] == model, "skill_vs_persistence"]
+        if np.allclose(values.fillna(0.0).to_numpy(), 0.0):
+            continue
+        candidates.append(model)
+
+    known_baselines = {"persistence", "seasonal_naive", "climatology", "sarimax", "ridge"}
+    trees = {"random_forest", "xgboost", "lightgbm"}
+
+    def _priority(name: str) -> int:
+        if name not in known_baselines and name not in trees:
+            return 0  # sequence models first: they are the contribution
+        if name in trees:
+            return 1
+        return 2
+
+    models = sorted(candidates, key=lambda m: (_priority(m), m))[: len(palette)]
+    if not models:
+        log.warning("no non-zero skill series to plot; skipping stratum figure")
+        return
 
     fig, ax = plt.subplots(figsize=(9.0, 4.4))
     width = 0.8 / max(len(models), 1)

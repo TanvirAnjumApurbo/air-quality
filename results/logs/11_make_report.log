@@ -4,3 +4,10 @@
 18:36:23 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
 18:36:23 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
 18:36:23 | WARNING | 11_make_report | abstract_facts.json has null sections: ['classification', 'significance']
+20:02:22 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+20:02:22 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+20:02:22 | WARNING | 11_make_report | abstract_facts.json has null sections: ['significance']
+20:39:13 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+20:39:13 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+20:40:34 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+20:40:34 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json

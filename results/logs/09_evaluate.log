@@ -11,3 +11,61 @@
 17:20:36 | INFO    | 09_evaluate | HORIZON h=24
 17:20:37 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l1_w48_H24_s42 (val loss 0.10103, seed 42)
 17:20:37 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json
+20:02:12 | INFO    | 09_evaluate | ======================================================================
+20:02:12 | INFO    | 09_evaluate | HORIZON h=1
+20:02:13 | INFO    | 09_evaluate | best sequence model at h=1: lstm_h64_l1_w24_H1_s2024 (val loss 0.03844, seed 2024)
+20:02:13 | INFO    | 09_evaluate | ======================================================================
+20:02:13 | INFO    | 09_evaluate | HORIZON h=3
+20:02:13 | INFO    | 09_evaluate | best sequence model at h=3: gru_h128_l1_w48_H3_s42 (val loss 0.06858, seed 42)
+20:02:13 | INFO    | 09_evaluate | ======================================================================
+20:02:13 | INFO    | 09_evaluate | HORIZON h=6
+20:02:14 | INFO    | 09_evaluate | best sequence model at h=6: gru_h128_l1_w48_H6_s2024 (val loss 0.08327, seed 2024)
+20:02:14 | INFO    | 09_evaluate | ======================================================================
+20:02:14 | INFO    | 09_evaluate | HORIZON h=12
+20:02:14 | INFO    | 09_evaluate | best sequence model at h=12: gru_h128_l1_w48_H12_s42 (val loss 0.08997, seed 42)
+20:02:14 | INFO    | 09_evaluate | ======================================================================
+20:02:14 | INFO    | 09_evaluate | HORIZON h=24
+20:02:14 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l2_w48_H24_s7 (val loss 0.09652, seed 7)
+20:02:15 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json
+20:07:26 | INFO    | 09_evaluate | ======================================================================
+20:07:26 | INFO    | 09_evaluate | HORIZON h=1
+20:07:26 | INFO    | 09_evaluate | best sequence model at h=1: lstm_h64_l1_w24_H1_s2024 (val loss 0.03844, seed 2024)
+20:07:26 | INFO    | 09_evaluate | ======================================================================
+20:07:26 | INFO    | 09_evaluate | HORIZON h=3
+20:07:27 | INFO    | 09_evaluate | best sequence model at h=3: gru_h128_l1_w48_H3_s42 (val loss 0.06858, seed 42)
+20:07:27 | INFO    | 09_evaluate | ======================================================================
+20:07:27 | INFO    | 09_evaluate | HORIZON h=6
+20:07:27 | INFO    | 09_evaluate | best sequence model at h=6: gru_h128_l1_w48_H6_s2024 (val loss 0.08327, seed 2024)
+20:07:27 | INFO    | 09_evaluate | ======================================================================
+20:07:27 | INFO    | 09_evaluate | HORIZON h=12
+20:07:28 | INFO    | 09_evaluate | best sequence model at h=12: gru_h128_l1_w48_H12_s42 (val loss 0.08997, seed 42)
+20:07:28 | INFO    | 09_evaluate | ======================================================================
+20:07:28 | INFO    | 09_evaluate | HORIZON h=24
+20:07:28 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l2_w48_H24_s7 (val loss 0.09652, seed 7)
+20:07:28 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json
+20:39:03 | INFO    | 09_evaluate | ======================================================================
+20:39:03 | INFO    | 09_evaluate | HORIZON h=1
+20:39:03 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=1
+20:39:04 | INFO    | 09_evaluate | best sequence model at h=1: lstm_h64_l1_w24_H1_s2024 (val loss 0.03844, seed 2024)
+20:39:04 | INFO    | 09_evaluate | DM h=1: lstm_h64_l1 vs lightgbm  stat 2.382  p 0.01722  better=lightgbm
+20:39:04 | INFO    | 09_evaluate | ======================================================================
+20:39:04 | INFO    | 09_evaluate | HORIZON h=3
+20:39:04 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=3
+20:39:04 | INFO    | 09_evaluate | best sequence model at h=3: gru_h128_l1_w48_H3_s42 (val loss 0.06858, seed 42)
+20:39:04 | INFO    | 09_evaluate | DM h=3: gru_h128_l1 vs lightgbm  stat 1.853  p 0.06386  better=lightgbm
+20:39:04 | INFO    | 09_evaluate | ======================================================================
+20:39:04 | INFO    | 09_evaluate | HORIZON h=6
+20:39:04 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=6
+20:39:05 | INFO    | 09_evaluate | best sequence model at h=6: gru_h128_l1_w48_H6_s2024 (val loss 0.08327, seed 2024)
+20:39:05 | INFO    | 09_evaluate | DM h=6: gru_h128_l1 vs lightgbm  stat 2.256  p 0.0241  better=lightgbm
+20:39:05 | INFO    | 09_evaluate | ======================================================================
+20:39:05 | INFO    | 09_evaluate | HORIZON h=12
+20:39:05 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=12
+20:39:05 | INFO    | 09_evaluate | best sequence model at h=12: gru_h128_l1_w48_H12_s42 (val loss 0.08997, seed 42)
+20:39:05 | INFO    | 09_evaluate | DM h=12: gru_h128_l1 vs lightgbm  stat 2.618  p 0.008849  better=lightgbm
+20:39:05 | INFO    | 09_evaluate | ======================================================================
+20:39:05 | INFO    | 09_evaluate | HORIZON h=24
+20:39:05 | INFO    | 09_evaluate | loaded 8 stored classical predictions for h=24
+20:39:05 | INFO    | 09_evaluate | best sequence model at h=24: gru_h64_l2_w48_H24_s7 (val loss 0.09652, seed 7)
+20:39:06 | INFO    | 09_evaluate | DM h=24: gru_h64_l2 vs random_forest  stat 3.498  p 0.0004712  better=random_forest
+20:39:06 | INFO    | 09_evaluate | wrote evaluation to F:\BUP\results\results.json

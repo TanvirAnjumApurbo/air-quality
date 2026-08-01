@@ -104,6 +104,7 @@ def main() -> int:
             {
                 "seed": seed,
                 "macro_f1": report.macro_f1,
+                "macro_f1_present": report.macro_f1_present,
                 "weighted_f1": report.weighted_f1,
                 "accuracy": report.accuracy,
                 "balanced_accuracy": report.balanced_accuracy,
@@ -111,9 +112,12 @@ def main() -> int:
             }
         )
         log.info(
-            "seed %d: macro-F1 %.4f  weighted-F1 %.4f  accuracy %.4f  balanced-acc %.4f",
+            "seed %d: macro-F1 %.4f (%.4f over %d non-empty classes)  weighted-F1 %.4f  "
+            "accuracy %.4f  balanced-acc %.4f",
             seed,
             report.macro_f1,
+            report.macro_f1_present,
+            report.n_classes_present,
             report.weighted_f1,
             report.accuracy,
             report.balanced_accuracy,
@@ -156,6 +160,10 @@ def main() -> int:
         "n_test": len(test),
         "per_seed": per_seed,
         "macro_f1": summarise([r["macro_f1"] for r in per_seed]),
+        "macro_f1_present": summarise([r["macro_f1_present"] for r in per_seed]),
+        "n_classes_defined": len(labels),
+        "n_classes_present": reports[0].n_classes_present,
+        "empty_classes": reports[0].empty_classes,
         "weighted_f1": summarise([r["weighted_f1"] for r in per_seed]),
         "accuracy": summarise([r["accuracy"] for r in per_seed]),
         "balanced_accuracy": summarise([r["balanced_accuracy"] for r in per_seed]),
@@ -195,9 +203,15 @@ def main() -> int:
     overall = pd.DataFrame(
         [
             {
-                "Metric": "Macro-F1",
+                "Metric": f"Macro-F1 (all {len(labels)} defined classes)",
                 "Value": format_mean_std(
                     summary["macro_f1"]["mean"], summary["macro_f1"]["std"], 4
+                ),
+            },
+            {
+                "Metric": f"Macro-F1 ({reports[0].n_classes_present} classes present in test)",
+                "Value": format_mean_std(
+                    summary["macro_f1_present"]["mean"], summary["macro_f1_present"]["std"], 4
                 ),
             },
             {
@@ -220,6 +234,16 @@ def main() -> int:
             },
         ]
     )
+    empty = reports[0].empty_classes
+    empty_note = ""
+    if empty:
+        empty_note = (
+            f" No test hour falls in {', '.join(repr(e) for e in empty)}: over the "
+            "held-out period the 24-hour mean never dropped to that band. Such a "
+            "class contributes a structural zero to the all-class macro-F1 and "
+            f"depresses it by roughly $1/{len(labels)}$ regardless of model quality, "
+            "so the macro-F1 over classes actually present is reported alongside it."
+        )
     write_table(
         cfg,
         overall,
@@ -227,7 +251,7 @@ def main() -> int:
         caption=(
             f"Overall AQI-classification performance at {horizon} hours. Macro-F1 is "
             "the headline because the categories are severely imbalanced; accuracy "
-            "alone would be dominated by the majority classes."
+            "alone would be dominated by the majority classes." + empty_note
         ),
     )
 

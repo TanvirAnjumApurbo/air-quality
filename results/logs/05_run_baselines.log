@@ -242,3 +242,133 @@
 17:59:10 | INFO    | 05_run_baselines |   xgboost          RMSE   58.70  MAE   36.37  R2  0.595  sMAPE  32.15  skill +0.2043
 17:59:10 | INFO    | 05_run_baselines |   lightgbm         RMSE   59.02  MAE   36.62  R2  0.591  sMAPE  32.40  skill +0.1999
 17:59:10 | INFO    | 05_run_baselines | permutation importance for random_forest at h=24
+20:09:00 | INFO    | 05_run_baselines | device: cuda
+20:09:01 | INFO    | 05_run_baselines | ======================================================================
+20:09:01 | INFO    | 05_run_baselines | HORIZON h=1
+20:09:01 | INFO    | 05_run_baselines | ======================================================================
+20:09:01 | INFO    | 05_run_baselines | rows: train=27186 val=6160 test=9334
+20:09:01 | INFO    | 05_run_baselines | SARIMAX h=1: training tail 8760 h (2021-05-31 to 2022-05-31), 3895 observed (44.5%), gaps kept as NaN
+20:09:01 | INFO    | 05_run_baselines | SARIMAX h=1: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+20:09:26 | INFO    | 05_run_baselines | SARIMAX h=1: fitted, applying to 9334 evaluation rows
+20:09:27 | INFO    | 05_run_baselines | sarimax h=1 took 26.0 s
+20:09:27 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+20:09:27 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+20:12:01 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+20:13:38 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+20:14:54 | INFO    | 05_run_baselines | ridge: clipped 39 predictions above 1000 ug/m3, 0 below zero, 0 non-finite (of 9334) to the physical range used by QC
+20:14:54 | INFO    | 05_run_baselines | ridge h=1: cv=-0.4996 best={'alpha': 100.0} (0.2 s)
+20:14:54 | INFO    | 05_run_baselines | random_forest h=1: cv=-0.3408 best={'n_estimators': 200, 'min_samples_leaf': 20, 'max_features': 0.4, 'max_depth': 20} (153.7 s)
+20:14:54 | INFO    | 05_run_baselines | xgboost h=1: cv=-0.3415 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (97.1 s)
+20:14:54 | INFO    | 05_run_baselines | lightgbm h=1: cv=-0.3438 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (76.0 s)
+20:14:54 | INFO    | 05_run_baselines | wrote predictions for 8 models to predictions
+20:14:55 | INFO    | 05_run_baselines |   persistence      RMSE   36.58  MAE   20.36  R2  0.842  sMAPE  18.46  skill +0.0000
+20:14:55 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.14  MAE   44.83  R2  0.368  sMAPE  37.91  skill -0.9993
+20:14:55 | INFO    | 05_run_baselines |   climatology      RMSE   65.32  MAE   42.79  R2  0.496  sMAPE  37.53  skill -0.7855
+20:14:55 | INFO    | 05_run_baselines |   sarimax          RMSE   35.81  MAE   20.67  R2  0.848  sMAPE  19.02  skill +0.0211
+20:14:55 | INFO    | 05_run_baselines |   ridge            RMSE   64.10  MAE   31.09  R2  0.514  sMAPE  24.69  skill -0.7522
+20:14:55 | INFO    | 05_run_baselines |   random_forest    RMSE   33.47  MAE   18.90  R2  0.868  sMAPE  17.26  skill +0.0850
+20:14:55 | INFO    | 05_run_baselines |   xgboost          RMSE   33.65  MAE   19.05  R2  0.866  sMAPE  17.37  skill +0.0800
+20:14:55 | INFO    | 05_run_baselines |   lightgbm         RMSE   33.46  MAE   18.94  R2  0.868  sMAPE  17.33  skill +0.0853
+20:14:55 | INFO    | 05_run_baselines | ======================================================================
+20:14:55 | INFO    | 05_run_baselines | HORIZON h=3
+20:14:55 | INFO    | 05_run_baselines | ======================================================================
+20:14:55 | INFO    | 05_run_baselines | rows: train=27063 val=6142 test=9311
+20:14:55 | INFO    | 05_run_baselines | SARIMAX h=3: training tail 8760 h (2021-05-31 to 2022-05-31), 3873 observed (44.2%), gaps kept as NaN
+20:14:55 | INFO    | 05_run_baselines | SARIMAX h=3: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+20:15:12 | INFO    | 05_run_baselines | SARIMAX h=3: fitted, applying to 9311 evaluation rows
+20:15:12 | INFO    | 05_run_baselines | sarimax h=3 took 17.5 s
+20:15:12 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+20:15:13 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+20:17:54 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+20:19:33 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+20:20:51 | INFO    | 05_run_baselines | ridge: clipped 4 predictions above 1000 ug/m3, 0 below zero, 0 non-finite (of 9311) to the physical range used by QC
+20:20:51 | INFO    | 05_run_baselines | ridge h=3: cv=-0.5088 best={'alpha': 100.0} (0.3 s)
+20:20:51 | INFO    | 05_run_baselines | random_forest h=3: cv=-0.4369 best={'n_estimators': 200, 'min_samples_leaf': 5, 'max_features': 0.2, 'max_depth': 20} (160.8 s)
+20:20:51 | INFO    | 05_run_baselines | xgboost h=3: cv=-0.4367 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (99.0 s)
+20:20:51 | INFO    | 05_run_baselines | lightgbm h=3: cv=-0.4403 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (78.3 s)
+20:20:51 | INFO    | 05_run_baselines | wrote predictions for 8 models to predictions
+20:20:51 | INFO    | 05_run_baselines |   persistence      RMSE   60.41  MAE   37.12  R2  0.569  sMAPE  31.46  skill +0.0000
+20:20:51 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.15  MAE   44.83  R2  0.367  sMAPE  37.89  skill -0.2109
+20:20:51 | INFO    | 05_run_baselines |   climatology      RMSE   65.31  MAE   42.76  R2  0.496  sMAPE  37.50  skill -0.0811
+20:20:51 | INFO    | 05_run_baselines |   sarimax          RMSE   55.49  MAE   35.16  R2  0.636  sMAPE  31.01  skill +0.0815
+20:20:51 | INFO    | 05_run_baselines |   ridge            RMSE   62.85  MAE   36.09  R2  0.533  sMAPE  29.98  skill -0.0404
+20:20:52 | INFO    | 05_run_baselines |   random_forest    RMSE   48.89  MAE   29.88  R2  0.717  sMAPE  26.14  skill +0.1906
+20:20:52 | INFO    | 05_run_baselines |   xgboost          RMSE   48.83  MAE   29.83  R2  0.718  sMAPE  26.03  skill +0.1916
+20:20:52 | INFO    | 05_run_baselines |   lightgbm         RMSE   48.75  MAE   29.82  R2  0.719  sMAPE  26.01  skill +0.1930
+20:20:52 | INFO    | 05_run_baselines | ======================================================================
+20:20:52 | INFO    | 05_run_baselines | HORIZON h=6
+20:20:52 | INFO    | 05_run_baselines | ======================================================================
+20:20:52 | INFO    | 05_run_baselines | rows: train=26872 val=6116 test=9277
+20:20:52 | INFO    | 05_run_baselines | SARIMAX h=6: training tail 8760 h (2021-05-31 to 2022-05-31), 3841 observed (43.8%), gaps kept as NaN
+20:20:52 | INFO    | 05_run_baselines | SARIMAX h=6: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+20:21:06 | INFO    | 05_run_baselines | SARIMAX h=6: fitted, applying to 9277 evaluation rows
+20:21:06 | INFO    | 05_run_baselines | sarimax h=6 took 14.6 s
+20:21:06 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+20:21:07 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+20:23:47 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+20:25:25 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+20:26:44 | INFO    | 05_run_baselines | ridge: clipped 1 predictions above 1000 ug/m3, 0 below zero, 0 non-finite (of 9277) to the physical range used by QC
+20:26:44 | INFO    | 05_run_baselines | ridge h=6: cv=-0.5241 best={'alpha': 10.0} (0.3 s)
+20:26:44 | INFO    | 05_run_baselines | random_forest h=6: cv=-0.4882 best={'n_estimators': 200, 'min_samples_leaf': 20, 'max_features': 0.2, 'max_depth': 10} (160.2 s)
+20:26:44 | INFO    | 05_run_baselines | xgboost h=6: cv=-0.4841 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (98.4 s)
+20:26:44 | INFO    | 05_run_baselines | lightgbm h=6: cv=-0.4907 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (78.5 s)
+20:26:44 | INFO    | 05_run_baselines | wrote predictions for 8 models to predictions
+20:26:44 | INFO    | 05_run_baselines |   persistence      RMSE   82.67  MAE   53.11  R2  0.191  sMAPE  42.51  skill +0.0000
+20:26:44 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.20  MAE   44.87  R2  0.366  sMAPE  37.92  skill +0.1145
+20:26:44 | INFO    | 05_run_baselines |   climatology      RMSE   65.23  MAE   42.72  R2  0.496  sMAPE  37.47  skill +0.2109
+20:26:44 | INFO    | 05_run_baselines |   sarimax          RMSE   70.37  MAE   46.69  R2  0.414  sMAPE  40.22  skill +0.1488
+20:26:44 | INFO    | 05_run_baselines |   ridge            RMSE   62.90  MAE   38.95  R2  0.532  sMAPE  32.92  skill +0.2391
+20:26:44 | INFO    | 05_run_baselines |   random_forest    RMSE   57.19  MAE   35.55  R2  0.613  sMAPE  30.85  skill +0.3082
+20:26:44 | INFO    | 05_run_baselines |   xgboost          RMSE   56.53  MAE   35.12  R2  0.622  sMAPE  30.49  skill +0.3162
+20:26:44 | INFO    | 05_run_baselines |   lightgbm         RMSE   56.08  MAE   34.92  R2  0.628  sMAPE  30.33  skill +0.3217
+20:26:44 | INFO    | 05_run_baselines | ======================================================================
+20:26:44 | INFO    | 05_run_baselines | HORIZON h=12
+20:26:44 | INFO    | 05_run_baselines | ======================================================================
+20:26:44 | INFO    | 05_run_baselines | rows: train=26503 val=6062 test=9212
+20:26:44 | INFO    | 05_run_baselines | SARIMAX h=12: training tail 8760 h (2021-05-31 to 2022-05-31), 3775 observed (43.1%), gaps kept as NaN
+20:26:44 | INFO    | 05_run_baselines | SARIMAX h=12: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+20:26:59 | INFO    | 05_run_baselines | SARIMAX h=12: fitted, applying to 9212 evaluation rows
+20:27:00 | INFO    | 05_run_baselines | sarimax h=12 took 15.4 s
+20:27:00 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+20:27:00 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+20:29:42 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+20:31:21 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+20:32:41 | INFO    | 05_run_baselines | ridge h=12: cv=-0.5376 best={'alpha': 100.0} (0.3 s)
+20:32:41 | INFO    | 05_run_baselines | random_forest h=12: cv=-0.5093 best={'n_estimators': 200, 'min_samples_leaf': 20, 'max_features': 0.2, 'max_depth': 20} (161.6 s)
+20:32:41 | INFO    | 05_run_baselines | xgboost h=12: cv=-0.5083 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (99.1 s)
+20:32:41 | INFO    | 05_run_baselines | lightgbm h=12: cv=-0.5138 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (79.9 s)
+20:32:41 | INFO    | 05_run_baselines | wrote predictions for 8 models to predictions
+20:32:41 | INFO    | 05_run_baselines |   persistence      RMSE   98.65  MAE   64.89  R2 -0.151  sMAPE  50.07  skill +0.0000
+20:32:41 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.36  MAE   44.94  R2  0.363  sMAPE  37.91  skill +0.2564
+20:32:41 | INFO    | 05_run_baselines |   climatology      RMSE   65.08  MAE   42.57  R2  0.499  sMAPE  37.32  skill +0.3403
+20:32:41 | INFO    | 05_run_baselines |   sarimax          RMSE   78.90  MAE   53.70  R2  0.264  sMAPE  46.78  skill +0.2002
+20:32:41 | INFO    | 05_run_baselines |   ridge            RMSE   64.89  MAE   40.53  R2  0.502  sMAPE  34.43  skill +0.3423
+20:32:41 | INFO    | 05_run_baselines |   random_forest    RMSE   57.28  MAE   35.48  R2  0.612  sMAPE  31.40  skill +0.4194
+20:32:41 | INFO    | 05_run_baselines |   xgboost          RMSE   57.02  MAE   35.28  R2  0.615  sMAPE  31.19  skill +0.4220
+20:32:41 | INFO    | 05_run_baselines |   lightgbm         RMSE   56.94  MAE   35.29  R2  0.616  sMAPE  31.14  skill +0.4228
+20:32:41 | INFO    | 05_run_baselines | ======================================================================
+20:32:41 | INFO    | 05_run_baselines | HORIZON h=24
+20:32:41 | INFO    | 05_run_baselines | ======================================================================
+20:32:41 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+20:32:41 | INFO    | 05_run_baselines | SARIMAX h=24: training tail 8760 h (2021-05-30 to 2022-05-30), 3643 observed (41.6%), gaps kept as NaN
+20:32:41 | INFO    | 05_run_baselines | SARIMAX h=24: fitting order=[2, 0, 1] seasonal=[1, 0, 1, 24] on 8760 points
+20:32:57 | INFO    | 05_run_baselines | SARIMAX h=24: fitted, applying to 9083 evaluation rows
+20:32:58 | INFO    | 05_run_baselines | sarimax h=24 took 16.4 s
+20:32:58 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+20:32:58 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+20:35:36 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+20:37:14 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+20:38:32 | INFO    | 05_run_baselines | ridge h=24: cv=-0.5551 best={'alpha': 100.0} (0.3 s)
+20:38:32 | INFO    | 05_run_baselines | random_forest h=24: cv=-0.5324 best={'n_estimators': 200, 'min_samples_leaf': 20, 'max_features': 0.2, 'max_depth': 20} (157.6 s)
+20:38:32 | INFO    | 05_run_baselines | xgboost h=24: cv=-0.5437 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (97.8 s)
+20:38:32 | INFO    | 05_run_baselines | lightgbm h=24: cv=-0.5490 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (78.1 s)
+20:38:32 | INFO    | 05_run_baselines | wrote predictions for 8 models to predictions
+20:38:32 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+20:38:32 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+20:38:32 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+20:38:32 | INFO    | 05_run_baselines |   sarimax          RMSE   81.36  MAE   55.76  R2  0.221  sMAPE  48.89  skill -0.1030
+20:38:32 | INFO    | 05_run_baselines |   ridge            RMSE   66.66  MAE   41.11  R2  0.478  sMAPE  34.81  skill +0.0963
+20:38:32 | INFO    | 05_run_baselines |   random_forest    RMSE   58.50  MAE   36.25  R2  0.598  sMAPE  32.38  skill +0.2069
+20:38:32 | INFO    | 05_run_baselines |   xgboost          RMSE   58.70  MAE   36.37  R2  0.595  sMAPE  32.15  skill +0.2043
+20:38:32 | INFO    | 05_run_baselines |   lightgbm         RMSE   59.02  MAE   36.62  R2  0.591  sMAPE  32.40  skill +0.1999
+20:38:32 | INFO    | 05_run_baselines | permutation importance for random_forest at h=24

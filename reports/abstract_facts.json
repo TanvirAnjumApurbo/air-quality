@@ -37,57 +37,57 @@
   ],
   "headline_horizon_h": 24,
   "best_model": {
-    "name": "gru_h64_l1",
-    "input_window_h": 24,
-    "n_parameters": 32321,
+    "name": "gru_h64_l2",
+    "input_window_h": 48,
+    "n_parameters": 57281,
     "n_seeds": 5,
     "parameter_budget": 100000
   },
   "per_horizon": {
     "1": {
-      "model": "gru_h32_l2",
-      "rmse": 37.543,
-      "rmse_std_across_seeds": 0.777,
-      "mae": 20.474,
-      "r2": 0.8333,
-      "smape": 18.464,
-      "skill_vs_persistence": -0.0263
+      "model": "lstm_h64_l1",
+      "rmse": 33.832,
+      "rmse_std_across_seeds": 0.569,
+      "mae": 19.519,
+      "r2": 0.8646,
+      "smape": 18.036,
+      "skill_vs_persistence": 0.0752
     },
     "3": {
-      "model": "gru_h64_l1",
-      "rmse": 50.959,
-      "rmse_std_across_seeds": 0.561,
-      "mae": 30.534,
-      "r2": 0.693,
-      "smape": 26.688,
-      "skill_vs_persistence": 0.1564
+      "model": "gru_h128_l1",
+      "rmse": 49.376,
+      "rmse_std_across_seeds": 0.378,
+      "mae": 30.105,
+      "r2": 0.7118,
+      "smape": 26.442,
+      "skill_vs_persistence": 0.1826
     },
     "6": {
-      "model": "gru_h64_l1",
-      "rmse": 59.069,
-      "rmse_std_across_seeds": 0.975,
-      "mae": 36.521,
-      "r2": 0.587,
-      "smape": 31.537,
-      "skill_vs_persistence": 0.2855
+      "model": "gru_h128_l1",
+      "rmse": 57.178,
+      "rmse_std_across_seeds": 1.328,
+      "mae": 35.593,
+      "r2": 0.613,
+      "smape": 30.884,
+      "skill_vs_persistence": 0.3084
     },
     "12": {
-      "model": "gru_h64_l1",
-      "rmse": 60.003,
-      "rmse_std_across_seeds": 1.082,
-      "mae": 37.181,
-      "r2": 0.574,
-      "smape": 32.543,
-      "skill_vs_persistence": 0.3918
+      "model": "gru_h128_l1",
+      "rmse": 58.144,
+      "rmse_std_across_seeds": 0.521,
+      "mae": 36.279,
+      "r2": 0.6,
+      "smape": 31.696,
+      "skill_vs_persistence": 0.4106
     },
     "24": {
-      "model": "gru_h64_l1",
-      "rmse": 60.824,
-      "rmse_std_across_seeds": 1.292,
-      "mae": 37.844,
-      "r2": 0.5651,
-      "smape": 33.395,
-      "skill_vs_persistence": 0.1754
+      "model": "gru_h64_l2",
+      "rmse": 60.006,
+      "rmse_std_across_seeds": 1.251,
+      "mae": 37.115,
+      "r2": 0.5767,
+      "smape": 32.585,
+      "skill_vs_persistence": 0.1865
     }
   },
   "persistence_rmse_by_horizon": {
@@ -97,29 +97,65 @@
     "12": 98.655,
     "24": 73.764
   },
-  "green": {},
-  "classification": null,
-  "significance": null,
+  "green": {
+    "best_model_params": 89217,
+    "best_model_macs": 4319360,
+    "best_model_latency_ms": 0.23625,
+    "best_model_train_kwh": 0.00011511969855707068,
+    "best_model_train_gco2e_bd_grid": 0.08014,
+    "grid_intensity_gco2_per_kwh": 696.13,
+    "grid_intensity_year": 2025,
+    "grid_intensity_source": "Ember (2026), with major processing by Our World in Data",
+    "energy_is_estimate_not_measurement": true
+  },
+  "classification": {
+    "horizon_h": 24,
+    "n_classes": 6,
+    "macro_f1_mean": 0.5179,
+    "macro_f1_std": 0.0047,
+    "macro_f1_present_mean": 0.6215,
+    "macro_f1_present_std": 0.0057,
+    "n_classes_defined": 6,
+    "n_classes_present_in_test": 5,
+    "empty_classes": [
+      "Good"
+    ],
+    "macro_f1_note": "Report the present-class figure alongside the all-class one. A category with zero test support contributes a structural zero and depresses the all-class macro-F1 regardless of model quality.",
+    "accuracy_mean": 0.6772,
+    "balanced_accuracy_mean": 0.6281,
+    "breakpoint_scheme": "us_epa_pm25_2024",
+    "target_basis": "rolling_24h_mean"
+  },
+  "significance": {
+    "test": "Diebold-Mariano",
+    "horizon_h": 24,
+    "model_a": "gru_h64_l2",
+    "model_b": "random_forest",
+    "statistic": 3.4979,
+    "p_value": 0.00047117610092994866,
+    "significant_at_5pct": true,
+    "lower_loss": "random_forest"
+  },
   "best_classical_by_horizon": {
     "1": {
-      "model": "lightgbm",
-      "rmse": 33.463,
-      "skill_vs_persistence": 0.0853
+      "model": "random_forest",
+      "rmse": 33.472,
+      "skill_vs_persistence": 0.085
     },
     "3": {
-      "model": "lightgbm",
-      "rmse": 48.746,
-      "skill_vs_persistence": 0.193
+      "model": "xgboost",
+      "rmse": 48.834,
+      "skill_vs_persistence": 0.1916
     },
     "6": {
-      "model": "lightgbm",
-      "rmse": 56.079,
-      "skill_vs_persistence": 0.3217
+      "model": "xgboost",
+      "rmse": 56.527,
+      "skill_vs_persistence": 0.3162
     },
     "12": {
-      "model": "lightgbm",
-      "rmse": 56.94,
-      "skill_vs_persistence": 0.4228
+      "model": "xgboost",
+      "rmse": 57.022,
+      "skill_vs_persistence": 0.422
     },
     "24": {
       "model": "random_forest",

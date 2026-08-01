@@ -139,12 +139,24 @@ def main() -> int:
         test = get_split_arrays(frame, cfg, h, "test")
         train = get_split_arrays(frame, cfg, h, "train")
 
-        classical: dict[str, np.ndarray] = {
-            "persistence": predict_persistence(test),
-            "climatology": predict_climatology(fit_climatology(train, h), test, h),
-        }
-        if h <= 24:
-            classical["seasonal_naive"] = predict_seasonal_naive(test)
+        # Prefer the predictions stage 3 wrote to disk: they cover every classical
+        # model including the trees, so the stratified table and the significance
+        # test can both use the model that actually won rather than only the
+        # naive rules that happen to be cheap to recompute here.
+        pred_path = cfg.path_for("data_interim") / "predictions" / f"classical_h{h}.parquet"
+        classical: dict[str, np.ndarray] = {}
+        if pred_path.exists():
+            stored = pd.read_parquet(pred_path).reindex(test.index)
+            for col in stored.columns:
+                if col not in {"y_true", "month_local"}:
+                    classical[col] = stored[col].to_numpy(dtype=float)
+            log.info("loaded %d stored classical predictions for h=%d", len(classical), h)
+        else:
+            log.warning("%s missing; falling back to naive baselines only", pred_path.name)
+            classical["persistence"] = predict_persistence(test)
+            classical["climatology"] = predict_climatology(fit_climatology(train, h), test, h)
+            if h <= 24:
+                classical["seasonal_naive"] = predict_seasonal_naive(test)
 
         # Tree predictions come from results.json rather than being refitted;
         # what is needed here is the stratification of the already-scored runs.

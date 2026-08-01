@@ -128,6 +128,20 @@ def main() -> int:
                 model.fit_seconds,
             )
 
+        # ---------------- persist predictions ------------------------------
+        # Written to disk so downstream stages can stratify these models and run
+        # significance tests against them. Without this, stage 5 only had the
+        # naive baselines in memory and silently skipped the Diebold-Mariano
+        # test whenever the best classical model was a tree -- which it always is.
+        pred_dir = cfg.path_for("data_interim") / "predictions"
+        pred_dir.mkdir(parents=True, exist_ok=True)
+        pred_frame = pd.DataFrame({"y_true": test.y}, index=test.index)
+        for name, pred in predictions.items():
+            pred_frame[name] = pred
+        pred_frame["month_local"] = test.month_local
+        pred_frame.to_parquet(pred_dir / f"classical_h{h}.parquet")
+        log.info("wrote predictions for %d models to %s", len(predictions), pred_dir.name)
+
         # ---------------- scoring -----------------------------------------
         persistence_rmse = all_metrics(test.y, predictions["persistence"])["rmse"]
 
