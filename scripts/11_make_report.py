@@ -176,6 +176,26 @@ def main() -> int:
     a("horizon by definition, not by accident.")
     a("")
 
+    # Persistence error is not necessarily monotone in the horizon, and when it is
+    # not that is a physical result rather than an anomaly -- so detect it and say
+    # so rather than leaving a reader to wonder whether the table is wrong.
+    if len(persistence) >= 3:
+        ordered = persistence.sort_index()
+        worst_h = int(ordered.idxmax())
+        if worst_h != int(ordered.index.max()):
+            a(
+                "**Persistence error is not monotone in the horizon.** It peaks at "
+                f"h = {worst_h} ({ordered.loc[worst_h]:.2f} µg/m³) and *falls* by "
+                f"h = {int(ordered.index.max())} ({ordered.iloc[-1]:.2f} µg/m³). This is the"
+            )
+            a("diurnal cycle, not an error in the table: at h = 24 persistence compares a")
+            a("time with the same clock hour one day earlier, whereas at intermediate")
+            a("horizons it compares opposite phases of a strong daily cycle — morning peak")
+            a("against afternoon minimum. Any skill score is therefore measured against a")
+            a("reference whose difficulty varies with the horizon, which is precisely why")
+            a("the raw RMSE column is reported alongside it.")
+            a("")
+
     # ---------------------------------------------------------------- sequence
     a("## 3. Sequence models")
     a("")
