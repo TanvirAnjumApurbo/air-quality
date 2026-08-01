@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\caption{Tier 1 and Tier 2 at the headline 24-hour horizon. RMSE intervals are moving-block bootstrap (block 24 h), which respects the serial correlation an i.i.d. bootstrap would ignore. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:tier1_tier2_h24}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & RMSE [95\textbackslash\{\}\% CI] & MAE & R2 & sMAPE & Skill \\
+\midrule
+persistence & 73.76 [67.8, 79.9] & 45.220 & 0.361 & 37.980 & 0.000 \\
+seasonal\_naive & 73.76 [67.8, 79.9] & 45.220 & 0.361 & 37.980 & 0.000 \\
+climatology & 65.43 [60.5, 70.5] & 42.720 & 0.497 & 37.280 & 0.113 \\
+ridge & 66.66 [60.6, 72.9] & 41.110 & 0.478 & 34.810 & 0.096 \\
+random\_forest & 58.50 [53.5, 63.5] & 36.250 & 0.598 & 32.380 & 0.207 \\
+xgboost & 58.70 [53.6, 63.7] & 36.370 & 0.595 & 32.150 & 0.204 \\
+lightgbm & 59.02 [54.0, 64.2] & 36.620 & 0.591 & 32.400 & 0.200 \\
+\bottomrule
+\end{tabular}
+\end{table}

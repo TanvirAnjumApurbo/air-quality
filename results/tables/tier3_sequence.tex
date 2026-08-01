@@ -1,0 +1,11 @@
+\begin{table}[htbp]
+\caption{Tier 3 sequence models, mean $\pm$ standard deviation across 1 seeds. All models respect the 100,000-parameter budget. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:tier3_sequence}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Model & Window (h) & h (hours) & Params & Seeds & RMSE & MAE & R2 & Skill \\
+\midrule
+gru\_h64\_l1 & 48 & 24 & 32321 & 1 & 59.62 & 37.54 & 0.582 & 0.1917 \\
+\bottomrule
+\end{tabular}
+\end{table}

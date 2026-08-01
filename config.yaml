@@ -335,17 +335,23 @@ models:
       n_splits: 4
       # Tuning uses TRAIN+VAL only. Test is never touched during tuning.
       scoring: neg_root_mean_squared_error
-      n_iter: 20                     # RandomizedSearchCV budget
+      n_iter: 10                     # RandomizedSearchCV budget, per model per horizon
     ridge:
       enabled: true
       alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
     random_forest:
       enabled: true
+      # Deliberately bounded rather than left to grow freely. An unconstrained
+      # forest (max_depth null, min_samples_leaf 1, max_features 1.0) on 33k rows
+      # x 102 features takes over ten minutes for a single horizon's search,
+      # which breaks the per-run time budget for no measurable accuracy gain on
+      # this data. Depth and leaf size are capped and the feature subsample is
+      # kept well below 1.0; the resulting forest is the one reported.
       grid:
-        n_estimators: [300]
-        max_depth: [10, 20, null]
-        min_samples_leaf: [1, 5, 20]
-        max_features: [0.3, 0.6, 1.0]
+        n_estimators: [200]
+        max_depth: [10, 20]
+        min_samples_leaf: [5, 20]
+        max_features: [0.2, 0.4]
       n_jobs: -1
     xgboost:
       enabled: true

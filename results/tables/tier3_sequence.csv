@@ -1,0 +1,2 @@
+Model,Window (h),h (hours),Params,Seeds,RMSE,MAE,R2,Skill
+gru_h64_l1,48,24,32321,1,59.62,37.54,0.582,0.1917

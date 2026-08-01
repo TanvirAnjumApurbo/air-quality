@@ -1,0 +1,36 @@
+16:46:21 | INFO    | 05_run_baselines | device: cuda
+16:46:23 | INFO    | 05_run_baselines | ======================================================================
+16:46:23 | INFO    | 05_run_baselines | HORIZON h=24
+16:46:23 | INFO    | 05_run_baselines | ======================================================================
+16:46:23 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+16:46:23 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+16:46:24 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+16:46:24 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+16:52:37 | INFO    | 05_run_baselines | device: cuda
+16:52:38 | INFO    | 05_run_baselines | ======================================================================
+16:52:38 | INFO    | 05_run_baselines | HORIZON h=24
+16:52:38 | INFO    | 05_run_baselines | ======================================================================
+16:52:38 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+16:52:38 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+16:52:39 | INFO    | 05_run_baselines | random_forest: randomised search, 20 of 27 configurations, 4 chronological folds
+17:03:46 | INFO    | 05_run_baselines | device: cuda
+17:03:47 | INFO    | 05_run_baselines | ======================================================================
+17:03:47 | INFO    | 05_run_baselines | HORIZON h=24
+17:03:47 | INFO    | 05_run_baselines | ======================================================================
+17:03:47 | INFO    | 05_run_baselines | rows: train=25787 val=5955 test=9083
+17:03:48 | INFO    | 05_run_baselines | ridge: randomised search, 5 of 5 configurations, 4 chronological folds
+17:03:48 | INFO    | 05_run_baselines | random_forest: randomised search, 8 of 8 configurations, 4 chronological folds
+17:06:24 | INFO    | 05_run_baselines | xgboost: randomised search, 10 of 216 configurations, 4 chronological folds
+17:08:04 | INFO    | 05_run_baselines | lightgbm: randomised search, 10 of 216 configurations, 4 chronological folds
+17:09:29 | INFO    | 05_run_baselines | ridge h=24: cv=-0.5551 best={'alpha': 100.0} (0.2 s)
+17:09:29 | INFO    | 05_run_baselines | random_forest h=24: cv=-0.5324 best={'n_estimators': 200, 'min_samples_leaf': 20, 'max_features': 0.2, 'max_depth': 20} (156.6 s)
+17:09:29 | INFO    | 05_run_baselines | xgboost h=24: cv=-0.5437 best={'subsample': 1.0, 'n_estimators': 400, 'min_child_weight': 1, 'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (99.7 s)
+17:09:29 | INFO    | 05_run_baselines | lightgbm h=24: cv=-0.5490 best={'subsample': 1.0, 'num_leaves': 31, 'n_estimators': 400, 'min_child_samples': 10, 'learning_rate': 0.03, 'colsample_bytree': 0.8} (85.1 s)
+17:09:29 | INFO    | 05_run_baselines |   persistence      RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:09:30 | INFO    | 05_run_baselines |   seasonal_naive   RMSE   73.76  MAE   45.22  R2  0.361  sMAPE  37.98  skill +0.0000
+17:09:30 | INFO    | 05_run_baselines |   climatology      RMSE   65.43  MAE   42.72  R2  0.497  sMAPE  37.28  skill +0.1130
+17:09:30 | INFO    | 05_run_baselines |   ridge            RMSE   66.66  MAE   41.11  R2  0.478  sMAPE  34.81  skill +0.0963
+17:09:30 | INFO    | 05_run_baselines |   random_forest    RMSE   58.50  MAE   36.25  R2  0.598  sMAPE  32.38  skill +0.2069
+17:09:30 | INFO    | 05_run_baselines |   xgboost          RMSE   58.70  MAE   36.37  R2  0.595  sMAPE  32.15  skill +0.2043
+17:09:30 | INFO    | 05_run_baselines |   lightgbm         RMSE   59.02  MAE   36.62  R2  0.591  sMAPE  32.40  skill +0.1999
+17:09:30 | INFO    | 05_run_baselines | permutation importance for random_forest at h=24
