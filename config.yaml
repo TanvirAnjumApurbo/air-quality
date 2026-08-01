@@ -115,9 +115,21 @@ data:
     s3_region: us-east-1
     parameter: pm25
     target_units: "ug/m3"       # anything else is converted or rejected, and logged
-    # location_ids stays EMPTY until the discovery table is reviewed and a site
-    # is chosen by the operator. Scripts refuse to bulk-download without it.
-    location_ids: []
+    # Chosen from the Phase-1 discovery table (results/tables/openaq_dhaka_candidates.csv)
+    # and approved by the operator.
+    #
+    # 2445 and 8415 are the SAME physical instrument -- the US Embassy Dhaka
+    # reference monitor -- split across two OpenAQ location IDs when the feed
+    # migrated from StateAir to AirNow. Evidence: 2445 ends 2016-11-09T16:00Z,
+    # 8415 begins 2016-11-09T18:00Z (a two-hour handover); coordinates differ by
+    # ~165 m (23.7977/90.4237 vs 23.7964/90.4246); both isMonitor=true with the
+    # same owner. Concatenating them yields 2016-03-10 -> 2025-03-24.
+    #
+    # Records are concatenated in this order and de-duplicated on timestamp; any
+    # overlapping hours are counted and logged rather than silently dropped.
+    location_ids: [2445, 8415]
+    combine_as_single_site: true
+    site_label: "US Embassy Dhaka (OpenAQ 2445+8415)"
     request:
       max_retries: 5
       backoff_base_s: 1.5
@@ -125,20 +137,36 @@ data:
       timeout_s: 60
 
   # --- NASA POWER (meteorological drivers) ---------------------------------
-  # No key required. Hourly point endpoint. Values are UTC.
+  # No key required. Hourly point endpoint.
+  #
+  # TIME STANDARD -- verified against the live API, and it is NOT what is
+  # commonly assumed. The hourly endpoint defaults to time_standard="LST"
+  # (Local Solar Time), not UTC. Requesting UTC explicitly is therefore
+  # mandatory, otherwise every meteorological driver is silently offset by about
+  # six hours relative to the OpenAQ target and the fusion is meaningless.
+  # Evidence (Dhaka, 2024-01-01, T2M): under LST the daily minimum falls at 06h
+  # and maximum at 13h; under UTC they fall at 23h and 07h, which map to 05:00
+  # and 13:00 Asia/Dhaka -- dawn and mid-afternoon, as expected.
   power:
     endpoint: https://power.larc.nasa.gov/api/temporal/hourly/point
     community: RE
-    # Verified against the live /system/manager/parameters response before use.
+    time_standard: UTC   # sent as the `time-standard` query parameter
+    # Verified present in the live response for this point and period; the
+    # fetcher re-checks and fails loudly if any requested name is not returned.
     parameters:
-      - T2M              # temperature at 2 m (C)
-      - T2MDEW           # dew point at 2 m (C)
-      - RH2M             # relative humidity at 2 m (%)
-      - WS10M            # wind speed at 10 m (m/s)
-      - WD10M            # wind direction at 10 m (deg)
-      - PS               # surface pressure (kPa)
-      - PRECTOTCORR      # bias-corrected total precipitation (mm/hour)
-      - ALLSKY_SFC_SW_DWN  # all-sky downward shortwave irradiance (W/m^2)
+      - T2M              # Temperature at 2 Meters                        [C]
+      - T2MDEW           # Dew/Frost Point at 2 Meters                    [C]
+      - RH2M             # Relative Humidity at 2 Meters                  [%]
+      - WS10M            # Wind Speed at 10 Meters                        [m/s]
+      - WD10M            # Wind Direction at 10 Meters                    [Degrees]
+      - PS               # Surface Pressure                               [kPa]
+      - PRECTOTCORR      # Precipitation Corrected                        [mm/day]
+      - ALLSKY_SFC_SW_DWN  # All Sky Surface Shortwave Downward Irradiance [Wh/m^2]
+    # Units above are quoted verbatim from the API `parameters` block and differ
+    # from what is often assumed: PRECTOTCORR is reported as mm/day (not mm/hour)
+    # and ALLSKY_SFC_SW_DWN as Wh/m^2 (not W/m^2). Values are used as returned
+    # and never rescaled on an assumption; the observed units are recorded in
+    # the data audit.
     fill_value: -999.0   # POWER missing sentinel -- treated as NaN, never as data
     chunk_by: year       # one request per calendar year, cached to data/raw
     request:
@@ -160,9 +188,12 @@ data:
     station: null
 
   # --- date range requested from every source ------------------------------
-  # Actual usable range is decided by the Phase-1 audit and written back here.
+  # Bounded by the chosen OpenAQ site: the archive begins 2016-03-10 and the
+  # feed stops 2025-03-24 (there is no Dhaka reference-monitor data after that).
+  # Requested slightly wider than the target coverage so the audit can show the
+  # true edges rather than edges imposed by this setting.
   range:
-    start: "2017-01-01"
+    start: "2016-01-01"
     end: "2025-12-31"
 
 # -----------------------------------------------------------------------------
@@ -566,11 +597,32 @@ output:
   figures:
     dpi: 300
     formats: [png, pdf]
-    # Okabe-Ito colourblind-safe qualitative palette.
-    palette: [
-      "#0072B2", "#D55E00", "#009E73", "#CC79A7",
-      "#E69F00", "#56B4E9", "#F0E442", "#000000"
-    ]
+    # Categorical series colours, assigned in THIS fixed order and never cycled.
+    #
+    # Derived from Okabe-Ito, then machine-validated for colourblind separation
+    # rather than assumed safe. The full 8-colour Okabe-Ito set fails on a light
+    # print surface: #F0E442 (yellow) sits outside the usable lightness band at
+    # L=0.902 with 1.29:1 contrast, #000000 has zero chroma and reads as ink
+    # rather than a series, and pink-adjacent-to-green gives a deuteranope
+    # separation of only dE 7.6. Dropping those two and reordering so that
+    # #56B4E9 neighbours #CC79A7 lifts the worst adjacent pair to dE 9.6
+    # (deuteranopia) and dE 20.0 (normal vision).
+    #
+    # Validation result (light surface, categorical):
+    #   lightness band     PASS  all 6 within L 0.43-0.77
+    #   chroma floor       PASS  all 6 >= 0.1
+    #   CVD separation     PASS  worst adjacent #56B4E9<->#CC79A7 dE 9.6 deutan
+    #   normal-vision      PASS  worst adjacent dE 20.0
+    #   contrast vs white  WARN  #E69F00 2.19, #56B4E9 2.25, #CC79A7 2.98
+    #
+    # The contrast WARN is relieved, not dismissed: every figure in this study
+    # ships with direct series labels and a matching results table in
+    # results/tables, so identity is never carried by colour alone.
+    palette: ["#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7", "#56B4E9"]
+    # Reserved, outside the categorical order:
+    observed_colour: "#222222"    # ground-truth series in predicted-vs-actual
+    reference_colour: "#767676"   # persistence / reference baseline, recessive
+    grid_colour: "#D9D9D9"        # recessive grid, never competes with marks
     style: seaborn-v0_8-whitegrid
     font_size: 11
     figsize_single: [6.0, 4.0]

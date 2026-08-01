@@ -470,3 +470,266 @@ def download_month(
     df = pd.concat(frames, ignore_index=True)
     df.to_parquet(dest, index=False)
     return n_objects, len(df)
+
+
+def list_partitions(cfg: Config, location_id: int) -> list[tuple[int, int]]:
+    """List every ``(year, month)`` partition present for a location.
+
+    Args:
+        cfg: Loaded configuration.
+        location_id: OpenAQ location identifier.
+
+    Returns:
+        Sorted ``(year, month)`` pairs.
+    """
+    client = _s3_client(cfg)
+    bucket = str(cfg.get("data.openaq.s3_bucket"))
+    paginator = client.get_paginator("list_objects_v2")
+
+    partitions: set[tuple[int, int]] = set()
+    year_prefix = f"records/csv.gz/locationid={location_id}/"
+    for year_page in paginator.paginate(Bucket=bucket, Prefix=year_prefix, Delimiter="/"):
+        for year_common in year_page.get("CommonPrefixes", []):
+            year_token = year_common["Prefix"].rstrip("/").rsplit("year=", 1)[-1]
+            if not year_token.isdigit():
+                continue
+            year = int(year_token)
+            for month_page in paginator.paginate(
+                Bucket=bucket, Prefix=year_common["Prefix"], Delimiter="/"
+            ):
+                for month_common in month_page.get("CommonPrefixes", []):
+                    month_token = month_common["Prefix"].rstrip("/").rsplit("month=", 1)[-1]
+                    if month_token.isdigit():
+                        partitions.add((year, int(month_token)))
+    return sorted(partitions)
+
+
+def download_location(cfg: Config, location_id: int, logger: Any) -> pd.DataFrame:
+    """Download every archived record for one location.
+
+    Daily objects are fetched concurrently and cached per location-month, so an
+    interrupted run resumes without re-downloading completed months.
+
+    Args:
+        cfg: Loaded configuration.
+        location_id: OpenAQ location identifier.
+        logger: Logger for progress reporting.
+
+    Returns:
+        Concatenated raw records, exactly as archived.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    raw_dir = cfg.path_for("data_raw") / "openaq"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+
+    partitions = list_partitions(cfg, location_id)
+    logger.info("location %d: %d month partitions in S3", location_id, len(partitions))
+
+    def _one(part: tuple[int, int]) -> pd.DataFrame:
+        year, month = part
+        dest = raw_dir / f"loc{location_id}_{year}-{month:02d}.parquet"
+        if dest.exists():
+            return pd.read_parquet(dest)
+        download_month(cfg, location_id, year, month, raw_dir)
+        return pd.read_parquet(dest) if dest.exists() else pd.DataFrame()
+
+    frames: list[pd.DataFrame] = []
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for i, frame in enumerate(pool.map(_one, partitions), start=1):
+            if len(frame):
+                frames.append(frame)
+            if i % 12 == 0 or i == len(partitions):
+                logger.info("location %d: %d/%d months", location_id, i, len(partitions))
+
+    if not frames:
+        return pd.DataFrame()
+    combined = pd.concat(frames, ignore_index=True)
+    logger.info("location %d: %d raw records", location_id, len(combined))
+    return combined
+
+
+def load_openaq_raw(cfg: Config, logger: Any) -> pd.DataFrame:
+    """Download and concatenate every configured OpenAQ location.
+
+    Args:
+        cfg: Loaded configuration.
+        logger: Logger for progress and overlap accounting.
+
+    Returns:
+        Raw records for all configured locations with a parsed UTC ``datetime``.
+
+    Raises:
+        OpenAQError: If no location IDs are configured, or nothing was retrieved.
+    """
+    location_ids = list(cfg.get("data.openaq.location_ids", []))
+    if not location_ids:
+        raise OpenAQError(
+            "data.openaq.location_ids is empty. Run scripts/01_discover_openaq.py, "
+            "review the candidate table, and set the chosen IDs in config.yaml."
+        )
+
+    frames = []
+    for location_id in location_ids:
+        frame = download_location(cfg, int(location_id), logger)
+        if len(frame):
+            frames.append(frame)
+
+    if not frames:
+        raise OpenAQError(f"no records retrieved for locations {location_ids}")
+
+    combined = pd.concat(frames, ignore_index=True)
+    # The archive stores ISO-8601 with an explicit local offset (+06:00 for
+    # Dhaka), so utc=True yields correct instants without assuming a timezone.
+    combined["datetime"] = pd.to_datetime(combined["datetime"], utc=True, format="ISO8601")
+    return combined.sort_values("datetime").reset_index(drop=True)
+
+
+def apply_qc(cfg: Config, df: pd.DataFrame, logger: Any) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
+    """Apply the configured quality filters, logging the rows each one removes.
+
+    Every filtering decision is recorded so the data audit can report exactly how
+    many observations each rule discarded.
+
+    Args:
+        cfg: Loaded configuration.
+        df: Raw records from :func:`load_openaq_raw`.
+        logger: Logger for per-filter accounting.
+
+    Returns:
+        ``(filtered, ledger)`` where ``ledger`` has one entry per filter with the
+        rule name, rows removed, and rows remaining.
+
+    Raises:
+        OpenAQError: If units cannot be reconciled to the configured target.
+    """
+    qc = cfg.get("qc.pm25")
+    target_units = str(cfg.get("data.openaq.target_units", "ug/m3"))
+    parameter = str(cfg.get("data.openaq.parameter", "pm25"))
+    ledger: list[dict[str, Any]] = []
+    n = len(df)
+
+    def _record(rule: str, before: int, after: int, note: str = "") -> None:
+        ledger.append(
+            {"rule": rule, "removed": before - after, "remaining": after, "note": note}
+        )
+        logger.info("QC %-28s removed %7d  remaining %7d %s", rule, before - after, after, note)
+
+    ledger.append({"rule": "raw records", "removed": 0, "remaining": n, "note": ""})
+    logger.info("QC %-28s %26d", "raw records", n)
+
+    before = len(df)
+    df = df[df["parameter"] == parameter]
+    _record(f"parameter != {parameter}", before, len(df))
+
+    # Units: µg/m³ and ug/m3 are the same unit written differently. Anything that
+    # is not micrograms per cubic metre is rejected rather than guessed at.
+    observed = sorted(set(df["units"].dropna().astype(str).unique()))
+    micrograms = {"µg/m³", "ug/m3", "ugm3", "µg/m3", "µg/m³"}
+    unknown = [u for u in observed if u not in micrograms]
+    if unknown:
+        raise OpenAQError(
+            f"unhandled PM2.5 units {unknown} (target {target_units!r}). "
+            "Add an explicit conversion rather than assuming a scale factor."
+        )
+    logger.info("QC units observed: %s -> all micrograms per cubic metre", observed)
+
+    before = len(df)
+    df = df[df["value"].notna()]
+    _record("value is NaN", before, len(df))
+
+    if bool(qc.get("drop_negative", True)):
+        before = len(df)
+        df = df[df["value"] >= 0]
+        _record("negative value", before, len(df))
+
+    if bool(qc.get("drop_exact_zero", True)):
+        before = len(df)
+        df = df[df["value"] != 0]
+        _record("exact zero (sensor fault)", before, len(df))
+
+    cap = float(qc.get("sanity_cap_ugm3", 1000.0))
+    before = len(df)
+    df = df[df["value"] <= cap]
+    _record(f"above sanity cap {cap:g}", before, len(df))
+
+    max_repeats = int(qc.get("flatline_max_repeats", 12))
+    if max_repeats > 0 and len(df):
+        df = df.sort_values("datetime")
+        run_id = (df["value"] != df["value"].shift()).cumsum()
+        run_len = run_id.map(run_id.value_counts())
+        before = len(df)
+        df = df[run_len <= max_repeats]
+        _record(
+            f"flatline run > {max_repeats}",
+            before,
+            len(df),
+            "(consecutive identical values = stuck sensor)",
+        )
+
+    before = len(df)
+    df = df.drop_duplicates(subset=["datetime"], keep="first")
+    _record(
+        "duplicate timestamps",
+        before,
+        len(df),
+        "(overlap between concatenated location IDs)",
+    )
+
+    return df.reset_index(drop=True), ledger
+
+
+def to_hourly(cfg: Config, df: pd.DataFrame, logger: Any) -> pd.DataFrame:
+    """Resample quality-controlled records onto a regular hourly UTC grid.
+
+    Gaps are left as NaN rather than filled: contiguity matters for gap-aware
+    windowing later, so missing hours must remain visible.
+
+    Args:
+        cfg: Loaded configuration.
+        df: Quality-controlled records.
+        logger: Logger for coverage reporting.
+
+    Returns:
+        Frame indexed by hourly UTC timestamp with a single ``pm25`` column.
+    """
+    freq = str(cfg.get("qc.resample.freq", "1h"))
+    how = str(cfg.get("qc.resample.aggregation", "mean"))
+
+    series = df.set_index("datetime")["value"].sort_index()
+    hourly = series.resample(freq).agg(how)
+
+    full = pd.date_range(hourly.index.min(), hourly.index.max(), freq=freq, tz="UTC")
+    hourly = hourly.reindex(full)
+    hourly.index.name = "datetime_utc"
+
+    n_obs = int(hourly.notna().sum())
+    n_total = len(hourly)
+    logger.info(
+        "hourly grid: %d of %d hours observed (%.1f%%), %s to %s",
+        n_obs,
+        n_total,
+        100.0 * n_obs / n_total,
+        hourly.index.min(),
+        hourly.index.max(),
+    )
+    return hourly.to_frame(name="pm25")
+
+
+def write_openaq(cfg: Config, frame: pd.DataFrame, logger: Any) -> Path:
+    """Persist the hourly PM2.5 series to ``data/interim``.
+
+    Args:
+        cfg: Loaded configuration.
+        frame: Hourly UTC PM2.5 frame.
+        logger: Logger for the write confirmation.
+
+    Returns:
+        Path of the written Parquet file.
+    """
+    out_dir = cfg.path_for("data_interim")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = out_dir / "openaq_pm25_hourly.parquet"
+    frame.to_parquet(out)
+    logger.info("wrote %s (%d rows)", out, len(frame))
+    return out

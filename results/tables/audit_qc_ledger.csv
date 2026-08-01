@@ -1,0 +1,9 @@
+rule,removed,remaining,note
+raw records,0,81808,
+parameter != pm25,11525,70283,
+value is NaN,0,70283,
+negative value,5056,65227,
+exact zero (sensor fault),13,65214,
+above sanity cap 1000,0,65214,
+flatline run > 12,0,65214,(consecutive identical values = stuck sensor)
+duplicate timestamps,0,65214,(overlap between concatenated location IDs)
