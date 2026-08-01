@@ -1,0 +1,4 @@
+12:41:14 | INFO    | 01_discover_openaq | discovering monitors: iso=BD, radius=25000 m around (23.8103, 90.4125)
+12:41:17 | INFO    | 01_discover_openaq | found 22 candidate locations
+12:41:17 | INFO    | 01_discover_openaq | probing S3 archive for actual year partitions (no data downloaded)
+12:41:24 | INFO    | 01_discover_openaq | wrote F:\BUP\results\tables\openaq_dhaka_candidates.csv (22 rows)

@@ -230,11 +230,14 @@ features:
     day_of_week: {period: 7}
     day_of_year: {period: 365.25}
 
-  # Season indicator. Bangladesh monsoon month boundaries -- see citations.season.
+  # Season indicator. Boundaries taken verbatim from the Bangladesh Department of
+  # Environment, which defines "dry season (November to April) and wet season
+  # (May to October)". See citations.season. Note this is a two-season split
+  # covering all 12 months, not a monsoon-core subset.
   season:
-    monsoon_months: [6, 7, 8, 9]
-    dry_months: [11, 12, 1, 2]
-    _status: PENDING_VERIFICATION
+    monsoon_months: [5, 6, 7, 8, 9, 10]
+    dry_months: [11, 12, 1, 2, 3, 4]
+    _status: VERIFIED
 
   gap_aware:
     enabled: true
@@ -383,16 +386,40 @@ classification:
   enabled: true
   horizon_h: 24                      # next-day health advisory
   class_weight: balanced             # imbalance handled explicitly and reported
-  # Breakpoints MUST come from a published standard. Values below are filled in
-  # and marked VERIFIED only after being read from the cited source document.
+  # The EPA breakpoints below are defined for a 24-HOUR AVERAGE PM2.5
+  # concentration. Applying them to an instantaneous hourly value is a common
+  # shortcut but is not what the standard specifies, so the classification target
+  # is the 24-hour mean ending at t+h. That mean is computed from observations at
+  # and before t+h only, and the predictor still sees nothing after t.
+  target_basis: rolling_24h_mean     # rolling_24h_mean | hourly_instantaneous
   breakpoints:
-    scheme: null                     # e.g. us_epa_pm25_2024 | bangladesh_doe
-    source_url: null
-    source_title: null
-    source_year: null
-    edges_ugm3: null                 # ordered upper bounds, ug/m3 (24-h basis)
-    labels: null
-    _status: PENDING_VERIFICATION
+    scheme: us_epa_pm25_2024
+    # Bangladesh does not publish its own PM2.5 concentration breakpoints. The
+    # DoE states it applies the USEPA AQI equation and category scale directly:
+    # "The following equation (eq. 1) adopted by the United States Environment
+    # Protection Agency (USEPA) is used to calculate the AQI in Bangladesh too."
+    # So the US EPA concentration breakpoints are the correct ones to use here,
+    # and the DoE report is the citation for that being Bangladesh practice.
+    source_title: >-
+      Technical Assistance Document for the Reporting of Daily Air Quality --
+      the Air Quality Index (AQI), Table 6: Breakpoints for the AQI
+    source_url: https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
+    source_org: US Environmental Protection Agency / AirNow
+    source_year: 2024
+    # Reflects the 2024 PM2.5 AQI revision (effective 6 May 2024): the Good/
+    # Moderate boundary moved from 12.0 to 9.0 ug/m3.
+    revision: "2024 revision, effective 2024-05-06"
+    # Inclusive upper bounds of each category, ug/m3, 24-hour basis. The final
+    # category is open-ended (> 225.4).
+    edges_ugm3: [9.0, 35.4, 55.4, 125.4, 225.4]
+    labels:
+      - Good                            # AQI   0-50
+      - Moderate                        # AQI  51-100
+      - Unhealthy for Sensitive Groups  # AQI 101-150
+      - Unhealthy                       # AQI 151-200
+      - Very Unhealthy                  # AQI 201-300
+      - Hazardous                       # AQI 301+
+    _status: VERIFIED
 
 # =============================================================================
 # EVALUATION
@@ -407,11 +434,20 @@ evaluation:
     by_season: true                  # monsoon vs dry, per features.season
     by_pollution_level:
       enabled: true
-      # Threshold on OBSERVED PM2.5. See citations.pm25_standard -- the operative
-      # Bangladesh national 24-h standard is being verified; 35 ug/m3 is the US
-      # EPA 24-h PM2.5 NAAQS. The discrepancy is flagged, not silently resolved.
-      threshold_ugm3: 35.0
-      _status: PENDING_VERIFICATION
+      # Thresholds on OBSERVED PM2.5, from the Bangladesh Air Pollution (Control)
+      # Rules 2022 (S.R.O 255-Law/2022), Table 3 of the DoE report. Both are
+      # Bangladesh national standards for PM2.5 -- they differ in averaging
+      # period, which is the distinction that matters here:
+      #   65 ug/m3 = 24-hour standard  -> the operative SHORT-TERM threshold, and
+      #                                   therefore the headline stratification
+      #                                   for an hourly forecasting task
+      #   35 ug/m3 = ANNUAL standard   -> reported as a secondary, more sensitive
+      #                                   cut. It coincides numerically with the
+      #                                   US EPA 24-hour PM2.5 NAAQS, which is a
+      #                                   coincidence and not the reason it is used.
+      threshold_ugm3: 65.0
+      secondary_thresholds_ugm3: [35.0]
+      _status: VERIFIED
   diebold_mariano:
     enabled: true
     # Compares best deep model vs best classical baseline.
@@ -445,14 +481,19 @@ green:
     output_file: emissions.csv       # gitignored
     country_iso_code: BGD
   grid_carbon_intensity:
-    # DO NOT INVENT THIS NUMBER. Filled from a citable source (Ember / IEA /
-    # Electricity Maps) with year recorded. Until then the gCO2e column is left
-    # blank and flagged rather than fabricated.
-    value_gco2_per_kwh: null
-    year: null
-    source_name: null
-    source_url: null
-    _status: PENDING_VERIFICATION
+    # Lifecycle carbon intensity of Bangladesh electricity generation, i.e.
+    # grams of CO2-EQUIVALENT per kilowatt-hour (not CO2 only).
+    value_gco2_per_kwh: 696.13
+    year: 2025
+    source_name: Ember (2026), with major processing by Our World in Data
+    source_url: https://ourworldindata.org/grapher/carbon-intensity-electricity
+    source_dataset: Ember, "Yearly Electricity Data"
+    source_note: >-
+      Retrieved 2026-08-01 from the Our World in Data machine-readable export of
+      the Ember Yearly Electricity Data series. Bangladesh values for recent
+      years: 2022 = 676.48, 2023 = 682.72, 2024 = 695.70, 2025 = 696.13
+      gCO2e/kWh. The 2025 figure is used as the most recent complete year.
+    _status: VERIFIED
 
 # =============================================================================
 # CITATIONS -- every externally-sourced constant is registered here.
@@ -460,25 +501,63 @@ green:
 # =============================================================================
 citations:
   season:
-    claim: "Bangladesh monsoon and dry season month boundaries"
-    source_name: null
-    source_url: null
-    _status: PENDING_VERIFICATION
+    claim: >-
+      Bangladesh dry season is November-April and wet (rainy) season is
+      May-October.
+    quote: >-
+      "Wind patterns are completely opposite in dry season (November to April)
+      and wet season (May to October)"
+    source_name: >-
+      Department of Environment, Ministry of Environment, Forest and Climate
+      Change, Government of Bangladesh (2025). Ambient Air Quality in Bangladesh
+      (2018-2023), section 2.7 Meteorology of the Country, p. 13.
+    source_url: https://objectstorage.ap-dcc-gazipur-1.oraclecloud15.com/n/axvjbnqprylg/b/V2Ministry/o/office-doe/2024/12/014a6e225cf849098389d835538afdc9.pdf
+    _status: VERIFIED
+
   aqi_breakpoints:
-    claim: "PM2.5 AQI category breakpoints"
-    source_name: null
-    source_url: null
-    _status: PENDING_VERIFICATION
+    claim: >-
+      PM2.5 24-hour AQI category breakpoints are 0.0-9.0, 9.1-35.4, 35.5-55.4,
+      55.5-125.4, 125.5-225.4 and 225.5+ ug/m3, and Bangladesh applies the USEPA
+      AQI scale rather than a national concentration scale.
+    quote: >-
+      "The following equation (eq. 1) adopted by the United States Environment
+      Protection Agency (USEPA) is used to calculate the AQI in Bangladesh too."
+    source_name: >-
+      US EPA / AirNow, Technical Assistance Document for the Reporting of Daily
+      Air Quality -- the Air Quality Index (AQI), Table 6 (breakpoints; reflects
+      the 2024 PM2.5 AQI revision effective 2024-05-06). Bangladesh adoption of
+      the USEPA scale per DoE (2025), Ambient Air Quality in Bangladesh
+      (2018-2023), section 3.3 and Table 4, pp. 22-23.
+    source_url: https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
+    _status: VERIFIED
+
   pm25_standard:
-    claim: "Operative national 24-hour PM2.5 standard used for high-pollution stratification"
-    source_name: null
-    source_url: null
-    _status: PENDING_VERIFICATION
+    claim: >-
+      Bangladesh national ambient air quality standards for PM2.5 are 65 ug/m3
+      (24-hour) and 35 ug/m3 (annual), set by the Air Pollution (Control) Rules
+      2022. The 24-hour value is the operative short-term standard.
+    quote: >-
+      "The government of Bangladesh has revised the ambient air quality standards
+      in 2022, applicable for all over the country, vide the Air Pollution
+      (Control) Rules - 2022" (S.R.O 255 Law/2022)" -- Table 3: PM2.5, 35 ug/m3
+      annual; 65 ug/m3 24-hour.
+    source_name: >-
+      Department of Environment, Ministry of Environment, Forest and Climate
+      Change, Government of Bangladesh (2025). Ambient Air Quality in Bangladesh
+      (2018-2023), section 2.6, Table 3, p. 13, citing Air Pollution (Control)
+      Rules 2022 (S.R.O 255-Law/2022).
+    source_url: https://objectstorage.ap-dcc-gazipur-1.oraclecloud15.com/n/axvjbnqprylg/b/V2Ministry/o/office-doe/2024/12/014a6e225cf849098389d835538afdc9.pdf
+    _status: VERIFIED
+
   grid_carbon_intensity:
-    claim: "Bangladesh electricity grid carbon intensity (gCO2e/kWh)"
-    source_name: null
-    source_url: null
-    _status: PENDING_VERIFICATION
+    claim: >-
+      Bangladesh lifecycle electricity carbon intensity was 696.13 gCO2e/kWh in
+      2025.
+    source_name: >-
+      Ember (2026), "Yearly Electricity Data", with major processing by Our World
+      in Data, "Lifecycle carbon intensity of electricity generation".
+    source_url: https://ourworldindata.org/grapher/carbon-intensity-electricity
+    _status: VERIFIED
 
 # =============================================================================
 # OUTPUT / FIGURES
