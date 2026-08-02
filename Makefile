@@ -21,9 +21,13 @@ SCRIPTS := scripts
 
 # Seeds/horizons/paths are NOT defined here -- they live in config.yaml.
 CONFIG := config.yaml
+# Cross-city generalisation check. Same pipeline, same grid, same seeds; only
+# the record, one meteorological driver and the season definition differ.
+CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
-        classify green eval figures report all lint fmt clean clean-results
+        classify green eval figures report all lint fmt clean clean-results \
+        beijing cross-city everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -42,6 +46,9 @@ help:  ## List available targets
 	@echo "  figures     Phase 6: all figures (png + pdf, 300 dpi)"
 	@echo "  report      Phase 6: RESULTS.md + abstract_facts.json"
 	@echo "  all         Everything above, in order"
+	@echo "  beijing     Cross-city: whole pipeline again on the Beijing record"
+	@echo "  cross-city  Rank-transfer comparison (needs 'all' and 'beijing')"
+	@echo "  everything  all + beijing + cross-city + report (final artefacts)"
 	@echo "  lint        ruff check + format check"
 	@echo "  clean       Remove caches and checkpoints (keeps raw data)"
 
@@ -91,6 +98,28 @@ report:  ## Phase 6 RESULTS.md + abstract_facts.json
 	$(PY) $(SCRIPTS)/11_make_report.py --config $(CONFIG)
 
 all: check data audit features test baselines deep classify green eval figures report  ## Full pipeline
+
+# ---- cross-city generalisation check ---------------------------------------
+# Reuses the Beijing frame already downloaded by `make data`; every stage after
+# 12_prepare_beijing is the identical script run against the other config.
+beijing:  ## Cross-city: run the whole pipeline again on the Beijing record
+	$(PY) $(SCRIPTS)/12_prepare_beijing.py --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/03_data_audit.py      --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/04_build_features.py  --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/05_run_baselines.py   --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/06_train_sequence.py  --config $(CONFIG_B) --resume auto
+	$(PY) $(SCRIPTS)/07_train_classifier.py --config $(CONFIG_B) --resume auto
+	$(PY) $(SCRIPTS)/08_green_measure.py   --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/11_make_report.py     --config $(CONFIG_B)
+
+cross-city:  ## Rank-transfer comparison (requires `all` and `beijing` first)
+	$(PY) $(SCRIPTS)/13_cross_city.py --config $(CONFIG) --config-b $(CONFIG_B)
+
+# `report` is repeated last on purpose: 13_cross_city writes the comparison into
+# results.json, and only a report generated afterwards carries section 7.
+everything: all beijing cross-city report  ## Every result in the paper
 
 lint:  ## ruff
 	$(PY) -m ruff check src scripts tests

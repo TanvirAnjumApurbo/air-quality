@@ -125,6 +125,15 @@ def main() -> int:
     audit = json.loads(
         (cfg.path_for("data_interim") / "audit_summary.json").read_text(encoding="utf-8")
     )
+    # Read for the Limitations section, so its site-specific numbers come from
+    # whichever city this config describes rather than being hardcoded.
+    qc_ledger = json.loads(
+        (cfg.path_for("data_interim") / str(cfg.get("data.files.qc_ledger"))).read_text(
+            encoding="utf-8"
+        )
+    )
+    gaps_path = cfg.path_for("tables") / "audit_longest_gaps.csv"
+    longest_gap = pd.read_csv(gaps_path).iloc[0] if gaps_path.exists() else None
 
     best_deep = _best_per_horizon(frame, "tier3")
     best_classical = _best_per_horizon(frame[frame["tier"].isin(["tier1", "tier2"])])
@@ -399,19 +408,104 @@ def main() -> int:
         )
         a("")
 
-    # ---------------------------------------------------------------- limits
-    a("## 7. Limitations")
+    # ---------------------------------------------------------- cross-city
+    # Section numbering is computed, not hardcoded: the comparison city's own
+    # report has no cross-city block, and a fixed "## 8." there would skip 7.
+    next_section = 7
+    cross = payload.get("cross_city") or {}
+    if cross:
+        other = next(iter(cross))
+        block = cross[other]
+        ranking = pd.DataFrame(block["ranking"])
+        rho = block.get("spearman_rank_correlation")
+        this_city = str(cfg.get("data.site.city"))
+
+        a(f"## {next_section}. Cross-city generalisation: {this_city} against {other}")
+        next_section += 1
+        a("")
+        a("The same pipeline, model grid, seed set, split procedure and QC thresholds")
+        a(f"were run on {other}. Co-located co-pollutants were excluded there because")
+        a(f"{this_city} has none, so the comparison tests the method rather than the")
+        a("richness of the feature set.")
+        a("")
+        a(f"**Spearman rank correlation between the two cities' method rankings: {rho:+.3f}.**")
+        a("")
+        if rho is not None and rho < 0.3:
+            a("The ranking does not transfer. A benchmark run on either city alone would")
+            a("have recommended a different method, and neither recommendation would")
+            a("generalise. This is the central argument for reporting both, and it is not")
+            a("visible from either city in isolation.")
+            a("")
+
+        pivot = ranking.pivot_table(index="model", columns="city", values="rank", aggfunc="first")
+        skl = ranking.pivot_table(index="model", columns="city", values="skill", aggfunc="first")
+        merged = pivot.join(skl, lsuffix=" rank", rsuffix=" skill").reset_index()
+        merged = merged.sort_values(f"{this_city} rank")
+        a(merged.round(4).to_markdown(index=False))
+        a("")
+
+        chosen = ranking[ranking.get("model") == "best sequence"]
+        if not chosen.empty and "chosen" in chosen.columns:
+            a("Validation-selected sequence configuration per city:")
+            a("")
+            for _, r in chosen.iterrows():
+                a(f"- {r['city']}: `{r['chosen']}` (RMSE {r['rmse']:.2f})")
+            a("")
+
+        a("### What this changes")
+        a("")
+        a("Read alone, the primary result says a compact recurrent model loses to tuned")
+        a("gradient boosting. The second city shows that conclusion is **not a property")
+        a("of compact recurrent models**: in the other city the sequence model beats")
+        a("every tree, while the trees collapse to near-worthless skill.")
+        a("")
+        a("The record characteristics point at the mechanism. Tree models on lagged")
+        a("tabular features tolerate fragmentation well, because each row stands alone.")
+        a("Sequence models need contiguous windows, and gap-aware windowing discards a")
+        a("large fraction of them where the record is broken.")
+        a("")
+        context = pd.DataFrame(block["context"])
+        a(context.to_markdown(index=False))
+        a("")
+        a("**Caveat on strength of evidence.** The ranking *reversal* is the robust")
+        a("claim. The identity of the winner in the comparison city is not: its")
+        a("Diebold-Mariano tests are mostly not significant at the 5% level, and its")
+        a("test period is shorter and spans a seasonal transition, so absolute skill is")
+        a("lower for every method there.")
+        a("")
+
+    # Site-specific limitations are read from this city's own audit and QC
+    # ledger. They were previously hardcoded to Dhaka's numbers, which the
+    # comparison city's report then restated as if they were its own.
+    city = str(cfg.get("data.site.city"))
+    site_label = str(cfg.get("data.openaq.site_label"))
+    n_negative = next(
+        (int(r["removed"]) for r in qc_ledger if r["rule"] == "negative value"),
+        None,
+    )
+
+    a(f"## {next_section}. Limitations")
     a("")
     a("- **Energy figures are estimates.** See §5. They should not be reported as measurements.")
-    a("- **One monitoring site.** The target series comes from a single reference monitor")
-    a("  (OpenAQ 2445 + 8415, the same physical instrument split across two provider records).")
-    a("  Results describe that site, not Dhaka as a whole.")
-    a("- **The record ends 2025-03-24.** The AirNow feed stops there; no Dhaka")
-    a("  reference-monitor data exists after that date in the archive.")
-    a("- **Coverage is fragmented.** 2,074 distinct gaps, of which a 113-day outage in 2022")
-    a("  removes an entire monsoon season.")
-    a(f"- **{audit['distribution']['n']:,} observed hours** after QC; 5,056 negative readings")
-    a("  were dropped rather than floored, which is a modelling choice, not a neutral act.")
+    a("- **One monitoring site.** The target series comes from a single monitor —")
+    a(f"  {site_label}. Results describe that site, not {city} as a whole.")
+    a(f"- **The record ends {audit['coverage']['last_utc'][:10]}.** No later data for this")
+    a("  monitor exists in the archive the pipeline reads, so the test period cannot be")
+    a("  extended without changing the data source.")
+    gap_h = int(audit["longest_gap_hours"])
+    gap_days = gap_h / 24.0
+    gap_when = (
+        f", {longest_gap['start_utc']} to {longest_gap['end_utc']}"
+        if longest_gap is not None
+        else ""
+    )
+    a(f"- **Coverage.** {audit['pct_observed']:.1f}% of hours observed, broken by")
+    a(f"  {audit['n_gaps']:,} distinct gaps; the longest runs {gap_h:,} h")
+    a(f"  ({gap_days:.0f} day{'' if round(gap_days) == 1 else 's'}{gap_when}).")
+    a(f"- **{audit['distribution']['n']:,} observed hours** after QC.")
+    if n_negative:
+        a(f"  {n_negative:,} negative readings were dropped rather than floored, which is a")
+        a("  modelling choice, not a neutral act.")
     a("- **SARIMAX is fitted on a bounded training tail**, making it a recent-history")
     a("  statistical baseline rather than a full-sample one. Gaps inside that tail are")
     a("  left as NaN and handled by the Kalman filter rather than dropped, which would")
@@ -470,7 +564,7 @@ def main() -> int:
             "pct_hours_above_bd_24h_standard": audit["distribution"]["exceedance"].get(
                 "above_65_ugm3_pct"
             ),
-            "meteorology_source": "NASA POWER hourly point (UTC)",
+            "meteorology_source": str(cfg.get("data.meteorology_source")).strip(),
             "split": {
                 "train_end": str(boundaries["train_end"])[:10],
                 "val_end": str(boundaries["val_end"])[:10],
@@ -579,6 +673,37 @@ def main() -> int:
             "p_value": float(d["p_value"]),
             "significant_at_5pct": bool(d["p_value"] < 0.05),
             "lower_loss": d["better"],
+        }
+
+    cross = payload.get("cross_city") or {}
+    if cross:
+        other = next(iter(cross))
+        block = cross[other]
+        ranking = pd.DataFrame(block["ranking"])
+        this_city = str(cfg.get("data.site.city"))
+        facts["cross_city"] = {
+            "comparison_city": other,
+            "spearman_rank_correlation": block.get("spearman_rank_correlation"),
+            "ranking_transfers": bool((block.get("spearman_rank_correlation") or 0) >= 0.3),
+            "headline_claim": (
+                "Method ranking does not transfer between cities: the Spearman rank "
+                f"correlation between {this_city} and {other} at the headline horizon is "
+                f"{block.get('spearman_rank_correlation'):+.3f}. The best method in one "
+                "city is among the worst in the other."
+            ),
+            "ranking_by_city": {
+                city: [
+                    {"rank": int(r["rank"]), "model": r["model"], "skill": r["skill"]}
+                    for _, r in g.sort_values("rank").iterrows()
+                ]
+                for city, g in ranking.groupby("city")
+            },
+            "record_context": block.get("context"),
+            "note": (
+                "The ranking reversal is the robust claim; the identity of the winner in "
+                "the comparison city is weaker, its significance tests being mostly "
+                "non-significant and its test period shorter."
+            ),
         }
 
     facts_path = Path(str(cfg.get("output.report.abstract_facts_json")))

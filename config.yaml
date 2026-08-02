@@ -104,6 +104,11 @@ data:
     longitude: 90.4125
     discovery_radius_m: 25000
 
+  # Where the meteorological drivers come from, quoted verbatim into
+  # abstract_facts.json rather than hardcoded in the report generator (the
+  # comparison city does not use NASA POWER and must not claim to).
+  meteorology_source: NASA POWER hourly point (UTC)
+
   # --- OpenAQ (target variable) --------------------------------------------
   openaq:
     # Discovery only (needs free key in .env as OPENAQ_API_KEY)

@@ -31,10 +31,10 @@
 # =============================================================================
 
 project:
-  name: dhaka-pm25-shortterm
+  name: dhaka-pm25-shortterm-beijing-check
   title: >-
-    Short-Horizon PM2.5 Forecasting for Dhaka: A Lightweight Sequence Model on
-    Fused OpenAQ and NASA POWER Data
+    Cross-City Generalisation Check: the Dhaka PM2.5 Pipeline Applied Unchanged
+    to the Beijing Multi-Site Record
   timezone_local: Asia/Shanghai     # UTC+08:00, no DST
   timezone_data: UTC                # all merges happen in UTC
 
@@ -119,10 +119,26 @@ data:
   # --- study location -------------------------------------------------------
   site:
     city: Beijing
-    country_iso: BD
-    latitude: 23.8103
-    longitude: 90.4125
-    discovery_radius_m: 25000
+    # Deliberately null. These three keys are read only by fetch_openaq.py and
+    # fetch_power.py, and neither runs on this path -- the Beijing target and
+    # meteorology both come out of the UCI record via 12_prepare_beijing.py.
+    # They previously carried Dhaka's values, inherited when this config was
+    # derived, so running discovery against it would have silently queried
+    # Dhaka and labelled the result Beijing. Null fails loudly instead.
+    country_iso: null
+    latitude: null
+    longitude: null
+    discovery_radius_m: null
+    # The energy accounting is NOT affected: CodeCarbon reads
+    # green.energy.country_iso_code, which stays BGD because the hardware that
+    # ran both cities is physically in Bangladesh.
+
+  # Where the meteorological drivers actually come from, quoted verbatim into
+  # abstract_facts.json. Dhaka's is NASA POWER; Beijing's is the station record
+  # itself, and the report must not claim otherwise.
+  meteorology_source: >-
+    UCI Beijing Multi-Site station record (co-located, hourly);
+    RH2M derived from TEMP and DEWP via Magnus-Tetens
 
   # --- OpenAQ (target variable) --------------------------------------------
   openaq:
@@ -135,19 +151,13 @@ data:
     s3_region: us-east-1
     parameter: pm25
     target_units: "ug/m3"       # anything else is converted or rejected, and logged
-    # Chosen from the Phase-1 discovery table (results/tables/openaq_dhaka_candidates.csv)
-    # and approved by the operator.
-    #
-    # 2445 and 8415 are the SAME physical instrument -- the US Embassy Dhaka
-    # reference monitor -- split across two OpenAQ location IDs when the feed
-    # migrated from StateAir to AirNow. Evidence: 2445 ends 2016-11-09T16:00Z,
-    # 8415 begins 2016-11-09T18:00Z (a two-hour handover); coordinates differ by
-    # ~165 m (23.7977/90.4237 vs 23.7964/90.4246); both isMonitor=true with the
-    # same owner. Concatenating them yields 2016-03-10 -> 2025-03-24.
-    #
-    # Records are concatenated in this order and de-duplicated on timestamp; any
-    # overlapping hours are counted and logged rather than silently dropped.
-    location_ids: [2445, 8415]
+    # Deliberately null. Beijing's target does not come from OpenAQ at all -- it
+    # comes from the UCI Multi-Site record via 12_prepare_beijing.py. These keys
+    # previously held Dhaka's IDs [2445, 8415], inherited when this config was
+    # derived, and the audit report printed them under a Beijing heading as if
+    # they were this record's provenance. The whole OpenAQ block above is dead
+    # on this path and kept only so the two configs stay diffable.
+    location_ids: null
     combine_as_single_site: true
     site_label: "Beijing Wanliu (UCI Multi-Site, id 501)"
     request:
@@ -682,6 +692,9 @@ output:
     tex_style: booktabs
     float_fmt: "%.3f"
   report:
-    results_md: reports/RESULTS.md
-    data_audit_md: reports/DATA_AUDIT.md
-    abstract_facts_json: reports/abstract_facts.json
+    # Separate directory from the Dhaka run. Both configs previously wrote to
+    # reports/RESULTS.md, so running the comparison city overwrote the primary
+    # city's report -- silently, because the file is regenerated wholesale.
+    results_md: reports/beijing/RESULTS.md
+    data_audit_md: reports/beijing/DATA_AUDIT.md
+    abstract_facts_json: reports/beijing/abstract_facts.json

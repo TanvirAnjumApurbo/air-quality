@@ -36,6 +36,11 @@ function Invoke-Step {
 
 $common = @('--config', $Cfg)
 
+# Cross-city generalisation check. Same pipeline, same grid, same seeds; only
+# the record, one meteorological driver and the season definition differ.
+$CfgB = Join-Path $Root 'config_beijing.yaml'
+$commonB = @('--config', $CfgB)
+
 switch ($Target) {
     'help' {
         Write-Host @'
@@ -55,6 +60,9 @@ Targets:
   figures     Phase 6: all figures (png + pdf, 300 dpi)
   report      Phase 6: RESULTS.md + abstract_facts.json
   all         Everything above, in order
+  beijing     Cross-city: whole pipeline again on the Beijing record
+  cross-city  Rank-transfer comparison (needs 'all' and 'beijing')
+  everything  all + beijing + cross-city + report (final artefacts)
   lint        ruff check + format check
   clean       Remove caches and checkpoints (keeps raw data)
 '@
@@ -78,6 +86,31 @@ Targets:
     'eval'      { Invoke-Step '09_evaluate.py'        $common }
     'figures'   { Invoke-Step '10_make_figures.py'    $common }
     'report'    { Invoke-Step '11_make_report.py'     $common }
+    'beijing' {
+        # Reuses the Beijing frame already downloaded by the 'data' target; every
+        # stage after 12_prepare_beijing is the identical script, other config.
+        Invoke-Step '12_prepare_beijing.py'  $commonB
+        Invoke-Step '03_data_audit.py'       $commonB
+        Invoke-Step '04_build_features.py'   $commonB
+        Invoke-Step '05_run_baselines.py'    $commonB
+        Invoke-Step '06_train_sequence.py'   ($commonB + @('--resume', 'auto') + $Rest)
+        Invoke-Step '07_train_classifier.py' ($commonB + @('--resume', 'auto') + $Rest)
+        Invoke-Step '08_green_measure.py'    $commonB
+        Invoke-Step '09_evaluate.py'         $commonB
+        Invoke-Step '10_make_figures.py'     $commonB
+        Invoke-Step '11_make_report.py'      $commonB
+    }
+    'cross-city' {
+        Invoke-Step '13_cross_city.py' @('--config', $Cfg, '--config-b', $CfgB)
+    }
+    'everything' {
+        # 'report' repeats last on purpose: 13_cross_city writes the comparison
+        # into results.json, and only a later report carries section 7.
+        foreach ($t in @('all', 'beijing', 'cross-city', 'report')) {
+            & $PSCommandPath $t
+            if ($LASTEXITCODE -ne 0) { throw "target '$t' failed" }
+        }
+    }
     'lint' {
         & $Py -m ruff check (Join-Path $Root 'src') (Join-Path $Root 'scripts') (Join-Path $Root 'tests')
         & $Py -m ruff format --check (Join-Path $Root 'src') (Join-Path $Root 'scripts') (Join-Path $Root 'tests')
