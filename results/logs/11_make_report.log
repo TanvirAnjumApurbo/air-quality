@@ -39,3 +39,14 @@
 11:13:03 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
 11:13:04 | INFO    | 11_make_report | wrote F:\BUP\reports\beijing\RESULTS.md
 11:13:04 | INFO    | 11_make_report | wrote F:\BUP\reports\beijing\abstract_facts.json
+12:49:47 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+12:49:47 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+13:13:36 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+13:13:36 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+23:19:38 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+23:19:38 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+23:19:38 | WARNING | 11_make_report | abstract_facts.json has null sections: ['significance']
+22:17:56 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+22:17:56 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+22:18:46 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+22:18:46 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json

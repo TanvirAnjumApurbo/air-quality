@@ -16,6 +16,9 @@ Examples::
     python scripts/06_train_sequence.py --config config.yaml \\
         --arch gru --hidden 64 --layers 1 --window 48 --horizon 24 --seed 42
 
+    # choose the training recipe on validation loss, before the sweep
+    python scripts/06_train_sequence.py --config config.yaml --tune
+
     # see what would run, without training
     python scripts/06_train_sequence.py --config config.yaml --dry-run
 """
@@ -23,12 +26,14 @@ Examples::
 from __future__ import annotations
 
 import argparse
+import itertools
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import numpy as np
 import pandas as pd
 import torch
 from src.eval.metrics import all_metrics, skill_score, summarise
@@ -44,7 +49,13 @@ from src.models.sequence import (
     save_history,
     train_one,
 )
-from src.results import load_results, save_results, upsert_run
+from src.results import (
+    find_reusable_run,
+    load_results,
+    save_results,
+    stale_width_runs,
+    upsert_run,
+)
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 from src.viz.tables import format_mean_std, write_table
 
@@ -65,6 +76,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-cache", action="store_true", help="disable the device-resident cache")
     p.add_argument("--dry-run", action="store_true", help="print the sweep and exit")
     p.add_argument("--force", action="store_true", help="retrain configurations already completed")
+    p.add_argument(
+        "--tune",
+        action="store_true",
+        help="search the training recipe on validation loss instead of running the sweep",
+    )
     p.add_argument("--arch", default=None, help="restrict to one architecture")
     p.add_argument("--hidden", type=int, default=None)
     p.add_argument("--layers", type=int, default=None)
@@ -92,6 +108,179 @@ def _filter(specs: list[ModelSpec], args: argparse.Namespace) -> list[ModelSpec]
     return out
 
 
+def _run_recipe_search(
+    cfg, frame, device: str, progress: str, max_minutes: float, args: argparse.Namespace, log
+) -> int:
+    """Search the training recipe on validation RMSE and report the winner.
+
+    Test data is never touched. Each candidate recipe is trained on the reduced
+    grid in ``models.sequence.tuning``; checkpoints are namespaced per recipe so
+    one candidate cannot resume another's weights.
+
+    Ranking is on validation RMSE in ug/m3, **not** on the training loss. The
+    grid varies ``huber_delta``, and Huber with a different delta is a different
+    function: for every residual above delta it assigns a mechanically smaller
+    value. Ranking recipes by that loss therefore rewards the smaller delta for
+    reasons unrelated to forecast quality. Measured here: on loss, delta=0.3 beat
+    delta=1.0 by 36% (0.067 vs 0.105); on validation RMSE the two differ by 0.1%,
+    in the opposite direction. RMSE is invariant to the loss shape, so it is the
+    only sound criterion when the loss itself is a search dimension.
+
+    Args:
+        cfg: Loaded configuration.
+        frame: Built feature frame.
+        device: Compute device.
+        progress: Progress backend.
+        max_minutes: Per-run wall-clock ceiling.
+        args: Parsed command line.
+        log: Logger.
+
+    Returns:
+        Process exit status.
+    """
+    tuning = cfg.get("models.sequence.tuning")
+    if not bool(tuning.get("enabled", False)):
+        log.error(
+            "models.sequence.tuning.enabled is false in %s -- the recipe is inherited "
+            "from the primary city on purpose. Tune there instead.",
+            cfg.path,
+        )
+        return 1
+
+    grid = tuning["grid"]
+    keys = sorted(grid)
+    combos = [
+        dict(zip(keys, values, strict=True))
+        for values in itertools.product(*(grid[k] for k in keys))
+    ]
+
+    specs = [
+        ModelSpec(
+            arch=arch,
+            hidden_size=int(hidden),
+            num_layers=int(layers),
+            window=int(window),
+            horizon=int(horizon),
+            seed=int(seed),
+        )
+        for arch in tuning["archs"]
+        for hidden in tuning["hidden_sizes"]
+        for layers in tuning["num_layers"]
+        for window in tuning["windows_h"]
+        for horizon in tuning["horizons_h"]
+        for seed in tuning["seeds"]
+    ]
+
+    total = len(combos) * len(specs)
+    log.info(
+        "recipe search: %d recipes x %d configurations = %d runs", len(combos), len(specs), total
+    )
+    if args.dry_run:
+        print(
+            f"\n{total} tuning runs would execute ({len(combos)} recipes x {len(specs)} configs):"
+        )
+        for combo in combos:
+            print("  " + "  ".join(f"{k}={v}" for k, v in sorted(combo.items())))
+        return 0
+
+    cache: dict[tuple[int, int, str], object] = {}
+
+    def get_index(horizon: int, window: int, split: str):  # noqa: ANN202
+        key = (horizon, window, split)
+        if key not in cache:
+            cache[key] = build_sequence_index(frame, cfg, horizon, window, split)
+        return cache[key]
+
+    train_cfg = cfg.raw["models"]["sequence"]["train"]
+    baseline = {k: train_cfg[k] for k in keys}
+    rows: list[dict] = []
+    done = 0
+
+    batch_size = int(cfg.get("models.sequence.train.batch_size"))
+
+    for combo in combos:
+        train_cfg.update(combo)
+        tag = "tune_" + "_".join(f"{k}{combo[k]:g}" for k in keys)
+        losses: list[float] = []
+        rmses: list[float] = []
+        loss_fn = _make_loss(cfg)
+
+        for spec in specs:
+            done += 1
+            log.info("[%d/%d] %s | %s", done, total, tag, spec.run_id)
+            model, result = train_one(
+                spec,
+                get_index(spec.horizon, spec.window, "train"),
+                get_index(spec.horizon, spec.window, "val"),
+                cfg,
+                device,
+                log,
+                resume=args.resume,
+                progress=progress,
+                max_minutes=max_minutes,
+                run_tag=tag,
+            )
+            losses.append(result.best_val_loss)
+
+            val_index = get_index(spec.horizon, spec.window, "val")
+            _, raw_val = evaluate_sampler(model, Sampler(val_index, device), loss_fn, batch_size)
+            val_rmse = all_metrics(val_index.y, invert(cfg, raw_val))["rmse"]
+            rmses.append(val_rmse)
+
+            log.info(
+                "  %s | %s  val RMSE %.3f, loss %.5f at epoch %d of %d run (%s)",
+                tag,
+                spec.run_id,
+                val_rmse,
+                result.best_val_loss,
+                result.best_epoch + 1,
+                result.total_epochs,
+                result.stopped_reason,
+            )
+            if device == "cuda":
+                torch.cuda.empty_cache()
+
+        rows.append(
+            {
+                **combo,
+                "mean_val_rmse": float(np.mean(rmses)),
+                "mean_val_loss": float(np.mean(losses)),
+                "n_runs": len(rmses),
+            }
+        )
+
+    train_cfg.update(baseline)  # leave the loaded config as we found it
+
+    table = pd.DataFrame(rows).sort_values("mean_val_rmse").reset_index(drop=True)
+    table.to_csv(cfg.path_for("tables") / "sequence_recipe_search.csv", index=False)
+
+    best = table.iloc[0]
+    payload = load_results(cfg)
+    payload["sequence_recipe_search"] = {
+        "selected_on": "validation RMSE (ug/m3), mean over the reduced grid",
+        "criterion_note": (
+            "RMSE, not training loss: huber_delta is a search dimension, and Huber "
+            "loss is not comparable across delta. mean_val_loss is retained per "
+            "recipe for reference but is not the ranking key."
+        ),
+        "n_recipes": len(combos),
+        "n_configs_per_recipe": len(specs),
+        "grid": {k: list(grid[k]) for k in keys},
+        "results": table.to_dict(orient="records"),
+        "best": {k: best[k] for k in [*keys, "mean_val_rmse", "mean_val_loss"]},
+    }
+    save_results(cfg, payload)
+
+    print("\n" + "=" * 78)
+    print("SEQUENCE RECIPE SEARCH — ranked by mean validation RMSE (test never read)")
+    print("=" * 78)
+    print(table.to_string(index=False))
+    print("\nPaste into models.sequence.train in both configs, then run the full sweep:\n")
+    for key in keys:
+        print(f"      {key}: {best[key]:g}")
+    return 0
+
+
 def main() -> int:
     """Run the sequence-model sweep."""
     args = parse_args()
@@ -110,6 +299,10 @@ def main() -> int:
     log.info("device=%s progress=%s max_minutes=%.1f", device, progress, max_minutes)
 
     frame = load_features(cfg)
+
+    if args.tune:
+        return _run_recipe_search(cfg, frame, device, progress, max_minutes, args, log)
+
     horizons = args.horizon or [int(h) for h in cfg.get("task.horizons_h")]
     seeds = args.seed or [int(s) for s in cfg.get("seeds.multi")]
 
@@ -120,11 +313,36 @@ def main() -> int:
     payload = load_results(cfg)
     payload.setdefault("green", {})["excluded_over_budget"] = excluded
 
+    stale = stale_width_runs(payload, "tier3", n_features)
+    reusable = sum(
+        1
+        for s in specs
+        if find_reusable_run(
+            payload,
+            model=s.name,
+            variant=f"w{s.window}",
+            horizon_h=s.horizon,
+            seed=s.seed,
+            n_features=n_features,
+        )
+    )
+
     if args.dry_run:
         print(
             f"\n{len(specs)} runs would execute ({len(seeds)} seeds x "
             f"{len(horizons)} horizons x architectures/windows):"
         )
+        print(
+            f"  {reusable} already complete at the current width ({n_features} channels) "
+            f"and would be reused; {len(specs) - reusable} would train."
+        )
+        if stale:
+            widths = sorted({r.get("n_features") for r in stale})
+            print(
+                f"  WARNING: {len(stale)} recorded tier3 runs are at a different input "
+                f"width ({', '.join('unrecorded' if w is None else str(w) for w in widths)}) "
+                f"and will be RETRAINED."
+            )
         for s in specs[:40]:
             print(f"  {s.run_id}")
         if len(specs) > 40:
@@ -137,6 +355,18 @@ def main() -> int:
         return 0
 
     log.info("sweep: %d runs, %d excluded by parameter budget", len(specs), len(excluded))
+
+    if stale:
+        widths = sorted({r.get("n_features") for r in stale})
+        log.warning(
+            "%d recorded tier3 runs were trained on a different input width (%s, now %d) "
+            "and will be RETRAINED, not reused. They are the record of a different "
+            "experiment; reporting them alongside runs at the current width would compare "
+            "two channel sets and call it a model comparison.",
+            len(stale),
+            ", ".join("unrecorded" if w is None else str(w) for w in widths),
+            n_features,
+        )
 
     # Cache window indices: they depend only on (horizon, window, split), so
     # rebuilding per seed would repeat identical work five times.
@@ -153,17 +383,13 @@ def main() -> int:
     batch_size = int(cfg.get("models.sequence.train.batch_size"))
 
     for i, spec in enumerate(specs, start=1):
-        existing = next(
-            (
-                r
-                for r in payload.get("runs", [])
-                if r.get("model") == spec.name
-                and r.get("variant") == f"w{spec.window}"
-                and r.get("horizon_h") == spec.horizon
-                and r.get("seed") == spec.seed
-                and r.get("completed")
-            ),
-            None,
+        existing = find_reusable_run(
+            payload,
+            model=spec.name,
+            variant=f"w{spec.window}",
+            horizon_h=spec.horizon,
+            seed=spec.seed,
+            n_features=n_features,
         )
         if existing and not args.force:
             log.info("[%d/%d] %s: already complete, skipping", i, len(specs), spec.run_id)
@@ -222,6 +448,7 @@ def main() -> int:
             "seed": spec.seed,
             "split": "test",
             "completed": True,
+            "n_features": n_features,
             "n_params": result.n_params,
             "best_val_loss": result.best_val_loss,
             "best_epoch": result.best_epoch,

@@ -32,10 +32,13 @@ from src.eval.split import (
 from src.features.build_features import (
     assign_runs,
     build_features,
+    derived_history_columns,
     feature_columns,
     max_backward_dependency,
     position_in_run,
+    sequence_channel_columns,
 )
+from src.features.gap_injection import GapProfile, inject_gaps
 from src.utils import Config, ConfigError, load_config
 
 LOG = logging.getLogger("test_leakage")
@@ -495,6 +498,233 @@ def test_target_transform_roundtrip(cfg):
 
 
 # ---------------------------------------------------------------------------
+# Sequence channels: the input the recurrent tier actually receives
+#
+# Not a leakage rule -- a fairness one. Feeding the sequence tier the engineered
+# lag/rolling columns restates what the window already contains and inflates the
+# input sixfold with collinear copies, which biases the tier comparison. These
+# assert the channel set is what it claims to be.
+# ---------------------------------------------------------------------------
+
+
+def test_sequence_channels_carry_no_derived_history(cfg, synthetic):
+    """Contemporaneous mode must expose no lag, rolling, difference or rate column."""
+    pm, met = synthetic
+    frame, _ = build_features(pm, met, cfg, LOG)
+    channels = sequence_channel_columns(frame, cfg)
+
+    assert str(cfg.get("features.sequence_channels.mode")) == "contemporaneous", (
+        "this test describes the shipped default; update it deliberately if that changes"
+    )
+    offenders = [
+        c
+        for c in channels
+        if "_lag_" in c or "_roll" in c or "_diff_" in c or "_roc_" in c or c.startswith("oracle_")
+    ]
+    assert not offenders, f"derived-history columns leaked into the channel set: {offenders}"
+
+
+def test_sequence_channels_partition_the_tabular_set(cfg, synthetic):
+    """Channels plus derived history must exactly reconstruct the tabular predictors.
+
+    Catches drift in either direction: a feature added to the builder but not to
+    ``derived_history_columns`` would silently reach the sequence tier, and a
+    renamed column would silently vanish from the tabular one.
+    """
+    pm, met = synthetic
+    frame, _ = build_features(pm, met, cfg, LOG)
+
+    tabular = set(feature_columns(frame, cfg))
+    channels = set(sequence_channel_columns(frame, cfg))
+    derived = derived_history_columns(cfg, frame)
+
+    assert channels <= tabular, "channels must be a subset of the tabular predictors"
+    assert derived <= set(frame.columns), (
+        f"derived_history_columns names columns the builder never produced: "
+        f"{sorted(derived - set(frame.columns))}"
+    )
+    assert tabular - channels == derived & tabular, (
+        "the channel/derived split does not partition the tabular predictor set"
+    )
+
+
+def test_engineered_mode_restores_the_full_predictor_set(cfg, synthetic):
+    """The ablation arm must be a genuine alternative, not a silent no-op."""
+    pm, met = synthetic
+    frame, _ = build_features(pm, met, cfg, LOG)
+
+    raw = copy.deepcopy(cfg.raw)
+    raw["features"]["sequence_channels"]["mode"] = "engineered"
+    engineered = Config(raw=raw, path=cfg.path)
+
+    assert sequence_channel_columns(frame, engineered) == feature_columns(frame, engineered)
+    assert len(sequence_channel_columns(frame, engineered)) > len(
+        sequence_channel_columns(frame, cfg)
+    ), "engineered mode must expose strictly more columns than contemporaneous mode"
+
+
+def test_unknown_sequence_channel_mode_raises(cfg, synthetic):
+    """A typo in the mode must fail loudly rather than silently picking a default."""
+    pm, met = synthetic
+    frame, _ = build_features(pm, met, cfg, LOG)
+
+    raw = copy.deepcopy(cfg.raw)
+    raw["features"]["sequence_channels"]["mode"] = "contemporeneous"  # plausible typo
+    broken = Config(raw=raw, path=cfg.path)
+
+    with pytest.raises(ValueError, match="contemporaneous"):
+        sequence_channel_columns(frame, broken)
+
+
+# ---------------------------------------------------------------------------
+# Gap injection: the controls the ablation's validity rests on
+#
+# The experiment claims to isolate fragmentation from data volume. That claim is
+# only true if the two arms remove identical hour counts, the test period is
+# never touched, and a zero-strength injection changes nothing. Each is asserted
+# here rather than trusted.
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def injectable() -> tuple[pd.DataFrame, GapProfile]:
+    """A near-complete hourly record plus a heavy-tailed gap profile."""
+    index = pd.date_range("2020-01-01", periods=8760, freq="1h", tz="UTC")
+    values = 50.0 + 30.0 * np.sin(np.arange(len(index)) / 24.0)
+    values[100:104] = np.nan  # a small pre-existing outage
+    frame = pd.DataFrame({"pm25": values}, index=index)
+    frame.index.name = "datetime_utc"
+    # Mimics a real monitoring record: mostly single hours, occasional long ones.
+    profile = GapProfile(lengths=np.array([1] * 60 + [2, 3, 5, 12] * 5 + [72, 200]), source="test")
+    return frame, profile
+
+
+def test_zero_strength_injection_is_a_no_op(injectable):
+    """arm='none', and any target at or above current coverage, must change nothing."""
+    frame, profile = injectable
+    protect = frame.index[6000]
+
+    for arm, coverage in (("none", 1.0), ("fragmented", 1.0), ("contiguous", 1.0)):
+        out, report = inject_gaps(
+            frame,
+            "pm25",
+            arm=arm,
+            target_coverage=coverage,
+            profile=profile,
+            protect_from=protect,
+            seed=42,
+        )
+        assert report.hours_removed == 0, f"{arm} removed hours it should not have"
+        assert out.equals(frame), f"{arm} altered the record at zero strength"
+
+
+def test_injection_never_touches_the_protected_period(injectable):
+    """The test period must survive intact however hard the record is degraded.
+
+    Every cell in the ablation is scored on these rows. If degradation reached
+    them, RMSE would stop being comparable across coverage levels and the whole
+    grid would be measuring two things at once.
+    """
+    frame, profile = injectable
+    protect = frame.index[6000]
+
+    for arm in ("fragmented", "contiguous"):
+        out, report = inject_gaps(
+            frame,
+            "pm25",
+            arm=arm,
+            target_coverage=0.40,
+            profile=profile,
+            protect_from=protect,
+            seed=7,
+        )
+        assert report.hours_removed > 0, "the degradation did nothing, so this proves nothing"
+        before = frame.loc[frame.index >= protect, "pm25"]
+        after = out.loc[out.index >= protect, "pm25"]
+        assert before.equals(after), f"{arm} degraded the protected period"
+
+
+def test_both_arms_remove_identical_hour_counts(injectable):
+    """Volume must be held constant so the arms differ only in arrangement.
+
+    This is the control that separates fragmentation from having less data. If
+    the counts diverge, the arm gap stops being interpretable.
+    """
+    frame, profile = injectable
+    protect = frame.index[6000]
+
+    for coverage in (0.95, 0.90, 0.82, 0.75):
+        for seed in (42, 1337):
+            _, fragmented = inject_gaps(
+                frame,
+                "pm25",
+                arm="fragmented",
+                target_coverage=coverage,
+                profile=profile,
+                protect_from=protect,
+                seed=seed,
+            )
+            _, contiguous = inject_gaps(
+                frame,
+                "pm25",
+                arm="contiguous",
+                target_coverage=coverage,
+                profile=profile,
+                protect_from=protect,
+                seed=seed,
+            )
+            assert fragmented.hours_removed == contiguous.hours_removed, (
+                f"arms removed different hour counts at coverage {coverage}, seed {seed}: "
+                f"{fragmented.hours_removed} vs {contiguous.hours_removed}"
+            )
+
+
+def test_fragmented_arm_breaks_contiguity_far_more_than_contiguous(injectable):
+    """The manipulated variable must actually differ between arms.
+
+    Equal hour counts alone would be satisfied by two identical arms; the point
+    is that one shatters the record and the other does not.
+    """
+    frame, profile = injectable
+    protect = frame.index[6000]
+    kwargs = {"target_coverage": 0.82, "profile": profile, "protect_from": protect, "seed": 42}
+
+    _, fragmented = inject_gaps(frame, "pm25", arm="fragmented", **kwargs)
+    _, contiguous = inject_gaps(frame, "pm25", arm="contiguous", **kwargs)
+
+    assert fragmented.n_gaps_after > 3 * contiguous.n_gaps_after, (
+        f"the arms did not differ in contiguity: {fragmented.n_gaps_after} gaps "
+        f"vs {contiguous.n_gaps_after}"
+    )
+
+
+def test_injection_is_reproducible_from_its_seed(injectable):
+    """Same seed, same degradation; different seed, different degradation."""
+    frame, profile = injectable
+    protect = frame.index[6000]
+    kwargs = {
+        "arm": "fragmented",
+        "target_coverage": 0.82,
+        "profile": profile,
+        "protect_from": protect,
+    }
+
+    first, _ = inject_gaps(frame, "pm25", seed=42, **kwargs)
+    again, _ = inject_gaps(frame, "pm25", seed=42, **kwargs)
+    other, _ = inject_gaps(frame, "pm25", seed=43, **kwargs)
+
+    assert first.equals(again), "the injector is not reproducible from its seed"
+    assert not first.equals(other), "different seeds produced identical degradation"
+
+
+def test_fragmented_arm_requires_a_profile(injectable):
+    """Silently falling back to some default distribution would be a hidden choice."""
+    frame, _ = injectable
+    with pytest.raises(ValueError, match="profile"):
+        inject_gaps(frame, "pm25", arm="fragmented", target_coverage=0.8, profile=None)
+
+
+# ---------------------------------------------------------------------------
 # Negative controls: prove the guards above actually fire.
 #
 # A leakage test that passes trivially is worthless. Each control below injects
@@ -653,3 +883,75 @@ def test_predictions_are_bounded_to_physical_range(cfg):
     assert np.all(np.isfinite(out))
     assert out.min() >= 0.0
     assert out.max() <= cap
+
+
+# ---------------------------------------------------------------------------
+# Resume must not reuse runs from a different input width
+# ---------------------------------------------------------------------------
+
+
+def _run_record(**over: object) -> dict:
+    """Build a minimal completed tier3 run record."""
+    base = {
+        "model": "gru_h64_l1",
+        "tier": "tier3",
+        "variant": "w48",
+        "horizon_h": 24,
+        "seed": 42,
+        "completed": True,
+        "n_features": 18,
+        "metrics": {"rmse": 1.0},
+    }
+    base.update(over)
+    return base
+
+
+def test_resume_reuses_a_run_at_the_same_input_width():
+    """A completed run at the current width is reused rather than retrained."""
+    from src.results import find_reusable_run
+
+    payload = {"runs": [_run_record()]}
+    found = find_reusable_run(
+        payload, model="gru_h64_l1", variant="w48", horizon_h=24, seed=42, n_features=18
+    )
+    assert found is not None
+
+
+@pytest.mark.leakage
+def test_control_resume_refuses_a_run_from_a_different_input_width():
+    """Negative control: a 102-channel record must NOT satisfy an 18-channel sweep.
+
+    This is the defect that mixed two experiments in one results.json. Resume
+    consults the results file, not the checkpoints, so clearing checkpoints does
+    not protect against it.
+    """
+    from src.results import find_reusable_run, stale_width_runs
+
+    payload = {"runs": [_run_record(n_features=102, n_params=32321)]}
+    assert (
+        find_reusable_run(
+            payload, model="gru_h64_l1", variant="w48", horizon_h=24, seed=42, n_features=18
+        )
+        is None
+    )
+    assert len(stale_width_runs(payload, "tier3", 18)) == 1
+
+
+@pytest.mark.leakage
+def test_control_resume_refuses_a_record_predating_width_tracking():
+    """Negative control: a record with no n_features is treated as stale."""
+    from src.results import find_reusable_run
+
+    record = _run_record()
+    del record["n_features"]
+    assert (
+        find_reusable_run(
+            {"runs": [record]},
+            model="gru_h64_l1",
+            variant="w48",
+            horizon_h=24,
+            seed=42,
+            n_features=18,
+        )
+        is None
+    )

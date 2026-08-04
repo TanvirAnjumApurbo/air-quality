@@ -13,27 +13,15 @@ Run::
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import sys
-from dataclasses import asdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pandas as pd
 import yaml
-from src.eval.split import (
-    TrainOnlyScaler,
-    assign_splits,
-    purge_boundary_rows,
-    resolve_boundaries,
-)
-from src.features.build_features import (
-    build_features,
-    feature_columns,
-    max_backward_dependency,
-)
+from src.features.pipeline import build_feature_matrix
 from src.utils import ConfigError, check_disk_space, load_config, setup_logging
 
 
@@ -122,108 +110,17 @@ def main() -> int:
     check_disk_space(cfg)
 
     interim = cfg.path_for("data_interim")
-    processed = cfg.path_for("data_processed")
-    processed.mkdir(parents=True, exist_ok=True)
-    tables_dir = cfg.path_for("tables")
 
     pm = pd.read_parquet(interim / str(cfg.get("data.files.target")))
     met = pd.read_parquet(interim / str(cfg.get("data.files.meteorology")))
     log.info("loaded PM2.5 %s and meteorology %s", pm.shape, met.shape)
 
-    frame, report = build_features(pm, met, cfg, log)
-    log.info(
-        "built %d predictor columns (max backward dependency %d h)",
-        report.n_features,
-        report.max_lag_h,
-    )
-
-    # ---- chronological split ------------------------------------------------
-    boundaries = resolve_boundaries(frame.index, cfg)
-    frame["split"] = assign_splits(frame.index, boundaries)
-    log.info("split: %s", boundaries.caption())
-
-    max_lag = max_backward_dependency(cfg)
-    horizons = [int(h) for h in cfg.get("task.horizons_h")]
-
-    # ---- boundary purge, per horizon ---------------------------------------
-    purge_counts: dict[int, int] = {}
-    for h in horizons:
-        keep = purge_boundary_rows(frame, frame["split"], max_lag, h)
-        before = int(frame[f"valid_h{h}"].sum())
-        frame[f"valid_h{h}"] = frame[f"valid_h{h}"] & keep
-        after = int(frame[f"valid_h{h}"].sum())
-        purge_counts[h] = before - after
-        log.info(
-            "h=%3d: boundary purge removed %d rows (%d -> %d)", h, before - after, before, after
-        )
-
-    # ---- scaling, fitted on train only -------------------------------------
-    predictors = feature_columns(frame, cfg, include_oracle=False)
+    built = build_feature_matrix(pm, met, cfg, log)
+    frame, report, boundaries = built.frame, built.report, built.boundaries
+    meta, summary, predictors = built.meta, built.row_accounting, built.predictors
     oracle_cols = [c for c in frame.columns if c.startswith("oracle_")]
-    train_mask = frame["split"] == "train"
-
-    scaler = TrainOnlyScaler(str(cfg.get("scaling.method"))).fit(
-        frame.loc[train_mask], predictors, "train"
-    )
-    log.info(
-        "scaler fitted on %d training rows over %d predictors",
-        int(train_mask.sum()),
-        len(predictors),
-    )
-
-    (processed / "scaler.json").write_text(json.dumps(scaler.to_dict(), indent=2), encoding="utf-8")
-
-    # ---- persist ------------------------------------------------------------
-    out_path = processed / "features.parquet"
-    frame.to_parquet(out_path)
-    log.info("wrote %s (%d rows, %d cols)", out_path, len(frame), frame.shape[1])
-
-    meta = {
-        "site": cfg.get("data.openaq.site_label"),
-        "boundaries": boundaries.to_dict(),
-        "caption": boundaries.caption(),
-        "max_backward_dependency_h": max_lag,
-        "n_predictors": len(predictors),
-        "predictors": predictors,
-        "n_oracle_columns": len(oracle_cols),
-        "horizons": horizons,
-        "build_report": asdict(report),
-        "boundary_purge_removed": purge_counts,
-        "rows_per_split": {
-            name: int((frame["split"] == name).sum()) for name in ("train", "val", "test")
-        },
-        "valid_rows_per_split_per_horizon": {
-            str(h): {
-                name: int(((frame["split"] == name) & frame[f"valid_h{h}"]).sum())
-                for name in ("train", "val", "test")
-            }
-            for h in horizons
-        },
-    }
-    (processed / "features_meta.json").write_text(
-        json.dumps(meta, indent=2, default=str), encoding="utf-8"
-    )
-
-    rows = []
-    for h in horizons:
-        rejected = report.rows_rejected_per_horizon[h]
-        counts = meta["valid_rows_per_split_per_horizon"][str(h)]
-        rows.append(
-            {
-                "horizon_h": h,
-                "train": counts["train"],
-                "val": counts["val"],
-                "test": counts["test"],
-                "total_valid": sum(counts.values()),
-                "rej_no_run": rejected["outside_any_run"],
-                "rej_short_history": rejected["insufficient_history"],
-                "rej_target_past_run_end": rejected["target_beyond_run_end"],
-                "rej_target_imputed": rejected["target_not_observed"],
-                "rej_split_boundary": purge_counts[h],
-            }
-        )
-    summary = pd.DataFrame(rows)
-    summary.to_csv(tables_dir / "features_row_accounting.csv", index=False)
+    max_lag = meta["max_backward_dependency_h"]
+    out_path = cfg.path_for("data_processed") / "features.parquet"
 
     if not args.no_write_back:
         write_back_boundaries(Path(args.config), boundaries.to_dict())

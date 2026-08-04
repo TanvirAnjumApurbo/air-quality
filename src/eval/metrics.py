@@ -247,6 +247,193 @@ def diebold_mariano(
     )
 
 
+def holm_bonferroni(p_values: list[float], alpha: float = 0.05) -> list[dict[str, Any]]:
+    """Control the family-wise error rate across a set of tests.
+
+    This study runs one Diebold-Mariano test per model pair per horizon. At the
+    nominal 5% level, a family of 45 such tests is expected to produce a couple
+    of "significant" results even if every model were identical, so reporting
+    raw p-values would overstate the evidence. Holm is used rather than plain
+    Bonferroni because it is uniformly more powerful and just as assumption-free.
+
+    NaN p-values -- from pairs the DM test declined to score -- are carried
+    through unadjusted and never counted in the family size.
+
+    Args:
+        p_values: Raw two-sided p-values, in their original order.
+        alpha: Family-wise error rate.
+
+    Returns:
+        One record per input, in input order, holding ``p_raw``, ``p_adjusted``,
+        ``rank`` and ``reject``.
+    """
+    raw = [float(p) for p in p_values]
+    order = [i for i in np.argsort(raw, kind="stable") if np.isfinite(raw[i])]
+    m = len(order)
+
+    adjusted = [float("nan")] * len(raw)
+    running = 0.0
+    for rank, idx in enumerate(order):
+        # Monotonicity: an adjusted p-value can never fall below an earlier one.
+        running = max(running, min(1.0, (m - rank) * raw[idx]))
+        adjusted[idx] = running
+
+    ranks = {idx: rank + 1 for rank, idx in enumerate(order)}
+    return [
+        {
+            "p_raw": raw[i],
+            "p_adjusted": adjusted[i],
+            "rank": ranks.get(i),
+            "reject": bool(np.isfinite(adjusted[i]) and adjusted[i] < alpha),
+        }
+        for i in range(len(raw))
+    ]
+
+
+@dataclass
+class MCSResult:
+    """Outcome of a Model Confidence Set procedure.
+
+    Attributes:
+        included: Models that survive at the chosen confidence level.
+        eliminated: Models removed, in elimination order (worst first).
+        p_values: MCS p-value per model; a model is included when its value
+            is at least ``alpha``.
+        mean_loss: Mean loss per model.
+        alpha: Confidence level used.
+        n_bootstrap: Bootstrap replicates.
+        block_size: Block length in observations.
+    """
+
+    included: list[str]
+    eliminated: list[str]
+    p_values: dict[str, float]
+    mean_loss: dict[str, float]
+    alpha: float
+    n_bootstrap: int
+    block_size: int
+
+
+def model_confidence_set(
+    losses: dict[str, np.ndarray],
+    *,
+    alpha: float = 0.05,
+    n_bootstrap: int = 1000,
+    block_size: int = 24,
+    seed: int = 42,
+) -> MCSResult:
+    """Identify the set of models that cannot be separated from the best.
+
+    Hansen, Lunde and Nason (2011). A ranked table invites the reader to treat
+    the top row as the winner even when the gap to the fifth row is noise. The
+    MCS answers the question actually being asked -- which models are
+    statistically indistinguishable from the best -- and controls the error rate
+    over the whole elimination sequence rather than one pairwise test at a time.
+
+    Uses the *T-max* statistic. On each pass, the surviving models are tested for
+    equal predictive ability; if the null is rejected the single worst model is
+    dropped and the test repeats. Variances come from a moving-block bootstrap,
+    matching :func:`block_bootstrap_rmse`, because hourly forecast errors are
+    serially correlated and an i.i.d. bootstrap would understate the spread.
+
+    Args:
+        losses: Per-observation loss series, keyed by model name. All series
+            must be aligned and of equal length.
+        alpha: Confidence level; survivors form the ``(1 - alpha)`` MCS.
+        n_bootstrap: Bootstrap replicates.
+        block_size: Block length in observations.
+        seed: RNG seed.
+
+    Returns:
+        The procedure's outcome.
+
+    Raises:
+        ValueError: If fewer than two models are supplied or lengths differ.
+    """
+    names = list(losses)
+    if len(names) < 2:
+        raise ValueError("the model confidence set needs at least two models")
+
+    matrix = np.column_stack([np.asarray(losses[k], dtype=float) for k in names])
+    # Rows must be finite for *every* model: the comparison is paired, so a model
+    # that cannot score an observation removes it for all of them.
+    finite = np.all(np.isfinite(matrix), axis=1)
+    matrix = matrix[finite]
+    n = matrix.shape[0]
+    # Reported on the rows actually compared, not the raw series -- otherwise a
+    # model with any missing prediction reports a mean of NaN beside rivals whose
+    # means were taken over a different set of hours.
+    mean_loss = {k: float(v) for k, v in zip(names, matrix.mean(axis=0), strict=True)}
+
+    if n < block_size * 2:
+        return MCSResult(
+            included=names,
+            eliminated=[],
+            p_values=dict.fromkeys(names, float("nan")),
+            mean_loss=mean_loss,
+            alpha=alpha,
+            n_bootstrap=n_bootstrap,
+            block_size=block_size,
+        )
+
+    # One shared set of block-bootstrap indices, so every elimination round is
+    # evaluated against the same resampled histories.
+    rng = np.random.default_rng(seed)
+    n_blocks = int(np.ceil(n / block_size))
+    starts = rng.integers(0, n - block_size + 1, size=(n_bootstrap, n_blocks))
+    offsets = np.arange(block_size)[None, None, :]
+    indices = (starts[:, :, None] + offsets).reshape(n_bootstrap, -1)[:, :n]
+
+    boot_means = np.stack([matrix[idx].mean(axis=0) for idx in indices])  # (B, m)
+    observed = matrix.mean(axis=0)
+
+    alive = list(range(len(names)))
+    eliminated: list[str] = []
+    p_values: dict[str, float] = {}
+    running_p = 0.0
+
+    while len(alive) > 1:
+        obs = observed[alive]
+        boot = boot_means[:, alive]
+
+        # Deviation of each model's mean loss from the surviving set's average.
+        centred_obs = obs - obs.mean()
+        centred_boot = boot - boot.mean(axis=1, keepdims=True)
+        variance = np.mean((centred_boot - centred_obs) ** 2, axis=0)
+        variance = np.where(variance <= 0, np.nan, variance)
+
+        t_obs = centred_obs / np.sqrt(variance)
+        t_boot = (centred_boot - centred_obs) / np.sqrt(variance)
+
+        statistic = float(np.nanmax(t_obs))
+        null = np.nanmax(t_boot, axis=1)
+        p = float(np.mean(null > statistic))
+
+        # Monotone: a model cannot be more confidently retained than one dropped
+        # before it.
+        running_p = max(running_p, p)
+        if running_p >= alpha:
+            break
+
+        worst = alive[int(np.nanargmax(t_obs))]
+        p_values[names[worst]] = running_p
+        eliminated.append(names[worst])
+        alive.remove(worst)
+
+    for i in alive:
+        p_values[names[i]] = max(running_p, alpha)
+
+    return MCSResult(
+        included=[names[i] for i in alive],
+        eliminated=eliminated,
+        p_values=p_values,
+        mean_loss=mean_loss,
+        alpha=alpha,
+        n_bootstrap=n_bootstrap,
+        block_size=block_size,
+    )
+
+
 @dataclass
 class BootstrapCI:
     """Moving-block bootstrap confidence interval.

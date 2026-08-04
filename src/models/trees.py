@@ -15,8 +15,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
 
-from src.models.data import SplitArrays
+from src.models.data import SplitArrays, load_scaler_params
 from src.utils import Config
 
 
@@ -41,6 +42,105 @@ class TunedModel:
     n_candidates: int = 0
     fit_seconds: float = 0.0
     feature_names: list[str] = field(default_factory=list)
+
+
+def target_level_columns(cfg: Config, feature_names: list[str]) -> list[int]:
+    """Indices of predictors that are PM2.5 *levels* rather than derived contrasts.
+
+    Levels are the target itself, its lags, and the rolling mean/min/max -- all
+    non-negative concentrations in ug/m3. Rolling standard deviations,
+    differences and rates of change are excluded: they are spreads or signed
+    contrasts, so a ``log1p`` is either meaningless or undefined on them.
+
+    Args:
+        cfg: Loaded configuration.
+        feature_names: Predictor names, in matrix order.
+
+    Returns:
+        Positions in ``feature_names`` that hold PM2.5 levels.
+    """
+    target = str(cfg.get("features.target"))
+
+    def is_level(name: str) -> bool:
+        if name == target or name.startswith(f"{target}_lag_"):
+            return True
+        return name.startswith(f"{target}_roll") and name.rsplit("_", 1)[-1] in {
+            "mean",
+            "min",
+            "max",
+        }
+
+    return [i for i, name in enumerate(feature_names) if is_level(name)]
+
+
+class LogScaleTargetHistory(BaseEstimator, TransformerMixin):
+    """Put PM2.5 history on the same ``log1p`` scale as the target.
+
+    The target is modelled as ``log1p(y)``. The PM2.5 predictors arrive on their
+    raw ug/m3 scale (standardised, but standardisation is affine and so does not
+    change the functional form). A linear model is therefore asked to express
+    ``log1p(y(t+h))`` as a linear function of ``y(t)`` -- which it cannot do, and
+    the resulting poor fit says nothing about linear methods on this task. Trees
+    and recurrent models are unaffected because both are non-linear in the
+    inputs; the handicap falls on ridge alone.
+
+    This transformer removes it. Standardisation is inverted to recover ug/m3,
+    ``log1p`` is applied to the level columns, and the result is handed on for
+    re-standardisation. It sits inside the ridge pipeline rather than in the
+    shared feature matrix so that the tier-2 comparison is otherwise untouched:
+    adding log columns globally would perturb the tree models' feature
+    subsampling for no benefit to them.
+
+    The pipeline placement also means the fix survives cross-validation -- the
+    re-standardisation that follows is fitted per fold, not once on everything.
+    """
+
+    def __init__(self, cfg: Config | None = None, feature_names: list[str] | None = None) -> None:
+        """Record what is needed to invert the shared standardisation.
+
+        Args:
+            cfg: Loaded configuration, for the scaler parameters and target name.
+            feature_names: Predictor names, in matrix order.
+        """
+        self.cfg = cfg
+        self.feature_names = feature_names
+
+    def fit(self, x: np.ndarray, y: np.ndarray | None = None) -> LogScaleTargetHistory:  # noqa: ARG002
+        """Resolve column positions and scaler parameters.
+
+        Args:
+            x: Predictor matrix; unused beyond the sklearn contract.
+            y: Targets; unused.
+
+        Returns:
+            ``self``.
+        """
+        names = list(self.feature_names or [])
+        mean, scale = load_scaler_params(self.cfg)
+        common = [c for c in names if c in mean.index]
+        self.scaled_idx_ = [names.index(c) for c in common]
+        self.mean_ = mean[common].to_numpy(dtype=np.float64)
+        self.scale_ = scale[common].to_numpy(dtype=np.float64)
+        self.level_idx_ = target_level_columns(self.cfg, names)
+        return self
+
+    def transform(self, x: np.ndarray) -> np.ndarray:
+        """Undo standardisation, then log the level columns.
+
+        Args:
+            x: Standardised predictor matrix.
+
+        Returns:
+            A copy with PM2.5 levels on the ``log1p`` scale.
+        """
+        out = np.asarray(x, dtype=np.float64).copy()
+        if self.scaled_idx_:
+            out[:, self.scaled_idx_] = out[:, self.scaled_idx_] * self.scale_ + self.mean_
+        if self.level_idx_:
+            # Clipped because QC bounds observations at zero but the inverse of a
+            # standardisation can land marginally below it on floating point.
+            out[:, self.level_idx_] = np.log1p(np.clip(out[:, self.level_idx_], 0.0, None))
+        return out
 
 
 def _search(
@@ -106,6 +206,16 @@ def fit_ridge(
 ) -> TunedModel:
     """Fit ridge regression with the alpha chosen by chronological CV.
 
+    The estimator is a pipeline, not a bare ``Ridge``. Its first step puts the
+    PM2.5 history on the ``log1p`` scale the target is modelled on -- see
+    :class:`LogScaleTargetHistory` for why a linear model is otherwise being
+    asked to do something impossible. The pipeline consumes and returns the same
+    standardised matrix every other tier-2 model sees, so nothing downstream
+    changes.
+
+    ``models.trees.ridge.log_scale_history`` disables the correction, which
+    reproduces the earlier crippled fit for the ablation table.
+
     Args:
         train: Training arrays.
         val: Validation arrays.
@@ -119,15 +229,31 @@ def fit_ridge(
     import time
 
     from sklearn.linear_model import Ridge
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
 
     x = np.vstack([train.x, val.x])
     y = np.concatenate([train.y_transformed, val.y_transformed])
     alphas = [float(a) for a in cfg.get("models.trees.ridge.alphas")]
 
+    if bool(cfg.get("models.trees.ridge.log_scale_history", True)):
+        estimator = Pipeline(
+            [
+                ("log_history", LogScaleTargetHistory(cfg, list(train.feature_names))),
+                # Re-standardise after the log: fitted per CV fold by the
+                # pipeline, so this introduces no leakage across folds.
+                ("rescale", StandardScaler()),
+                ("ridge", Ridge(random_state=seed)),
+            ]
+        )
+        grid = {"ridge__alpha": alphas}
+    else:
+        logger.warning("ridge: log_scale_history disabled -- fitting the handicapped variant")
+        estimator = Ridge(random_state=seed)
+        grid = {"alpha": alphas}
+
     started = time.perf_counter()
-    best, params, score, n = _search(
-        Ridge(random_state=seed), {"alpha": alphas}, cfg, x, y, seed, logger, "ridge"
-    )
+    best, params, score, n = _search(estimator, grid, cfg, x, y, seed, logger, "ridge")
     return TunedModel(
         name="ridge",
         estimator=best,

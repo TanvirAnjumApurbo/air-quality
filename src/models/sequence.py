@@ -1,16 +1,23 @@
-"""Tier 3: compact recurrent forecasters.
+"""Tier 3: compact sequence forecasters.
 
 The parameter ceiling is the contribution, not an inconvenience. Every
 architecture is checked against ``models.sequence.max_params`` before training
 and is **skipped and recorded** if it exceeds it, rather than quietly trained
-anyway to chase a better RMSE. With 102 input features this ceiling genuinely
-bites: an LSTM with hidden size 128 needs about 119k parameters and is excluded,
-while the equivalent GRU at 89k is not.
+anyway to chase a better RMSE. At the default 18 input channels the ceiling
+still bites at the top of the grid -- both two-layer 128-wide recurrent models
+are excluded, at 156k and 208k parameters -- while the single-layer variants fit.
+It bit harder under the older 102-column input, where ``lstm_h128_l1`` came to
+119k and was excluded; at 18 channels the same architecture is 76k and runs.
+
+Two of the architectures here are not recurrent at all. DLinear and NLinear
+(Zeng et al., AAAI 2023) are linear maps over the flattened window, costing a few
+hundred to a few thousand parameters, and they are included because a compact-
+model paper that never checks the simplest compact model has not made its case.
 
 Training is engineered for the operating constraints of the target machine:
 
-* the full scaled matrix (~32 MB) lives on the compute device, so batches are
-  gathered on-device with no host-to-device copy in the loop;
+* the full scaled channel matrix (~6 MB) lives on the compute device, so batches
+  are gathered on-device with no host-to-device copy in the loop;
 * every epoch writes ``last.ckpt`` and, on improvement, ``best.ckpt``, both
   atomically, so an interrupted run resumes exactly where it stopped;
 * a wall-clock budget aborts a run that would breach the thermal limit rather
@@ -151,6 +158,140 @@ class AttentionForecaster(nn.Module):
         return self.head(self.dropout(context)).squeeze(-1)
 
 
+class SeriesDecomposition(nn.Module):
+    """Split a window into a moving-average trend and the seasonal remainder.
+
+    The ends are padded by repeating the first and last observation so the trend
+    keeps the input length. Zero-padding would drag the trend towards zero at
+    exactly the recent end of the window the forecast depends on most.
+    """
+
+    def __init__(self, kernel_size: int) -> None:
+        """Build the smoother.
+
+        Args:
+            kernel_size: Moving-average width in hours; forced odd so the window
+                is symmetric about each point.
+        """
+        super().__init__()
+        self.kernel_size = int(kernel_size) | 1
+        self.pad = (self.kernel_size - 1) // 2
+
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """Decompose a batch of windows.
+
+        Args:
+            x: Batch of shape ``(batch, window, features)``.
+
+        Returns:
+            ``(seasonal, trend)``, both shaped like ``x``.
+        """
+        front = x[:, :1, :].repeat(1, self.pad, 1)
+        back = x[:, -1:, :].repeat(1, self.pad, 1)
+        padded = torch.cat([front, x, back], dim=1).transpose(1, 2)
+        trend = torch.nn.functional.avg_pool1d(padded, self.kernel_size, stride=1).transpose(1, 2)
+        return x - trend, trend
+
+
+class DLinearForecaster(nn.Module):
+    """DLinear (Zeng et al., AAAI 2023) adapted to scalar direct forecasting.
+
+    The original decomposes the input into trend and seasonal components, maps
+    each through its own linear layer along the time axis, and sums the results.
+    That is reproduced here; the adaptation is in the output.
+
+    The original predicts a horizon-length sequence for every channel. This study
+    is direct multi-horizon -- one model per *h* emitting a single scalar -- so
+    each component is mapped straight to a scalar by a linear layer over the
+    flattened ``(window, channels)`` input. Note that the natural alternative, a
+    per-channel temporal filter followed by a channel-mixing head, collapses
+    algebraically to exactly this single linear map when the output is scalar, so
+    nothing is lost by writing it directly.
+
+    The point of including it is that it is the baseline that showed simple
+    linear models matching transformers on long-horizon forecasting. If a linear
+    map on the raw window competes with the recurrent tier here, that is a
+    finding, and it costs a few thousand parameters to check.
+    """
+
+    def __init__(self, n_features: int, window: int, kernel_size: int, dropout: float) -> None:
+        """Build the network.
+
+        Args:
+            n_features: Input channels per timestep.
+            window: Input window length in hours.
+            kernel_size: Trend moving-average width; clamped to fit the window.
+            dropout: Dropout applied to the flattened components before the head.
+        """
+        super().__init__()
+        self.decomp = SeriesDecomposition(min(int(kernel_size), int(window)))
+        self.dropout = nn.Dropout(dropout)
+        flat = int(window) * int(n_features)
+        self.seasonal = nn.Linear(flat, 1)
+        self.trend = nn.Linear(flat, 1)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Map a batch of windows to a scalar forecast each.
+
+        Args:
+            x: Batch of shape ``(batch, window, features)``.
+
+        Returns:
+            Predictions of shape ``(batch,)``.
+        """
+        seasonal, trend = self.decomp(x)
+        seasonal = self.dropout(seasonal.flatten(1))
+        trend = self.dropout(trend.flatten(1))
+        return (self.seasonal(seasonal) + self.trend(trend)).squeeze(-1)
+
+
+class NLinearForecaster(nn.Module):
+    """NLinear (Zeng et al., AAAI 2023) adapted to a transformed target.
+
+    The original subtracts the last value of the input sequence, applies one
+    linear layer, and adds that same value back -- a parameter-free way to
+    absorb level shifts between train and test.
+
+    The identity add-back cannot be used here. Input channels are standardised by
+    the train-fitted scaler while the target is modelled on ``log1p``, so the last
+    observed value and the quantity being predicted live on different scales, and
+    adding one to the other would be a unit error rather than a normalisation.
+    The level term is therefore reintroduced through a learned affine map on the
+    target channel's last value, which preserves the mechanism -- the linear layer
+    only has to predict a *deviation* from the current level -- while staying
+    dimensionally coherent. The cost is two extra parameters.
+
+    The target channel is index 0 by construction: ``sequence_channel_columns``
+    inherits the ordering of ``feature_columns``, which inserts the target first.
+    """
+
+    def __init__(self, n_features: int, window: int, dropout: float) -> None:
+        """Build the network.
+
+        Args:
+            n_features: Input channels per timestep.
+            window: Input window length in hours.
+            dropout: Dropout applied to the flattened window before the head.
+        """
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+        self.projection = nn.Linear(int(window) * int(n_features), 1)
+        self.level = nn.Linear(1, 1)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Map a batch of windows to a scalar forecast each.
+
+        Args:
+            x: Batch of shape ``(batch, window, features)``.
+
+        Returns:
+            Predictions of shape ``(batch,)``.
+        """
+        last = x[:, -1:, :]
+        deviation = self.projection(self.dropout((x - last).flatten(1)))
+        return (deviation + self.level(last[:, :, 0])).squeeze(-1)
+
+
 def count_parameters(model: nn.Module) -> int:
     """Total trainable parameters.
 
@@ -161,6 +302,12 @@ def count_parameters(model: nn.Module) -> int:
         Number of trainable parameters.
     """
     return int(sum(p.numel() for p in model.parameters() if p.requires_grad))
+
+
+# Architectures whose parameter count depends on the input window rather than on
+# a hidden width. They are sized by the window, so the budget filter cannot cache
+# their counts by name alone and the sweep tables identify them by window only.
+WINDOW_SIZED_ARCHS = frozenset({"dlinear", "nlinear"})
 
 
 def build_model(spec: ModelSpec, n_features: int, dropout: float) -> nn.Module:
@@ -178,6 +325,10 @@ def build_model(spec: ModelSpec, n_features: int, dropout: float) -> nn.Module:
         return AttentionForecaster(
             n_features, spec.hidden_size, spec.num_layers, spec.attention_dim or 32, dropout
         )
+    if spec.arch == "dlinear":
+        return DLinearForecaster(n_features, spec.window, spec.kernel_size or 25, dropout)
+    if spec.arch == "nlinear":
+        return NLinearForecaster(n_features, spec.window, dropout)
     return RecurrentForecaster(n_features, spec.hidden_size, spec.num_layers, spec.arch, dropout)
 
 
@@ -191,13 +342,16 @@ class ModelSpec:
     """One point in the sequence-model sweep.
 
     Attributes:
-        arch: ``"gru"``, ``"lstm"`` or ``"gru_attention"``.
-        hidden_size: Recurrent hidden width.
-        num_layers: Stacked recurrent layers.
+        arch: ``"gru"``, ``"lstm"``, ``"gru_attention"``, ``"dlinear"`` or
+            ``"nlinear"``.
+        hidden_size: Recurrent hidden width. Unused by the window-sized
+            architectures, which have no hidden state.
+        num_layers: Stacked recurrent layers. Unused as above.
         window: Input window length in hours.
         horizon: Forecast horizon in hours.
         seed: RNG seed.
         attention_dim: Attention width, for the attention variant only.
+        kernel_size: Trend moving-average width, for DLinear only.
     """
 
     arch: str
@@ -207,10 +361,15 @@ class ModelSpec:
     horizon: int
     seed: int
     attention_dim: int | None = None
+    kernel_size: int | None = None
 
     @property
     def name(self) -> str:
         """Architecture name including size, for tables."""
+        if self.arch in WINDOW_SIZED_ARCHS:
+            # Sized by the window, which the ``variant`` column already carries;
+            # a hidden width here would be a fiction.
+            return self.arch
         base = f"{self.arch}_h{self.hidden_size}_l{self.num_layers}"
         return base if self.attention_dim is None else f"{base}_a{self.attention_dim}"
 
@@ -236,8 +395,11 @@ def enumerate_specs(cfg: Config, horizons: list[int], seeds: list[int]) -> list[
     for arch, arch_cfg in sequence["architectures"].items():
         if not arch_cfg.get("enabled", False):
             continue
-        for hidden in arch_cfg["hidden_sizes"]:
-            for layers in arch_cfg["num_layers"]:
+        # The window-sized architectures have neither a hidden width nor stacked
+        # layers, so they declare neither and collapse to a single grid point per
+        # window.
+        for hidden in arch_cfg.get("hidden_sizes", [0]):
+            for layers in arch_cfg.get("num_layers", [1]):
                 for window in sequence["input_windows_h"]:
                     for horizon in horizons:
                         for seed in seeds:
@@ -252,6 +414,11 @@ def enumerate_specs(cfg: Config, horizons: list[int], seeds: list[int]) -> list[
                                     attention_dim=(
                                         int(arch_cfg.get("attention_dim", 32))
                                         if arch == "gru_attention"
+                                        else None
+                                    ),
+                                    kernel_size=(
+                                        int(arch_cfg.get("kernel_size", 25))
+                                        if arch == "dlinear"
                                         else None
                                     ),
                                 )
@@ -282,14 +449,18 @@ def filter_by_parameter_budget(
 
     kept: list[ModelSpec] = []
     excluded: list[dict[str, Any]] = []
-    seen: dict[str, int] = {}
+    # Keyed by window as well as name: a recurrent model's size is independent of
+    # the window, but DLinear and NLinear are sized *by* it, so caching on the
+    # name alone would report whichever window happened to be built first.
+    seen: dict[tuple[str, int], int] = {}
 
     for spec in specs:
-        if spec.name not in seen:
+        key = (spec.name, spec.window)
+        if key not in seen:
             model = build_model(spec, n_features, dropout)
-            seen[spec.name] = count_parameters(model)
+            seen[key] = count_parameters(model)
             del model
-        n_params = seen[spec.name]
+        n_params = seen[key]
         if n_params <= max_params:
             kept.append(spec)
         else:
@@ -465,6 +636,63 @@ def _atomic_save(payload: dict[str, Any], path: Path, logger: Any = None) -> Non
     tmp.unlink(missing_ok=True)
 
 
+def _make_scheduler(optimiser: torch.optim.Optimizer, cfg: Config, epochs: int) -> tuple[Any, bool]:
+    """Build the learning-rate schedule.
+
+    ``reduce_on_plateau`` reacts to the validation loss, which on this data is
+    noisy enough that the reaction is often to noise: the original sweep decayed
+    at epochs 7 and 12 and was then stopped at 13, so the schedule never
+    materially annealed. ``warmup_cosine`` instead follows a fixed path from a
+    warmup ramp down to ``min_lr``, decoupling the schedule from validation
+    noise and letting every run finish the anneal it started.
+
+    Args:
+        optimiser: The optimiser to schedule.
+        cfg: Loaded configuration (``models.sequence.train.scheduler``).
+        epochs: Total epoch budget, which sets the cosine period.
+
+    Returns:
+        ``(scheduler, needs_metric)`` -- ``needs_metric`` is True when
+        ``scheduler.step`` expects the validation loss as an argument.
+
+    Raises:
+        ValueError: If the scheduler name is unknown.
+    """
+    spec = cfg.get("models.sequence.train.scheduler")
+    name = str(spec.get("name", "warmup_cosine")).lower()
+
+    if name == "reduce_on_plateau":
+        return (
+            torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimiser,
+                mode="min",
+                factor=float(spec["factor"]),
+                patience=int(spec["patience"]),
+                min_lr=float(spec["min_lr"]),
+            ),
+            True,
+        )
+
+    if name != "warmup_cosine":
+        raise ValueError(
+            f"models.sequence.train.scheduler.name must be 'warmup_cosine' or "
+            f"'reduce_on_plateau', got {name!r}"
+        )
+
+    base_lr = float(cfg.get("models.sequence.train.lr"))
+    warmup = max(1, int(spec.get("warmup_epochs", 3)))
+    floor = float(spec.get("min_lr", 1e-5)) / base_lr if base_lr > 0 else 0.0
+
+    def factor(epoch: int) -> float:
+        if epoch < warmup:
+            return (epoch + 1) / warmup
+        progress = (epoch - warmup) / max(1, epochs - warmup)
+        cosine = 0.5 * (1.0 + math.cos(math.pi * min(1.0, progress)))
+        return floor + (1.0 - floor) * cosine
+
+    return torch.optim.lr_scheduler.LambdaLR(optimiser, factor), False
+
+
 def _make_loss(cfg: Config) -> nn.Module:
     """Build the configured loss function.
 
@@ -519,6 +747,7 @@ def train_one(
     resume: str = "auto",
     progress: str = "tqdm",
     max_minutes: float | None = None,
+    run_tag: str = "",
 ) -> tuple[nn.Module, TrainResult]:
     """Train one sequence model, with checkpointing and resume.
 
@@ -532,6 +761,10 @@ def train_one(
         resume: ``"auto"``, ``"never"`` or ``"always"``.
         progress: ``"tqdm"`` or ``"plain"``.
         max_minutes: Wall-clock ceiling for this run.
+        run_tag: Optional checkpoint sub-directory. ``run_id`` encodes the
+            architecture but not the training recipe, so a recipe search would
+            otherwise resume the previous recipe's checkpoint and silently
+            evaluate the wrong thing.
 
     Returns:
         ``(model_with_best_weights, result)``.
@@ -541,7 +774,7 @@ def train_one(
     train_cfg = cfg.get("models.sequence.train")
     set_seed(spec.seed, cfg)
 
-    ckpt_dir = cfg.path_for("checkpoints") / spec.run_id
+    ckpt_dir = cfg.path_for("checkpoints") / run_tag / spec.run_id
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     last_path = ckpt_dir / "last.ckpt"
     best_path = ckpt_dir / "best.ckpt"
@@ -562,14 +795,7 @@ def train_one(
         lr=float(train_cfg["lr"]),
         weight_decay=float(train_cfg["weight_decay"]),
     )
-    scheduler_cfg = train_cfg["scheduler"]
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimiser,
-        mode="min",
-        factor=float(scheduler_cfg["factor"]),
-        patience=int(scheduler_cfg["patience"]),
-        min_lr=float(scheduler_cfg["min_lr"]),
-    )
+    scheduler, scheduler_needs_metric = _make_scheduler(optimiser, cfg, int(train_cfg["epochs"]))
     loss_fn = _make_loss(cfg)
 
     history = TrainHistory()
@@ -610,6 +836,11 @@ def train_one(
     early = train_cfg["early_stopping"]
     patience = int(early["patience"])
     min_delta = float(early["min_delta"])
+    # Validation loss here is noisy enough that the first few epochs routinely
+    # produce a minimum no later epoch beats by min_delta. Without a floor the
+    # run then ends at epoch ~13 of 60 with the cosine schedule barely started --
+    # which is what the original sweep did, in all 1,353 runs.
+    min_epochs = int(early.get("min_epochs", 0))
 
     amp_cfg = cfg.get("runtime.amp", {})
     use_amp = bool(amp_cfg.get("enabled", True)) and device == "cuda"
@@ -675,8 +906,12 @@ def train_one(
 
         train_loss = running / max(n_train, 1)
         val_loss, _ = evaluate_sampler(model, val_sampler, loss_fn, batch_size)
-        scheduler.step(val_loss)
+        # Read the rate the epoch actually ran at, before the step moves it on.
         current_lr = float(optimiser.param_groups[0]["lr"])
+        if scheduler_needs_metric:
+            scheduler.step(val_loss)
+        else:
+            scheduler.step()
         elapsed = time.perf_counter() - epoch_started
 
         history.epochs.append(epoch)
@@ -734,7 +969,7 @@ def train_one(
                 "  *" if improved else "",
             )
 
-        if epochs_without_improvement >= patience:
+        if epochs_without_improvement >= patience and (epoch + 1) >= min_epochs:
             stopped_reason = f"early stopping after {patience} epochs without improvement"
             break
 

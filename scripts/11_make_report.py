@@ -192,16 +192,95 @@ def main() -> int:
             )
             a("")
 
-    dm = payload.get("significance", {}).get("diebold_mariano", [])
+    significance = payload.get("significance", {})
+    dm = significance.get("diebold_mariano", [])
     dm_head = [d for d in dm if d["horizon_h"] == headline]
     if dm_head:
         d = dm_head[0]
-        verdict = "significant" if d["p_value"] < 0.05 else "not significant"
-        a(
+        # The Holm-adjusted value is the one that may be cited: one test per
+        # horizon is a family of five, and the raw p-value ignores that.
+        adjusted = d.get("p_value_holm")
+        decisive = adjusted if adjusted is not None else d["p_value"]
+        verdict = "significant" if decisive < 0.05 else "not significant"
+        line = (
             f"Diebold-Mariano at {headline} h ({d['model_a']} vs {d['model_b']}): "
-            f"statistic {d['statistic']:.3f}, p = {d['p_value']:.3g} — **{verdict}** at the 5% level. "
-            f"Lower average loss: {d['better']}."
+            f"statistic {d['statistic']:.3f}, p = {d['p_value']:.3g}"
         )
+        if adjusted is not None:
+            line += f", Holm-adjusted p = {adjusted:.3g}"
+        a(f"{line} — **{verdict}** at the 5% level. Lower average loss: {d['better']}.")
+        a("")
+        if adjusted is not None:
+            multiplicity = significance.get("multiplicity", {})
+            a(
+                f"Adjustment is Holm-Bonferroni over {multiplicity.get('n_tests', len(dm))} "
+                "tests, one per horizon. At the nominal 5% level a family that size is "
+                "expected to return a significant result now and then even if every "
+                "model were identical, so the adjusted column is the one that carries "
+                "the claim."
+            )
+            a("")
+
+    # ---- interval estimates ------------------------------------------------
+    ci = [c for c in significance.get("bootstrap_ci", []) if c["horizon_h"] == headline]
+    if ci:
+        # Named, not `frame`: `frame` is the runs table and the sections below
+        # still need it. Shadowing it here crashed the whole report with a
+        # KeyError on 'tier' the first time a run actually had MCS data.
+        ci_frame = pd.DataFrame(ci).sort_values("rmse")
+        a("### Interval estimates")
+        a("")
+        a(
+            f"Moving-block bootstrap, {ci_frame['n_resamples'].iloc[0]:,} resamples over "
+            f"{ci_frame['block_size_h'].iloc[0]}-hour blocks. Blocks rather than independent "
+            "draws because consecutive hourly errors are strongly correlated, and an "
+            "i.i.d. bootstrap would read that correlation as extra evidence."
+        )
+        a("")
+        display = ci_frame.assign(
+            **{
+                "Model": ci_frame["model"],
+                "RMSE": ci_frame["rmse"].round(2),
+                "95% CI": [
+                    f"[{low:.2f}, {high:.2f}]"
+                    for low, high in zip(ci_frame["ci_low"], ci_frame["ci_high"], strict=True)
+                ],
+            }
+        )[["Model", "RMSE", "95% CI"]]
+        a(display.to_markdown(index=False))
+        a("")
+
+    # ---- model confidence set ----------------------------------------------
+    mcs = [m for m in significance.get("model_confidence_set", []) if m["horizon_h"] == headline]
+    if mcs:
+        mcs_frame = pd.DataFrame(mcs).sort_values("mean_squared_loss")
+        retained = mcs_frame[mcs_frame["in_confidence_set"]]["model"].tolist()
+        a("### Model Confidence Set")
+        a("")
+        a(
+            f"**{len(retained)} of {len(mcs_frame)} models survive at the 95% level: "
+            f"{', '.join(f'`{m}`' for m in retained)}.**"
+        )
+        a("")
+        a(
+            "Hansen, Lunde and Nason (2011). A ranked table invites the reader to treat "
+            "the top row as the winner even when the gap to the row below is smaller than "
+            "the seed-to-seed spread. The confidence set answers the question actually "
+            "being asked — which models cannot be separated from the best — and controls "
+            "the error rate across the whole elimination sequence rather than one "
+            "pairwise test at a time. Ordering *within* the surviving set is not evidence "
+            "of an ordering."
+        )
+        a("")
+        display = mcs_frame.assign(
+            **{
+                "Model": mcs_frame["model"],
+                "Mean squared loss": mcs_frame["mean_squared_loss"].round(1),
+                "MCS p": mcs_frame["mcs_p_value"].round(3),
+                "In 95% MCS": mcs_frame["in_confidence_set"].map({True: "yes", False: "no"}),
+            }
+        )[["Model", "Mean squared loss", "MCS p", "In 95% MCS"]]
+        a(display.to_markdown(index=False))
         a("")
 
     # ---------------------------------------------------------------- baselines
@@ -386,10 +465,29 @@ def main() -> int:
         a("  instantaneous hourly value.")
         a(f"- Class imbalance handled with `class_weight = {clf['class_weight']}`.")
         a("")
-        a(
-            f"- **Macro-F1 {clf['macro_f1']['mean']:.4f} ± {clf['macro_f1']['std']:.4f}** "
-            f"over {clf['macro_f1']['n_seeds']} seeds"
-        )
+        present = clf.get("macro_f1_present", {})
+        empty = [c["label"] for c in clf["per_class"] if not c["support"]]
+        n_seeds = clf["macro_f1"]["n_seeds"]
+
+        if present and empty:
+            # Lead with the figure that measures the model. A category with zero
+            # test support contributes a structural zero to the all-class mean
+            # regardless of how well the model does, so quoting that as the
+            # headline understates it by an arithmetic artefact.
+            a(
+                f"- **Macro-F1 {present['mean']:.4f} ± {present['std']:.4f}** over "
+                f"{n_seeds} seeds, across the "
+                f"{len(clf['per_class']) - len(empty)} categories present in the test period"
+            )
+            a(
+                f"- Macro-F1 over all {len(clf['per_class'])} defined categories: "
+                f"{clf['macro_f1']['mean']:.4f} ± {clf['macro_f1']['std']:.4f}"
+            )
+        else:
+            a(
+                f"- **Macro-F1 {clf['macro_f1']['mean']:.4f} ± {clf['macro_f1']['std']:.4f}** "
+                f"over {n_seeds} seeds"
+            )
         a(
             f"- Weighted-F1 {clf['weighted_f1']['mean']:.4f}, accuracy {clf['accuracy']['mean']:.4f}, "
             f"balanced accuracy {clf['balanced_accuracy']['mean']:.4f}"
@@ -398,6 +496,15 @@ def main() -> int:
         a("Macro-F1 is the headline: the categories are severely imbalanced, so accuracy")
         a("alone would be dominated by the majority classes and would hide failure on the")
         a("hazardous categories an advisory exists to flag.")
+        if present and empty:
+            a("")
+            a(
+                f"{'; '.join(f'**{c}**' for c in empty)} never occurs in the test period, so it "
+                "has zero support. A category with no instances scores an F1 of zero "
+                "whatever the model predicts, and averaging that in measures the test "
+                "period's composition rather than the classifier. Both figures are given "
+                "above; the present-class one is the model's performance."
+            )
         a("")
         a(
             pd.DataFrame(clf["per_class"])[
@@ -664,6 +771,11 @@ def main() -> int:
 
     if dm_head:
         d = dm_head[0]
+        holm = d.get("p_value_holm")
+        # significant_at_5pct follows the ADJUSTED p-value when one exists. The
+        # abstract is written from this file, and quoting an unadjusted p-value
+        # out of a family of five is the error the adjustment exists to prevent.
+        decisive = holm if holm is not None else d["p_value"]
         facts["significance"] = {
             "test": "Diebold-Mariano",
             "horizon_h": d["horizon_h"],
@@ -671,8 +783,47 @@ def main() -> int:
             "model_b": d["model_b"],
             "statistic": round(d["statistic"], 4),
             "p_value": float(d["p_value"]),
-            "significant_at_5pct": bool(d["p_value"] < 0.05),
+            "p_value_holm": float(holm) if holm is not None else None,
+            "multiplicity_correction": payload.get("significance", {}).get("multiplicity"),
+            "significant_at_5pct": bool(decisive < 0.05),
+            "significance_basis": "Holm-adjusted" if holm is not None else "unadjusted",
             "lower_loss": d["better"],
+        }
+
+    mcs_head = [
+        m
+        for m in payload.get("significance", {}).get("model_confidence_set", [])
+        if m["horizon_h"] == int(cfg.get("task.headline_horizon_h"))
+    ]
+    if mcs_head:
+        retained = [m["model"] for m in mcs_head if m["in_confidence_set"]]
+        facts["model_confidence_set"] = {
+            "reference": "Hansen, Lunde and Nason (2011)",
+            "horizon_h": mcs_head[0]["horizon_h"],
+            "alpha": 0.05,
+            "n_models": len(mcs_head),
+            "n_retained": len(retained),
+            "retained": retained,
+            "note": (
+                "Models in the set cannot be distinguished from the best at the 5% "
+                "level. Their relative order is not evidence of an ordering, and the "
+                "abstract must not name one of them as the winner over another."
+            ),
+        }
+
+    ci_head = [
+        c
+        for c in payload.get("significance", {}).get("bootstrap_ci", [])
+        if c["horizon_h"] == int(cfg.get("task.headline_horizon_h"))
+    ]
+    if ci_head:
+        facts["headline_rmse_intervals"] = {
+            c["model"]: {
+                "rmse": round(c["rmse"], 3),
+                "ci_low": round(c["ci_low"], 3),
+                "ci_high": round(c["ci_high"], 3),
+            }
+            for c in sorted(ci_head, key=lambda c: c["rmse"])
         }
 
     cross = payload.get("cross_city") or {}

@@ -116,3 +116,68 @@ def upsert_run(payload: dict[str, Any], record: dict[str, Any]) -> None:
             runs[i] = record
             return
     runs.append(record)
+
+
+def find_reusable_run(
+    payload: dict[str, Any],
+    *,
+    model: str,
+    variant: str,
+    horizon_h: int,
+    seed: int,
+    n_features: int,
+) -> dict[str, Any] | None:
+    """Return a completed run that may be reused as-is, or ``None`` to retrain.
+
+    Identity is ``upsert_run``'s key plus the input width. Width is part of the
+    test because ``--resume`` consults this file, not the checkpoints: deleting
+    the checkpoint directory does not invalidate a record here. When the channel
+    set changed from 102 columns to 18, a resumed sweep kept 675 of 900 records
+    trained at the old width and retrained only the 225 configurations that were
+    new, leaving a ``results.json`` that mixed two experiments and a report that
+    compared them as if they were one.
+
+    Records written before the width was tracked have no ``n_features`` and so
+    never match, which is the safe direction: the cost is retraining, and the
+    cost of the other direction is a silently invalid comparison.
+
+    Args:
+        payload: The results mapping.
+        model: Model name.
+        variant: Variant tag, e.g. ``"w48"``.
+        horizon_h: Forecast horizon in hours.
+        seed: Random seed.
+        n_features: Input channel count the current run would use.
+
+    Returns:
+        The matching completed record, or ``None`` if it must be retrained.
+    """
+    for run in payload.get("runs", []):
+        if (
+            run.get("model") == model
+            and run.get("variant") == variant
+            and run.get("horizon_h") == horizon_h
+            and run.get("seed") == seed
+            and run.get("completed")
+            and run.get("n_features") == n_features
+        ):
+            return run
+    return None
+
+
+def stale_width_runs(payload: dict[str, Any], tier: str, n_features: int) -> list[dict[str, Any]]:
+    """Return recorded runs of ``tier`` whose input width is not ``n_features``.
+
+    Args:
+        payload: The results mapping.
+        tier: Tier to inspect, e.g. ``"tier3"``.
+        n_features: The width the current configuration produces.
+
+    Returns:
+        Records that will be retrained rather than reused.
+    """
+    return [
+        run
+        for run in payload.get("runs", [])
+        if run.get("tier") == tier and run.get("n_features") != n_features
+    ]

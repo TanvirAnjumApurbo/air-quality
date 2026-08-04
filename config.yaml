@@ -285,6 +285,32 @@ features:
     dry_months: [11, 12, 1, 2, 3, 4]
     _status: VERIFIED
 
+  # Which per-timestep channels a SEQUENCE model receives. Tier 1 and tier 2 are
+  # unaffected -- a tree sees one timestamp and needs the past folded into it, so
+  # it always gets the full engineered set above.
+  #
+  # A recurrent model consumes the window itself, so those same columns are
+  # mostly a restatement of what it already reads: pm25_lag_24 at step t IS the
+  # pm25 channel at step t-24, which sits inside a 48-hour window. Supplying both
+  # turns a 48x18 input into 48x102 with heavy collinearity and no added
+  # information. That handicaps the sequence tier in a comparison against the
+  # tabular tier the same columns help -- i.e. it biases the headline result in
+  # one direction, which is why the default changed.
+  #
+  #   contemporaneous  observation channels only (18): the target, the met vars,
+  #                    derived wind u/v, cyclical calendar encodings, season flag.
+  #   engineered       all 102 tabular predictors, reproducing the original
+  #                    behaviour. Retained as a reported ablation arm, not dead
+  #                    code: which representation suits which model class is a
+  #                    result, and dropping the arm would leave the claim
+  #                    unevidenced.
+  #
+  # Cost of the default: lags reaching past the window (pm25_lag_168 under a
+  # 24-hour window) are genuinely lost. That is the trade the engineered arm
+  # quantifies.
+  sequence_channels:
+    mode: contemporaneous          # contemporaneous | engineered
+
   gap_aware:
     enabled: true
     # A window is valid only if its internal timestamps are strictly contiguous
@@ -354,6 +380,20 @@ models:
     ridge:
       enabled: true
       alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
+      # Put the PM2.5 history on the log1p scale the TARGET is modelled on.
+      #
+      # Without this, ridge is asked to express log1p(y(t+h)) as a linear
+      # function of raw y(t), which no linear model can do well. The first run of
+      # this study reported ridge as a near-useless baseline on exactly that
+      # basis and said so in its limitations -- the number was measuring the
+      # feature/target parameterisation, not linear methods.
+      #
+      # Trees and recurrent models are non-linear in the inputs and so were never
+      # affected, which is why the correction lives inside the ridge pipeline
+      # rather than in the shared feature matrix.
+      #
+      # Set false to reproduce the handicapped fit for the ablation table.
+      log_scale_history: true
     random_forest:
       enabled: true
       # Deliberately bounded rather than left to grow freely. An unconstrained
@@ -412,26 +452,97 @@ models:
         hidden_sizes: [64]
         num_layers: [1]
         attention_dim: 32
+      # Zeng et al., "Are Transformers Effective for Time Series Forecasting?"
+      # (AAAI 2023) showed a linear map on the raw window matching or beating
+      # transformer forecasters. It has since become the baseline a time-series
+      # reviewer looks for first, and omitting it invites the obvious objection
+      # that the recurrent tier was never compared against the simplest thing
+      # that works. Both are sized by the window, not a hidden width, so they
+      # declare neither hidden_sizes nor num_layers.
+      dlinear:
+        enabled: true
+        kernel_size: 25              # trend moving-average width, clamped to the window
+      nlinear:
+        enabled: true
     train:
       epochs: 60
       batch_size: 256
-      lr: 0.001
+      # --- recipe -------------------------------------------------------------
+      # These four are what `--tune` searches. The values below are the shipped
+      # defaults; re-run the search after any change to the channel set, since
+      # the optimal rate moved when the input went from 102 columns to 18.
+      lr: 0.003
       optimizer: adamw
-      weight_decay: 0.0001
+      weight_decay: 0.001
       dropout: 0.2
-      grad_clip_norm: 1.0
-      loss: huber                    # robust to PM2.5 spikes
+      loss: huber
+      # Huber is quadratic within +/-delta and linear beyond it. The target is
+      # modelled on log1p, where residuals are small, so delta controls how much
+      # of the loss is actually robust. Measured on validation at h=24: mean
+      # |residual| 0.344, RMS 0.471, p99 1.43. So delta=1.0 leaves only 4.0% of
+      # residuals in the linear branch (it is MSE in all but name), while
+      # delta=0.3 puts 45.2% there -- a genuinely different loss shape.
+      #
+      # The two perform the same. Validation RMSE over the 18-cell search:
+      # delta=1.0 -> 49.17 ug/m3, delta=0.3 -> 49.23 ug/m3, a 0.1% difference in
+      # favour of the LESS robust setting. Reported as a null result.
+      #
+      # Note the search cannot be ranked on mean validation LOSS across delta:
+      # Huber with a different delta is a different function, and assigns
+      # mechanically smaller values for every residual above delta. On loss,
+      # delta=0.3 appears to win by 36% (0.067 vs 0.105); on RMSE the effect is
+      # zero. Recipes are therefore selected on validation RMSE, which is
+      # invariant to the loss shape.
       huber_delta: 1.0
+      grad_clip_norm: 1.0
       scheduler:
-        name: reduce_on_plateau
+        # warmup_cosine | reduce_on_plateau.
+        #
+        # Plateau reacts to validation loss, and on this record that loss is
+        # noisy enough that it was reacting to noise: the original sweep decayed
+        # at epochs 7 and 12 and stopped at 13, so the schedule never annealed.
+        # Cosine follows a fixed path instead, which is independent of that noise.
+        name: warmup_cosine
+        warmup_epochs: 3
+        min_lr: 0.00001
+        # Read only by reduce_on_plateau; kept so the arm can be re-selected.
         factor: 0.5
         patience: 4
-        min_lr: 0.00001
       early_stopping:
         monitor: val_loss
-        patience: 10
+        # Raised from 10, and floored. Every one of the 1,353 runs in the first
+        # sweep stopped early and none reached epoch 60: the noisy validation
+        # curve routinely puts its minimum in the first three epochs, and nothing
+        # later clears it by min_delta. min_epochs stops that from ending a run
+        # before the cosine schedule has done anything.
+        patience: 15
+        min_epochs: 20
         min_delta: 0.0001
         mode: min
+    # --- recipe search ------------------------------------------------------
+    # Run by `06_train_sequence.py --tune`. Deliberately small: one representative
+    # size per recurrent family, one window, the headline horizon, one seed. The
+    # point is to choose a recipe defensibly, not to explore -- a full-grid search
+    # would multiply the sweep by 18 and invite the charge that the model was
+    # tuned until it won.
+    #
+    # Selection is on VALIDATION loss only. Test is never read here. The complete
+    # grid and every run's score are written to results.json under
+    # `sequence_recipe_search` so the search itself is reportable.
+    tuning:
+      enabled: true
+      archs: [gru, lstm]
+      hidden_sizes: [64]
+      num_layers: [1]
+      windows_h: [48]
+      horizons_h: [24]
+      seeds: [42]
+      grid:
+        # 0.01 probes above the winning value: the search selected 0.003, which
+        # was the top of the original grid, so the optimum could lie outside it.
+        lr: [0.0003, 0.001, 0.003, 0.01]
+        weight_decay: [0.0001, 0.001, 0.01]
+        huber_delta: [0.3, 1.0]
 
 # ---- Secondary task: AQI-category classification ---------------------------
 classification:
@@ -506,11 +617,64 @@ evaluation:
     loss: squared
     h: null                          # defaults to the forecast horizon under test
     alternative: two-sided
+    # One test per horizon is a family of five. Reported p-values are
+    # Holm-Bonferroni adjusted across that family; the raw column is kept beside
+    # it for transparency, but the adjusted one is what the text may cite.
+    alpha: 0.05
+    multiplicity: holm
   bootstrap_ci:
     enabled: true
     n_resamples: 1000
     block_size_h: 24                 # moving-block bootstrap for autocorrelation
     alpha: 0.05
+  # Hansen, Lunde and Nason (2011). A ranked table is read as declaring a winner
+  # even when the top several rows differ by less than the seed-to-seed spread.
+  # The MCS reports which models cannot be separated from the best instead, and
+  # controls the error rate over the whole elimination sequence rather than one
+  # pairwise comparison at a time.
+  model_confidence_set:
+    enabled: true
+    alpha: 0.05
+    n_bootstrap: 1000
+    block_size_h: 24                 # matches bootstrap_ci; errors are autocorrelated
+
+# =============================================================================
+# ABLATION: the gap-injection experiment (scripts/16_gap_injection.py)
+#
+# Present so the key exists on both paths, but DISABLED here. The experiment
+# needs a near-complete donor record to degrade, and this one is already the
+# fragmented case at 82.3% coverage with 2,074 gaps -- degrading it further
+# would start from the wrong end and have no undegraded reference cell.
+#
+# This record's role in the experiment is the opposite: its empirical
+# gap-length distribution is what gets injected into the donor. See
+# `--profile-config`, which defaults to this file.
+# =============================================================================
+ablation:
+  gap_injection:
+    enabled: false
+    horizon_h: 24
+    coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
+    arms: [fragmented, contiguous]
+    injection_seeds: [42, 1337, 2024]
+    contiguous_blocks: 8
+    # Equalise the OPTIMIZER-STEP budget across cells, not the epoch budget.
+    # Fragmentation shrinks the training set, so at a fixed 60 epochs a
+    # fragmented cell takes 16 steps/epoch where a contiguous one takes 65 --
+    # four times fewer gradient updates for the same nominal training. Part of
+    # the fragmented arm's degradation would then be undertraining rather than
+    # lost information, which is precisely the confound this experiment exists
+    # to avoid. Epochs, patience and the minimum-epoch floor are rescaled per
+    # cell so every cell receives ~target_optimizer_steps updates.
+    # 5100 = the undegraded reference cell's own budget (85 steps x 60 epochs).
+    target_optimizer_steps: 5100
+    max_epoch_scale: 8.0           # ceiling on the rescale, for pathological cells
+    tabular_models: [ridge, random_forest, xgboost, lightgbm]
+    sequence_models:
+      - {name: gru, arch: gru, hidden_size: 64, num_layers: 2, window_h: 48}
+      - {name: lstm, arch: lstm, hidden_size: 64, num_layers: 1, window_h: 48}
+      - {name: dlinear, arch: dlinear, window_h: 48}
+    model_seeds: [42, 1337, 2024]
 
 # =============================================================================
 # GREEN AI

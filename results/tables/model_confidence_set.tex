@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\caption{Model Confidence Set at 24 hours (Hansen, Lunde and Nason, 2011), on squared-error loss with a moving-block bootstrap. Models marked yes cannot be distinguished from the best at the 5\% level; the ranking among them is not evidence of an ordering. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:model_confidence_set}
+\begin{tabular}{lrrr}
+\toprule
+Model & Mean squared loss & MCS p & In 95\% MCS \\
+\midrule
+gru\_h64\_l1 & 3277.900 & 0.071 & yes \\
+random\_forest & 3418.700 & 0.071 & yes \\
+xgboost & 3437.100 & 0.071 & yes \\
+lightgbm & 3474.600 & 0.071 & yes \\
+ridge & 3520.500 & 0.071 & yes \\
+climatology & 4263.500 & 0.000 & no \\
+seasonal\_naive & 5450.300 & 0.000 & no \\
+persistence & 5450.300 & 0.000 & no \\
+sarimax & 6619.800 & 0.000 & no \\
+\bottomrule
+\end{tabular}
+\end{table}

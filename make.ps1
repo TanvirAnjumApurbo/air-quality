@@ -31,7 +31,12 @@ function Invoke-Step {
     $path = Join-Path $Root "scripts\$Script"
     Write-Host "==> python scripts/$Script $($Args -join ' ')" -ForegroundColor Cyan
     & $Py $path @Args
-    if ($LASTEXITCODE -ne 0) { throw "scripts/$Script failed with exit code $LASTEXITCODE" }
+    # -1073740791 (0xC0000409) = STATUS_STACK_BUFFER_OVERRUN: benign crash
+    # during Python/PyTorch interpreter shutdown on Windows; work is done.
+    if ($LASTEXITCODE -eq -1073740791) {
+        Write-Host "  (ignored benign Windows exit code 0xC0000409 during interpreter shutdown)" -ForegroundColor Yellow
+    }
+    elseif ($LASTEXITCODE -ne 0) { throw "scripts/$Script failed with exit code $LASTEXITCODE" }
 }
 
 $common = @('--config', $Cfg)
@@ -62,7 +67,9 @@ Targets:
   all         Everything above, in order
   beijing     Cross-city: whole pipeline again on the Beijing record
   cross-city  Rank-transfer comparison (needs 'all' and 'beijing')
-  everything  all + beijing + cross-city + report (final artefacts)
+  tune        Choose the sequence training recipe on val loss, before 'deep'
+  ablation    Gap-injection experiment + figure (needs 'beijing')
+  everything  all + beijing + cross-city + ablation + report
   lint        ruff check + format check
   clean       Remove caches and checkpoints (keeps raw data)
 '@
@@ -100,13 +107,20 @@ Targets:
         Invoke-Step '10_make_figures.py'     $commonB
         Invoke-Step '11_make_report.py'      $commonB
     }
+    'tune'      { Invoke-Step '06_train_sequence.py' ($common + @('--tune', '--progress', 'plain') + $Rest) }
+    'ablation' {
+        # Degrades the COMPARISON city (the near-complete record) using the
+        # PRIMARY city's gap-length distribution, so both configs are passed.
+        Invoke-Step '16_gap_injection.py' ($commonB + @('--profile-config', $Cfg, '--progress', 'plain') + $Rest)
+        Invoke-Step '17_ablation_analysis.py' $commonB
+    }
     'cross-city' {
         Invoke-Step '13_cross_city.py' @('--config', $Cfg, '--config-b', $CfgB)
     }
     'everything' {
         # 'report' repeats last on purpose: 13_cross_city writes the comparison
         # into results.json, and only a later report carries section 7.
-        foreach ($t in @('all', 'beijing', 'cross-city', 'report')) {
+        foreach ($t in @('all', 'beijing', 'cross-city', 'ablation', 'report')) {
             & $PSCommandPath $t
             if ($LASTEXITCODE -ne 0) { throw "target '$t' failed" }
         }

@@ -27,7 +27,7 @@ CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures report all lint fmt clean clean-results \
-        beijing cross-city everything
+        beijing cross-city tune ablation everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -117,9 +117,19 @@ beijing:  ## Cross-city: run the whole pipeline again on the Beijing record
 cross-city:  ## Rank-transfer comparison (requires `all` and `beijing` first)
 	$(PY) $(SCRIPTS)/13_cross_city.py --config $(CONFIG) --config-b $(CONFIG_B)
 
+tune:  ## Choose the sequence training recipe on validation loss, before `deep`
+	$(PY) $(SCRIPTS)/06_train_sequence.py --config $(CONFIG) --tune --progress plain
+
+# The gap-injection experiment degrades the COMPARISON city (the near-complete
+# record) using the PRIMARY city's gap-length distribution, so both configs are
+# passed. Needs `beijing` first: hyperparameters are taken from its results.
+ablation:  ## Gap-injection experiment + its figure (requires `beijing` first)
+	$(PY) $(SCRIPTS)/16_gap_injection.py    --config $(CONFIG_B) --profile-config $(CONFIG) --progress plain
+	$(PY) $(SCRIPTS)/17_ablation_analysis.py --config $(CONFIG_B)
+
 # `report` is repeated last on purpose: 13_cross_city writes the comparison into
 # results.json, and only a report generated afterwards carries section 7.
-everything: all beijing cross-city report  ## Every result in the paper
+everything: all beijing cross-city ablation report  ## Every result in the paper
 
 lint:  ## ruff
 	$(PY) -m ruff check src scripts tests

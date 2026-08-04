@@ -4,11 +4,15 @@ One loader serves baselines, trees and sequence models so that all three are
 scored on exactly the same rows. If the tiers selected rows independently, a
 comparison between them would silently be a comparison of different test sets.
 
-Sequence batching keeps the **whole scaled feature matrix** resident (79,216 x
-102 float32, about 32 MB) and gathers windows by index arithmetic rather than
-materialising a windowed tensor. Materialising would cost roughly 2.7 GB at a
-168-hour window for no benefit; at 32 MB the matrix fits in GPU memory outright,
-so batches are assembled on-device with no host transfer in the training loop.
+Sequence batching keeps the **whole scaled channel matrix** resident and gathers
+windows by index arithmetic rather than materialising a windowed tensor. At the
+default 18 contemporaneous channels the matrix is about 6 MB and fits in GPU
+memory outright, so batches are assembled on-device with no host transfer in the
+training loop; materialising the windows instead would cost around 500 MB at a
+168-hour window for no benefit. Under ``features.sequence_channels.mode:
+engineered`` the matrix carries all 102 tabular predictors and grows about
+sixfold, which is still resident but is the arm the honest comparison exists to
+measure against -- see ``features.build_features.sequence_channel_columns``.
 """
 
 from __future__ import annotations
@@ -22,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 from src.eval.split import inverse_transform_target, transform_target
-from src.features.build_features import feature_columns
+from src.features.build_features import feature_columns, sequence_channel_columns
 from src.utils import Config
 
 
@@ -301,7 +305,10 @@ def build_sequence_index(
     Returns:
         The window index.
     """
-    names = feature_columns(frame, cfg, include_oracle=False)
+    # Channels, not tabular predictors: the recurrence reads the window, so the
+    # engineered lag/rolling columns are largely a restatement of what it already
+    # sees. See features.build_features.sequence_channel_columns.
+    names = sequence_channel_columns(frame, cfg, include_oracle=False)
     matrix = frame[names].to_numpy(dtype=np.float32)
     matrix = np.nan_to_num(matrix, nan=0.0, posinf=0.0, neginf=0.0)
 

@@ -1,0 +1,10 @@
+Model,Mean squared loss,MCS p,In 95% MCS
+gru_h64_l1,3277.900,0.071,yes
+random_forest,3418.700,0.071,yes
+xgboost,3437.100,0.071,yes
+lightgbm,3474.600,0.071,yes
+ridge,3520.500,0.071,yes
+climatology,4263.500,0.000,no
+seasonal_naive,5450.300,0.000,no
+persistence,5450.300,0.000,no
+sarimax,6619.800,0.000,no

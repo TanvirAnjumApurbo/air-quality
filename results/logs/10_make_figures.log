@@ -34,3 +34,15 @@
 02:51:25 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
 02:51:26 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
 02:51:27 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+21:41:54 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+21:41:54 | WARNING | 10_make_figures | no checkpoint for gru_h64_l2_w48_H24_s7
+21:41:54 | INFO    | 10_make_figures | wrote fig07_feature_importance
+21:41:55 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+21:41:56 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+21:41:56 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum
+22:17:52 | INFO    | 10_make_figures | wrote fig05_rmse_vs_horizon
+22:17:53 | INFO    | 10_make_figures | wrote fig06_pred_vs_actual
+22:17:53 | INFO    | 10_make_figures | wrote fig07_feature_importance
+22:17:54 | INFO    | 10_make_figures | wrote fig08_pareto_accuracy_emissions
+22:17:54 | INFO    | 10_make_figures | wrote fig09_confusion_matrix
+22:17:55 | INFO    | 10_make_figures | wrote fig10_skill_by_stratum

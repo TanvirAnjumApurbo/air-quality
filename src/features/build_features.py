@@ -289,6 +289,97 @@ def feature_columns(frame: pd.DataFrame, cfg: Config, *, include_oracle: bool = 
     return cols
 
 
+def derived_history_columns(cfg: Config, frame: pd.DataFrame | None = None) -> set[str]:
+    """Names of every column produced by lagging, rolling or differencing.
+
+    Generated from the same configuration keys that :func:`add_target_history`
+    and :func:`add_met_history` read, so the two cannot drift apart: adding a
+    rolling statistic to the config changes what is built and what is listed
+    here in one step.
+
+    Args:
+        cfg: Loaded configuration.
+        frame: Optional built frame. When given, meteorological names are
+            restricted to columns actually present, matching what
+            :func:`add_met_history` does.
+
+    Returns:
+        The set of derived-history column names.
+    """
+    target = str(cfg.get("features.target"))
+    names: set[str] = set()
+
+    for lag in cfg.get("features.pm25_lags_h"):
+        names.add(f"{target}_lag_{int(lag)}")
+    for window in cfg.get("features.rolling_windows_h"):
+        for stat in cfg.get("features.rolling_stats"):
+            names.add(f"{target}_roll{int(window)}_{stat}")
+    for horizon in cfg.get("features.diff_horizons_h"):
+        names.add(f"{target}_diff_{int(horizon)}")
+        names.add(f"{target}_roc_{int(horizon)}")
+
+    met_vars = list(cfg.get("features.met_vars"))
+    if frame is not None:
+        met_vars = [v for v in met_vars if v in frame.columns]
+    for var in [*met_vars, "wind_u", "wind_v"]:
+        for lag in cfg.get("features.met_lags_h"):
+            names.add(f"{var}_lag_{int(lag)}")
+
+    return names
+
+
+def sequence_channel_columns(
+    frame: pd.DataFrame, cfg: Config, *, include_oracle: bool = False
+) -> list[str]:
+    """Select the per-timestep channels a sequence model receives.
+
+    Tabular models are given engineered history because each row must stand
+    alone: a tree sees one timestamp and needs the past folded into it. A
+    recurrent model consumes the window itself, so the same columns are largely
+    redundant with what it already reads -- ``pm25_lag_24`` at step *t* is the
+    ``pm25`` channel at step *t-24*, which is inside a 48-hour window. Supplying
+    both inflates a 48x18 input to 48x102 with heavy collinearity and no added
+    information, which handicaps the sequence tier in a comparison against the
+    tabular tier that the same columns help.
+
+    ``features.sequence_channels.mode`` selects between:
+
+    - ``contemporaneous`` -- observation channels only, letting the recurrence
+      extract temporal structure. The honest comparison.
+    - ``engineered`` -- the full tabular predictor set, reproducing the earlier
+      behaviour so the two representations can be reported side by side.
+
+    Lags reaching further back than the window (``pm25_lag_168`` under a 24-hour
+    window) are the one genuinely additional signal dropped in
+    ``contemporaneous`` mode. That is a deliberate trade and it is what the
+    ``engineered`` arm exists to quantify.
+
+    Args:
+        frame: Built feature frame.
+        cfg: Loaded configuration.
+        include_oracle: Whether to include the perfect-forecast oracle columns.
+
+    Returns:
+        Channel names, in the same stable order as :func:`feature_columns`.
+
+    Raises:
+        ValueError: If the configured mode is unknown.
+    """
+    columns = feature_columns(frame, cfg, include_oracle=include_oracle)
+    mode = str(cfg.get("features.sequence_channels.mode", "contemporaneous"))
+
+    if mode == "engineered":
+        return columns
+    if mode != "contemporaneous":
+        raise ValueError(
+            f"features.sequence_channels.mode must be 'contemporaneous' or 'engineered', "
+            f"got {mode!r}"
+        )
+
+    derived = derived_history_columns(cfg, frame)
+    return [c for c in columns if c not in derived]
+
+
 def max_backward_dependency(cfg: Config) -> int:
     """Longest backward lookback any feature requires, in hours.
 

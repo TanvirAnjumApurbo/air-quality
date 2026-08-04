@@ -37,57 +37,57 @@
   ],
   "headline_horizon_h": 24,
   "best_model": {
-    "name": "gru_h64_l2",
-    "input_window_h": 48,
-    "n_parameters": 57281,
+    "name": "gru_h64_l1",
+    "input_window_h": 24,
+    "n_parameters": 16193,
     "n_seeds": 5,
     "parameter_budget": 100000
   },
   "per_horizon": {
     "1": {
-      "model": "lstm_h64_l1",
-      "rmse": 33.832,
-      "rmse_std_across_seeds": 0.569,
-      "mae": 19.519,
-      "r2": 0.8646,
-      "smape": 18.036,
-      "skill_vs_persistence": 0.0752
+      "model": "gru_h64_l2",
+      "rmse": 33.885,
+      "rmse_std_across_seeds": 0.396,
+      "mae": 19.388,
+      "r2": 0.8642,
+      "smape": 17.691,
+      "skill_vs_persistence": 0.0737
     },
     "3": {
-      "model": "gru_h128_l1",
-      "rmse": 49.376,
-      "rmse_std_across_seeds": 0.378,
-      "mae": 30.105,
-      "r2": 0.7118,
-      "smape": 26.442,
-      "skill_vs_persistence": 0.1826
+      "model": "gru_h64_l1",
+      "rmse": 48.711,
+      "rmse_std_across_seeds": 0.857,
+      "mae": 29.587,
+      "r2": 0.7194,
+      "smape": 26.036,
+      "skill_vs_persistence": 0.1936
     },
     "6": {
-      "model": "gru_h128_l1",
-      "rmse": 57.178,
-      "rmse_std_across_seeds": 1.328,
-      "mae": 35.593,
-      "r2": 0.613,
-      "smape": 30.884,
-      "skill_vs_persistence": 0.3084
+      "model": "gru_h64_l1",
+      "rmse": 55.724,
+      "rmse_std_across_seeds": 0.638,
+      "mae": 34.944,
+      "r2": 0.6325,
+      "smape": 30.45,
+      "skill_vs_persistence": 0.326
     },
     "12": {
-      "model": "gru_h128_l1",
-      "rmse": 58.144,
-      "rmse_std_across_seeds": 0.521,
-      "mae": 36.279,
-      "r2": 0.6,
-      "smape": 31.696,
-      "skill_vs_persistence": 0.4106
+      "model": "gru_h64_l1",
+      "rmse": 60.046,
+      "rmse_std_across_seeds": 0.947,
+      "mae": 37.319,
+      "r2": 0.5734,
+      "smape": 32.354,
+      "skill_vs_persistence": 0.3914
     },
     "24": {
-      "model": "gru_h64_l2",
-      "rmse": 60.006,
-      "rmse_std_across_seeds": 1.251,
-      "mae": 37.115,
-      "r2": 0.5767,
-      "smape": 32.585,
-      "skill_vs_persistence": 0.1865
+      "model": "gru_h64_l1",
+      "rmse": 57.699,
+      "rmse_std_across_seeds": 0.437,
+      "mae": 36.91,
+      "r2": 0.6087,
+      "smape": 32.304,
+      "skill_vs_persistence": 0.2178
     }
   },
   "persistence_rmse_by_horizon": {
@@ -98,11 +98,11 @@
     "24": 73.764
   },
   "green": {
-    "best_model_params": 89217,
-    "best_model_macs": 4319360,
-    "best_model_latency_ms": 0.23625,
-    "best_model_train_kwh": 0.00011511969855707068,
-    "best_model_train_gco2e_bd_grid": 0.08014,
+    "best_model_params": 54849,
+    "best_model_macs": 1339456,
+    "best_model_latency_ms": 0.2758,
+    "best_model_train_kwh": 0.0002416793395494327,
+    "best_model_train_gco2e_bd_grid": 0.16824,
     "grid_intensity_gco2_per_kwh": 696.13,
     "grid_intensity_year": 2025,
     "grid_intensity_source": "Ember (2026), with major processing by Our World in Data",
@@ -129,12 +129,20 @@
   "significance": {
     "test": "Diebold-Mariano",
     "horizon_h": 24,
-    "model_a": "gru_h64_l2",
+    "model_a": "gru_h64_l1",
     "model_b": "random_forest",
-    "statistic": 3.4979,
-    "p_value": 0.00047117610092994866,
+    "statistic": -2.5033,
+    "p_value": 0.012320204006126101,
+    "p_value_holm": 0.0369606120183783,
+    "multiplicity_correction": {
+      "method": "Holm-Bonferroni",
+      "family": "one DM test per horizon, best sequence vs best classical",
+      "n_tests": 5,
+      "alpha": 0.05
+    },
     "significant_at_5pct": true,
-    "lower_loss": "random_forest"
+    "significance_basis": "Holm-adjusted",
+    "lower_loss": "gru_h64_l1"
   },
   "best_classical_by_horizon": {
     "1": {
@@ -148,9 +156,9 @@
       "skill_vs_persistence": 0.1916
     },
     "6": {
-      "model": "xgboost",
-      "rmse": 56.527,
-      "skill_vs_persistence": 0.3162
+      "model": "ridge",
+      "rmse": 57.135,
+      "skill_vs_persistence": 0.3089
     },
     "12": {
       "model": "xgboost",
@@ -163,11 +171,73 @@
       "skill_vs_persistence": 0.2069
     }
   },
+  "model_confidence_set": {
+    "reference": "Hansen, Lunde and Nason (2011)",
+    "horizon_h": 24,
+    "alpha": 0.05,
+    "n_models": 9,
+    "n_retained": 5,
+    "retained": [
+      "gru_h64_l1",
+      "ridge",
+      "random_forest",
+      "xgboost",
+      "lightgbm"
+    ],
+    "note": "Models in the set cannot be distinguished from the best at the 5% level. Their relative order is not evidence of an ordering, and the abstract must not name one of them as the winner over another."
+  },
+  "headline_rmse_intervals": {
+    "gru_h64_l1": {
+      "rmse": 57.236,
+      "ci_low": 52.38,
+      "ci_high": 62.173
+    },
+    "random_forest": {
+      "rmse": 58.5,
+      "ci_low": 53.455,
+      "ci_high": 63.489
+    },
+    "xgboost": {
+      "rmse": 58.697,
+      "ci_low": 53.636,
+      "ci_high": 63.732
+    },
+    "lightgbm": {
+      "rmse": 59.021,
+      "ci_low": 54.029,
+      "ci_high": 64.189
+    },
+    "ridge": {
+      "rmse": 59.365,
+      "ci_low": 54.298,
+      "ci_high": 64.342
+    },
+    "climatology": {
+      "rmse": 65.431,
+      "ci_low": 60.524,
+      "ci_high": 70.454
+    },
+    "persistence": {
+      "rmse": 73.764,
+      "ci_low": 67.772,
+      "ci_high": 79.862
+    },
+    "seasonal_naive": {
+      "rmse": 73.764,
+      "ci_low": 67.772,
+      "ci_high": 79.862
+    },
+    "sarimax": {
+      "rmse": 81.362,
+      "ci_low": 74.828,
+      "ci_high": 87.933
+    }
+  },
   "cross_city": {
     "comparison_city": "Beijing",
-    "spearman_rank_correlation": 0.016666666666666666,
+    "spearman_rank_correlation": 0.19999999999999998,
     "ranking_transfers": false,
-    "headline_claim": "Method ranking does not transfer between cities: the Spearman rank correlation between Dhaka and Beijing at the headline horizon is +0.017. The best method in one city is among the worst in the other.",
+    "headline_claim": "Method ranking does not transfer between cities: the Spearman rank correlation between Dhaka and Beijing at the headline horizon is +0.200. The best method in one city is among the worst in the other.",
     "ranking_by_city": {
       "Beijing": [
         {
@@ -178,12 +248,12 @@
         {
           "rank": 2,
           "model": "ridge",
-          "skill": 0.0717
+          "skill": 0.0609
         },
         {
           "rank": 3,
           "model": "best sequence",
-          "skill": 0.059
+          "skill": 0.0442
         },
         {
           "rank": 4,
@@ -219,33 +289,33 @@
       "Dhaka": [
         {
           "rank": 1,
+          "model": "best sequence",
+          "skill": 0.2178
+        },
+        {
+          "rank": 2,
           "model": "random_forest",
           "skill": 0.2069
         },
         {
-          "rank": 2,
+          "rank": 3,
           "model": "xgboost",
           "skill": 0.2043
         },
         {
-          "rank": 3,
+          "rank": 4,
           "model": "lightgbm",
           "skill": 0.1999
         },
         {
-          "rank": 4,
-          "model": "best sequence",
-          "skill": 0.1865
-        },
-        {
           "rank": 5,
-          "model": "climatology",
-          "skill": 0.113
+          "model": "ridge",
+          "skill": 0.1952
         },
         {
           "rank": 6,
-          "model": "ridge",
-          "skill": 0.0963
+          "model": "climatology",
+          "skill": 0.113
         },
         {
           "rank": 7,

@@ -1,10 +1,10 @@
 Model,Beijing rank,Dhaka rank,Beijing skill,Dhaka skill
-random_forest,5,1,0.037,0.207
-xgboost,4,2,0.038,0.204
-lightgbm,6,3,0.032,0.200
-best sequence,3,4,0.059,0.186
-climatology,7,5,0.025,0.113
-ridge,2,6,0.072,0.096
+best sequence,3,1,0.044,0.218
+random_forest,5,2,0.037,0.207
+xgboost,4,3,0.038,0.204
+lightgbm,6,4,0.032,0.200
+ridge,2,5,0.061,0.195
+climatology,7,6,0.025,0.113
 seasonal_naive,9,7,0.000,0.000
 persistence,8,8,0.000,0.000
 sarimax,1,9,0.125,-0.103

@@ -317,6 +317,14 @@ features:
     dry_months: [11, 12, 1, 2, 3, 4]
     _status: VERIFIED
 
+  # Must match config.yaml: the cross-city comparison tests the METHOD, so both
+  # cities have to feed their sequence models the same kind of input. See the
+  # long note in config.yaml for why contemporaneous is the honest default.
+  # Beijing has one fewer met var (no ALLSKY_SFC_SW_DWN), so this resolves to 17
+  # channels here against 18 in Dhaka.
+  sequence_channels:
+    mode: contemporaneous          # contemporaneous | engineered
+
   gap_aware:
     enabled: true
     # A window is valid only if its internal timestamps are strictly contiguous
@@ -386,6 +394,8 @@ models:
     ridge:
       enabled: true
       alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
+      # Must match config.yaml -- see the note there. Same method, both cities.
+      log_scale_history: true
     random_forest:
       enabled: true
       # Deliberately bounded rather than left to grow freely. An unconstrained
@@ -444,26 +454,58 @@ models:
         hidden_sizes: [64]
         num_layers: [1]
         attention_dim: 32
+      # Must mirror config.yaml -- see the note there. The comparison city runs
+      # the same architecture set or it is not the same method.
+      dlinear:
+        enabled: true
+        kernel_size: 25
+      nlinear:
+        enabled: true
     train:
+      # EVERY VALUE BELOW IS INHERITED FROM config.yaml ON PURPOSE, and must be
+      # copied across whenever the primary city's recipe changes.
+      #
+      # The recipe is tuned once, on the primary city, and applied unchanged
+      # here. Tuning per city would mean the cross-city comparison measured
+      # tuning effort per city as well as method, and the claim this run exists
+      # to test -- that the same pipeline run unchanged ranks methods differently
+      # in the two cities -- would no longer be about the pipeline.
       epochs: 60
       batch_size: 256
-      lr: 0.001
+      # Selected on Dhaka validation RMSE (not validation loss -- see config.yaml
+      # for why Huber loss is not comparable across huber_delta).
+      lr: 0.003
       optimizer: adamw
-      weight_decay: 0.0001
+      weight_decay: 0.001
       dropout: 0.2
-      grad_clip_norm: 1.0
-      loss: huber                    # robust to PM2.5 spikes
+      loss: huber
       huber_delta: 1.0
+      grad_clip_norm: 1.0
       scheduler:
-        name: reduce_on_plateau
+        name: warmup_cosine
+        warmup_epochs: 3
+        min_lr: 0.00001
         factor: 0.5
         patience: 4
-        min_lr: 0.00001
       early_stopping:
         monitor: val_loss
-        patience: 10
+        patience: 15
+        min_epochs: 20
         min_delta: 0.0001
         mode: min
+    tuning:
+      # The search runs on the primary city only; see the block above.
+      enabled: false
+      archs: [gru, lstm]
+      hidden_sizes: [64]
+      num_layers: [1]
+      windows_h: [48]
+      horizons_h: [24]
+      seeds: [42]
+      grid:
+        lr: [0.0003, 0.001, 0.003]
+        weight_decay: [0.0001, 0.001, 0.01]
+        huber_delta: [0.3, 1.0]
 
 # ---- Secondary task: AQI-category classification ---------------------------
 classification:
@@ -542,11 +584,75 @@ evaluation:
     loss: squared
     h: null                          # defaults to the forecast horizon under test
     alternative: two-sided
+    # Must match config.yaml -- see the note there.
+    alpha: 0.05
+    multiplicity: holm
   bootstrap_ci:
     enabled: true
     n_resamples: 1000
     block_size_h: 24                 # moving-block bootstrap for autocorrelation
     alpha: 0.05
+  # Must match config.yaml -- see the note there.
+  model_confidence_set:
+    enabled: true
+    alpha: 0.05
+    n_bootstrap: 1000
+    block_size_h: 24
+
+# =============================================================================
+# ABLATION: the gap-injection experiment (scripts/16_gap_injection.py)
+#
+# The study's central claim is that record FRAGMENTATION, not model class,
+# decides which method wins. Across two cities that is only an observation --
+# Dhaka and Beijing differ in coverage, span, climate and instrument at once.
+# This block turns it into a controlled experiment on a single record.
+#
+# This near-complete record (98.9% coverage, 180 gaps) is the donor. It is
+# degraded to each coverage level by two arms that remove an IDENTICAL number of
+# observed hours and differ only in how those hours are arranged. Data volume is
+# therefore constant along the coverage axis, and the gap between the arms
+# isolates fragmentation.
+#
+# Measured effect at 82% coverage, h=24 (Dhaka's own coverage level):
+#   contiguous   21,732 -> 16,400 usable training rows   (-25%, i.e. the volume lost)
+#   fragmented   21,732 ->  4,059 usable training rows   (-81%)
+# Same hours removed; four times the damage. Gap-aware windowing rejects almost
+# everything once contiguity is broken, which is the mechanism the paper argues
+# separates the model classes.
+# =============================================================================
+ablation:
+  gap_injection:
+    enabled: true
+    horizon_h: 24
+    # 0.99 is a no-op on this record (it already sits at 0.9894) and serves as
+    # the undegraded reference cell. 0.82 is Dhaka's measured coverage.
+    coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
+    arms: [fragmented, contiguous]
+    # Three draws per cell so a ranking change cannot be one lucky arrangement.
+    injection_seeds: [42, 1337, 2024]
+    # Several blocks, not one. A single block large enough to remove 25% of a
+    # multi-year record would delete whole seasons, confounding fragmentation
+    # with seasonal composition -- the arms have to differ in contiguity ONLY.
+    contiguous_blocks: 8
+    # Hyperparameters come from the undegraded run, never re-tuned per cell.
+    # Equalise the OPTIMIZER-STEP budget across cells, not the epoch budget.
+    # Fragmentation shrinks the training set, so at a fixed 60 epochs a
+    # fragmented cell takes 16 steps/epoch where a contiguous one takes 65 --
+    # four times fewer gradient updates for the same nominal training. Part of
+    # the fragmented arm's degradation would then be undertraining rather than
+    # lost information, which is precisely the confound this experiment exists
+    # to avoid. Epochs, patience and the minimum-epoch floor are rescaled per
+    # cell so every cell receives ~target_optimizer_steps updates.
+    # 5100 = the undegraded reference cell's own budget (85 steps x 60 epochs).
+    target_optimizer_steps: 5100
+    max_epoch_scale: 8.0           # ceiling on the rescale, for pathological cells
+    tabular_models: [ridge, random_forest, xgboost, lightgbm]
+    # Filled in from the main sweep's validation-selected winners.
+    sequence_models:
+      - {name: gru, arch: gru, hidden_size: 64, num_layers: 2, window_h: 48}
+      - {name: lstm, arch: lstm, hidden_size: 64, num_layers: 1, window_h: 48}
+      - {name: dlinear, arch: dlinear, window_h: 48}
+    model_seeds: [42, 1337, 2024]
 
 # =============================================================================
 # GREEN AI

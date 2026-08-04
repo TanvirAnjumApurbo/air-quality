@@ -91,6 +91,8 @@ same targets:
 | 5 | `.\make.ps1 eval` | `09_evaluate.py` | stratified metrics + Diebold-Mariano |
 | 6 | `.\make.ps1 figures` | `10_make_figures.py` | all figures, 300 dpi PNG + PDF |
 | 6 | `.\make.ps1 report` | `11_make_report.py` | `RESULTS.md`, `abstract_facts.json` |
+| 7 | — | `16_gap_injection.py` | the gap-injection experiment (see §8) |
+| 7 | — | `17_ablation_analysis.py` | `fig11_gap_injection`, arm-gap table |
 
 `make all` reproduces everything from scratch with fixed seeds. The git commit
 hash is written into `results/results.json`.
@@ -110,6 +112,18 @@ Every training entrypoint prints live progress, checkpoints each epoch, and
 resumes automatically from the last checkpoint if interrupted.
 
 ### Sequence models (Tier 3)
+
+**Choose the training recipe first.** `--tune` searches learning rate, weight
+decay and the Huber delta on a reduced grid, scored on **validation loss only**,
+and prints a ready-to-paste block. Paste it into `models.sequence.train` in
+*both* configs before the sweep — the comparison city inherits the recipe on
+purpose. The full grid and every candidate's score are written to
+`results.json` under `sequence_recipe_search`, so the search is reportable
+rather than something that happened offstage.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\06_train_sequence.py --config config.yaml --tune --progress plain
+```
 
 ```powershell
 # full sweep, all architectures x horizons x seeds, resumes if interrupted
@@ -220,7 +234,46 @@ sizes and learning rates all live in `config.yaml`.
   than filling in an invented figure.
 - Every filtering and imputation decision is logged with a count of affected rows.
 
-## 7. Data sources
+## 7. The gap-injection experiment
+
+Across two cities it looks as though record **fragmentation**, not model class,
+decides which method wins: tree ensembles lead on Dhaka's broken record, the
+sequence model leads on Beijing's near-complete one. Two cities that differ in
+coverage, span, climate and instrument at once cannot establish that. This
+experiment makes fragmentation the manipulated variable on a single record.
+
+A near-complete donor is degraded to a series of coverage levels by two arms
+that remove **exactly the same number of observed hours** and differ only in how
+those hours are arranged:
+
+- **fragmented** — many short outages, lengths drawn from Dhaka's own empirical
+  gap-length distribution (2,074 gaps, 64% of them a single hour, longest 2,712 h);
+- **contiguous** — the same hour count as a few long blocks, spread evenly so the
+  arms differ in contiguity and not in seasonal composition.
+
+Three controls make the comparison mean what it claims:
+
+1. **The test period is never degraded**, so every cell is scored on identical
+   rows and RMSE stays comparable across the whole grid.
+2. **Hyperparameters are fixed** at the undegraded record's selections. Re-tuning
+   per cell would let search compensate for the damage.
+3. **The optimizer-step budget is equalised**, not the epoch budget. Fragmentation
+   shrinks the training set, so at a fixed 60 epochs a fragmented cell takes 16
+   steps/epoch where a contiguous one takes 65 — four times fewer gradient
+   updates. Epochs, patience and the minimum-epoch floor are rescaled per cell so
+   the degradation cannot be undertraining in disguise.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\16_gap_injection.py --config config_beijing.yaml --progress plain
+.\.venv\Scripts\python.exe scripts\17_ablation_analysis.py --config config_beijing.yaml
+```
+
+The grid is resumable and skips cells already recorded in
+`results/ablation_gap_injection.json`. Each cell's feature matrix is deleted
+after scoring unless `--keep-cells` is given, because the full grid would
+otherwise hold several GB.
+
+## 8. Data sources
 
 | Source | Role | Access |
 |---|---|---|

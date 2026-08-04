@@ -1,4 +1,3 @@
 Configuration,Parameters,Budget
-gru_h128_l2,188289,100000
-lstm_h128_l1,118913,100000
-lstm_h128_l2,251009,100000
+gru_h128_l2,156033,100000
+lstm_h128_l2,208001,100000
