@@ -44,3 +44,54 @@ sequence     15   -0.0527 [-0.0897, -0.0219]        0.0012    0.0046
    trees     15   -0.0112 [-0.0307, +0.0073]        0.3591    0.7183
    naive     15   -0.0101 [-0.0297, +0.0067]        0.5995    0.7183
   linear     15    0.0106 [+0.0018, +0.0188]        0.0256    0.0767
+04:37:23 | WARNING | 17_ablation_analysis | GRID INCOMPLETE: 21 of 100 degraded cells missing. The paired test below is computed on the cells that exist and is NOT the designed experiment. Re-run scripts/16_gap_injection.py to resume, then re-run this script. Missing: contiguous_cov0.82_s7, contiguous_cov0.82_s101, contiguous_cov0.82_s2718, contiguous_cov0.82_s4096, contiguous_cov0.82_s8191, contiguous_cov0.82_s31415, contiguous_cov0.82_s60613, fragmented_cov0.75_s7, fragmented_cov0.75_s101, fragmented_cov0.75_s2718, fragmented_cov0.75_s4096, fragmented_cov0.75_s8191 ...
+04:37:25 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+04:37:25 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  1.0  2.0  2.0  2.0
+naive                  4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        3.0  2.0  2.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        2.0  3.0  3.0  3.0  3.0  3.0
+04:37:25 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0427, 'trees': -0.0118, 'linear': -0.0038, 'naive': -0.002}
+04:37:25 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI  p (Wilcoxon)  p (Holm)
+sequence     36   -0.0354 [-0.0549, -0.0180]        0.0003    0.0012
+   trees     36   -0.0186 [-0.0311, -0.0061]        0.0020    0.0059
+   naive     36   -0.0136 [-0.0346, +0.0010]        0.4140    0.8281
+  linear     36    0.0011 [-0.0053, +0.0070]        0.6694    0.8281
+04:37:32 | WARNING | 17_ablation_analysis | GRID INCOMPLETE: 21 of 100 degraded cells missing. The paired test below is computed on the cells that exist and is NOT the designed experiment. Re-run scripts/16_gap_injection.py to resume, then re-run this script. Missing: contiguous_cov0.82_s7, contiguous_cov0.82_s101, contiguous_cov0.82_s2718, contiguous_cov0.82_s4096, contiguous_cov0.82_s8191, contiguous_cov0.82_s31415, contiguous_cov0.82_s60613, fragmented_cov0.75_s7, fragmented_cov0.75_s101, fragmented_cov0.75_s2718, fragmented_cov0.75_s4096, fragmented_cov0.75_s8191 ...
+04:37:33 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+04:37:33 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  1.0  2.0  2.0  2.0
+naive                  4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        3.0  2.0  2.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        2.0  3.0  3.0  3.0  3.0  3.0
+04:37:33 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0427, 'trees': -0.0118, 'linear': -0.0038, 'naive': -0.002}
+04:37:33 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI  p (Wilcoxon)  p (Holm)
+sequence     36   -0.0354 [-0.0549, -0.0180]        0.0003    0.0012
+   trees     36   -0.0186 [-0.0311, -0.0061]        0.0020    0.0059
+   naive     36   -0.0136 [-0.0346, +0.0010]        0.4140    0.8281
+  linear     36    0.0011 [-0.0053, +0.0070]        0.6694    0.8281
+04:38:05 | WARNING | 17_ablation_analysis | GRID INCOMPLETE: 21 of 100 degraded cells missing. The paired test below is computed on the cells that exist and is NOT the designed experiment. Re-run scripts/16_gap_injection.py to resume, then re-run this script. Missing: contiguous_cov0.82_s7, contiguous_cov0.82_s101, contiguous_cov0.82_s2718, contiguous_cov0.82_s4096, contiguous_cov0.82_s8191, contiguous_cov0.82_s31415, contiguous_cov0.82_s60613, fragmented_cov0.75_s7, fragmented_cov0.75_s101, fragmented_cov0.75_s2718, fragmented_cov0.75_s4096, fragmented_cov0.75_s8191 ...
+04:38:06 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+04:38:06 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  1.0  2.0  2.0  2.0
+naive                  4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        3.0  2.0  2.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        2.0  3.0  3.0  3.0  3.0  3.0
+04:38:06 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0427, 'trees': -0.0118, 'linear': -0.0038, 'naive': -0.002}
+04:38:06 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI  p (Wilcoxon)  p (Holm)
+sequence     36   -0.0354 [-0.0549, -0.0180]        0.0003    0.0012
+   trees     36   -0.0186 [-0.0311, -0.0061]        0.0020    0.0059
+   naive     36   -0.0136 [-0.0346, +0.0010]        0.4140    0.8281
+  linear     36    0.0011 [-0.0053, +0.0070]        0.6694    0.8281

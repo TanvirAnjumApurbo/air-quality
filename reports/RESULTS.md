@@ -359,6 +359,11 @@ period is shorter and spans a seasonal transition.
 attribute a ranking difference to any one of those differences. This
 section holds the record fixed and cuts it two ways.
 
+> ⚠ **PROVISIONAL.** 21 of 100 degraded cells have not
+> run, so the levels below are unequally weighted and this is not yet the
+> designed experiment. Resume `scripts/16_gap_injection.py`, re-run
+> `scripts/17_ablation_analysis.py`, then regenerate this report.
+
 - Donor record: **Beijing Wanliu (UCI Multi-Site, id 501)**
 - Injected gap-length distribution: **US Embassy Dhaka (OpenAQ 2445+8415)**
 - Horizon: **24 h**
@@ -373,17 +378,17 @@ loss of contiguous data.
 
 | family   |   100% |     95% |     90% |     85% |     82% |     75% |
 |:---------|-------:|--------:|--------:|--------:|--------:|--------:|
-| sequence |      0 | -0.0206 | -0.0107 | -0.0243 | -0.0427 | -0.099  |
-| trees    |      0 |  0.0004 |  0.0136 | -0.0034 |  0.0219 | -0.0165 |
-| linear   |      0 |  0.0061 |  0.0159 |  0.0037 |  0.0275 | -0.0133 |
-| naive    |      0 | -0.006  |  0.0136 |  0      | -0.0005 |  0      |
+| sequence |      0 | -0.0076 | -0.0272 | -0.0275 | -0.0522 | -0.099  |
+| trees    |      0 | -0.0057 | -0.0096 | -0.0101 | -0.0171 | -0.0165 |
+| linear   |      0 | -0.0021 | -0.0014 |  0.0014 | -0.0037 | -0.0133 |
+| naive    |      0 |  0.0005 |  0.0033 | -0.0134 | -0.0005 |  0      |
 
 The undegraded level removes nothing, so both arms are the same run
 and their difference there is exactly zero by construction. Any other
 value in that column would mean the injector perturbs something besides
 contiguity.
 
-**Paired test.** Each of the 15 pairs is one (coverage level,
+**Paired test.** Each of the 36 pairs is one (coverage level,
 injection seed): the two arms remove an identical number of observed
 hours and differ only in arrangement. The representative model per
 family is fixed on the undegraded record and never re-chosen per arm,
@@ -392,15 +397,13 @@ Holm-corrected across families.
 
 | Family   |   Pairs |   Mean gap | 95% CI             |      p |   p (Holm) |
 |:---------|--------:|-----------:|:-------------------|-------:|-----------:|
-| sequence |      15 |    -0.0527 | [-0.0897, -0.0219] | 0.0012 |     0.0046 |
-| trees    |      15 |    -0.0112 | [-0.0307, +0.0073] | 0.3591 |     0.7183 |
-| naive    |      15 |    -0.0101 | [-0.0297, +0.0067] | 0.5995 |     0.7183 |
-| linear   |      15 |     0.0106 | [+0.0018, +0.0188] | 0.0256 |     0.0767 |
+| sequence |      36 |    -0.0354 | [-0.0549, -0.0180] | 0.0003 |     0.0012 |
+| trees    |      36 |    -0.0186 | [-0.0311, -0.0061] | 0.002  |     0.0059 |
+| naive    |      36 |    -0.0136 | [-0.0346, +0.0010] | 0.414  |     0.8281 |
+| linear   |      36 |     0.0011 | [-0.0053, +0.0070] | 0.6694 |     0.8281 |
 
-The sequence family loses 0.0527 skill to arrangement alone (95% CI [-0.0897, -0.0219], Holm p = 0.0046).
-No other family's gap survives correction. Fragmentation is
-costly specifically to the model class that requires contiguous
-windows — which is the mechanism §7 proposed and could not test.
+The sequence family loses 0.0354 skill to arrangement alone (95% CI [-0.0549, -0.0180], Holm p = 0.0012).
+It is not alone: trees (-0.0186) also move, so the effect is not specific to the sequence tier.
 
 Representative model per family, fixed on the undegraded record: linear = `ridge`, naive = `climatology`, sequence = `gru_h64_l2`, trees = `xgboost`.
 
@@ -410,8 +413,8 @@ contiguous removal of the same number of hours.
 
 | arm / family          |   100% |   95% |   90% |   85% |   82% |   75% |
 |:----------------------|-------:|------:|------:|------:|------:|------:|
-| fragmented / sequence |      1 |     1 |     1 |     2 |     3 |     3 |
-| fragmented / trees    |      3 |     3 |     3 |     3 |     2 |     2 |
+| fragmented / sequence |      1 |     1 |     1 |     2 |     2 |     3 |
+| fragmented / trees    |      3 |     3 |     3 |     3 |     3 |     2 |
 | fragmented / linear   |      2 |     2 |     2 |     1 |     1 |     1 |
 | fragmented / naive    |      4 |     4 |     4 |     4 |     4 |     4 |
 | contiguous / sequence |      1 |     1 |     1 |     1 |     1 |     1 |
@@ -425,7 +428,7 @@ period is untouched, and the optimizer-step budget is equalised so that
 a fragmented cell is not simply undertrained. What it does not establish
 is generality.
 
-- **One donor record**, degraded 3 ways per cell. A second
+- **One donor record**, degraded 10 ways per cell. A second
   donor would separate the effect from this station's own dynamics.
 - **One horizon** and one injected gap-length distribution.
 - The per-cell differences in the first table are individually noisy; it is

@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import shutil
 import sys
 import time
@@ -450,6 +451,12 @@ def main() -> int:
             "test_rows": valid["test"],
             "models": results,
         }
+        # Rebuilt from scratch on every cell, which deliberately DROPS the
+        # `analysis` block 17_ablation_analysis.py writes here. Do not "fix"
+        # this by merging: an analysis computed over a different set of cells
+        # is worse than no analysis, because it looks finished. Re-run 17 after
+        # this script, always. 11_make_report.py warns when it finds cells with
+        # no analysis rather than silently omitting the section.
         payload = {
             "donor": cfg.get("data.openaq.site_label") or cfg.get("data.site.city"),
             "gap_profile_source": profile.source,
@@ -484,4 +491,25 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # An uncaught exception here writes its traceback to stderr and nowhere
+    # else, so a grid that dies partway leaves results/logs/16_gap_injection.log
+    # ending mid-epoch with no reason recorded -- which is what happened at cell
+    # 66/101, and the fault turned out to be transient and unreproducible. The
+    # logger is name-keyed and setup_logging has already attached the file
+    # handler, so re-fetching it here puts the traceback in the log.
+    #
+    # The grid still aborts rather than skipping the cell and carrying on. Its
+    # design is paired -- each (coverage, seed) contributes one fragmented and
+    # one contiguous cell to a signed-rank test -- so a silently missing cell
+    # would unbalance the pairs. Failing loudly and resuming is correct;
+    # continuing past a hole is not.
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except BaseException:
+        logging.getLogger("16_gap_injection").exception(
+            "gap-injection grid ABORTED; the cell in progress was not recorded. "
+            "Re-run with the same command to resume from it."
+        )
+        raise

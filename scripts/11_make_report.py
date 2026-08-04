@@ -651,6 +651,20 @@ def main() -> int:
     if ablation_path.exists():
         abl = json.loads(ablation_path.read_text(encoding="utf-8"))
         by_family = pd.DataFrame(abl.get("analysis", {}).get("by_family", []))
+        # Omitting an un-run section is right; omitting it in silence is not.
+        # 16_gap_injection.py rewrites this file wholesale and drops the
+        # `analysis` block that 17_ablation_analysis.py put there, so a grid
+        # that was extended but not re-analysed leaves cells with no analysis --
+        # and this report then quietly renumbers Limitations over the top of the
+        # study's central section. That happened once. Say so, loudly.
+        if by_family.empty and abl.get("cells"):
+            log.warning(
+                "%s holds %d cells but no analysis block, so the gap-injection "
+                "section is being OMITTED from this report. Run "
+                "scripts/17_ablation_analysis.py --config <donor config> first.",
+                ablation_path,
+                len(abl["cells"]),
+            )
         if not by_family.empty:
             a(f"## {next_section}. Does fragmentation cause the ranking to change?")
             next_section += 1
@@ -659,6 +673,15 @@ def main() -> int:
             a("attribute a ranking difference to any one of those differences. This")
             a("section holds the record fixed and cuts it two ways.")
             a("")
+            analysis = abl.get("analysis", {})
+            if analysis.get("grid_complete") is False:
+                n_missing = len(analysis.get("missing_cells", []))
+                n_expected = analysis.get("n_expected_degraded_cells")
+                a(f"> ⚠ **PROVISIONAL.** {n_missing} of {n_expected} degraded cells have not")
+                a("> run, so the levels below are unequally weighted and this is not yet the")
+                a("> designed experiment. Resume `scripts/16_gap_injection.py`, re-run")
+                a("> `scripts/17_ablation_analysis.py`, then regenerate this report.")
+                a("")
             a(f"- Donor record: **{abl.get('donor')}**")
             a(f"- Injected gap-length distribution: **{abl.get('gap_profile_source')}**")
             a(f"- Horizon: **{abl.get('horizon_h')} h**")

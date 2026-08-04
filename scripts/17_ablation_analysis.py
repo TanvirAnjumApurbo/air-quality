@@ -215,6 +215,42 @@ def main() -> int:
         log.error("no cells recorded in %s", path)
         return 1
 
+    # A partial grid must not be analysed as if it were whole. 16_gap_injection
+    # aborts on a transient fault and resumes on the next invocation, so it is
+    # entirely normal to find this file holding, say, 80 of 101 cells -- and
+    # nothing downstream would notice. It matters here specifically because the
+    # design is paired: a level whose two arms have different seed sets, or
+    # fewer seeds than its neighbours, silently reweights the signed-rank test
+    # toward whichever levels happen to have finished.
+    spec_cfg = cfg.get("ablation.gap_injection") or {}
+    expected_seeds = {int(s) for s in spec_cfg.get("injection_seeds", [])}
+    expected_levels = {round(float(c), 4) for c in spec_cfg.get("coverage_levels", [])}
+    degraded_cells = frame[frame["arm"] != "none"]
+    missing: list[str] = []
+    for level in sorted(expected_levels, reverse=True):
+        for arm in ("fragmented", "contiguous"):
+            have = set(
+                degraded_cells[
+                    (degraded_cells["arm"] == arm)
+                    & (degraded_cells["target_coverage"].round(4) == level)
+                ]["injection_seed"].astype(int)
+            )
+            for seed in sorted(expected_seeds - have):
+                missing.append(f"{arm}_cov{level:.2f}_s{seed}")
+    if missing:
+        log.warning(
+            "GRID INCOMPLETE: %d of %d degraded cells missing. The paired test below "
+            "is computed on the cells that exist and is NOT the designed experiment. "
+            "Re-run scripts/16_gap_injection.py to resume, then re-run this script. "
+            "Missing: %s",
+            len(missing),
+            len(expected_levels) * 2 * len(expected_seeds),
+            ", ".join(missing[:12]) + (" ..." if len(missing) > 12 else ""),
+        )
+        print("\n" + "!" * 78)
+        print(f"GRID INCOMPLETE — {len(missing)} degraded cells missing; results are provisional")
+        print("!" * 78)
+
     # Paired analysis first, on the frame that still has one row per injection
     # seed. Everything below averages the seeds away, and a difference of two
     # averages discards the pairing that makes this an experiment rather than a
@@ -425,6 +461,12 @@ def main() -> int:
         "family_ranks": json.loads(pivot.to_json()),
         "paired_gaps": paired.to_dict(orient="records") if not paired.empty else [],
         "paired_tests": tests.to_dict(orient="records") if not tests.empty else [],
+        # Carried into the payload so the report can say "provisional" on the
+        # reader's behalf. Without it a partial grid renders as a finished
+        # section, which is the failure mode this whole guard exists for.
+        "grid_complete": not missing,
+        "missing_cells": missing,
+        "n_expected_degraded_cells": len(expected_levels) * 2 * len(expected_seeds),
     }
     path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
     print(f"\nwrote {path} and results/figures/.../fig11_gap_injection")

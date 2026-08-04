@@ -64,3 +64,10 @@
 21:19:16 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
 21:19:16 | INFO    | 11_make_report | wrote F:\BUP\reports\beijing\RESULTS.md
 21:19:16 | INFO    | 11_make_report | wrote F:\BUP\reports\beijing\abstract_facts.json
+02:47:35 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+02:47:35 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+04:20:23 | WARNING | 11_make_report | results\ablation_gap_injection.json holds 74 cells but no analysis block, so the gap-injection section is being OMITTED from this report. Run scripts/17_ablation_analysis.py --config <donor config> first.
+04:20:23 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+04:20:23 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
+04:38:07 | INFO    | 11_make_report | wrote F:\BUP\reports\RESULTS.md
+04:38:07 | INFO    | 11_make_report | wrote F:\BUP\reports\abstract_facts.json
