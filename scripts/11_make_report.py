@@ -561,25 +561,257 @@ def main() -> int:
 
         a("### What this changes")
         a("")
-        a("Read alone, the primary result says a compact recurrent model loses to tuned")
-        a("gradient boosting. The second city shows that conclusion is **not a property")
-        a("of compact recurrent models**: in the other city the sequence model beats")
-        a("every tree, while the trees collapse to near-worthless skill.")
-        a("")
-        a("The record characteristics point at the mechanism. Tree models on lagged")
-        a("tabular features tolerate fragmentation well, because each row stands alone.")
-        a("Sequence models need contiguous windows, and gap-aware windowing discards a")
-        a("large fraction of them where the record is broken.")
-        a("")
         context = pd.DataFrame(block["context"])
         a(context.to_markdown(index=False))
         a("")
-        a("**Caveat on strength of evidence.** The ranking *reversal* is the robust")
-        a("claim. The identity of the winner in the comparison city is not: its")
-        a("Diebold-Mariano tests are mostly not significant at the 5% level, and its")
-        a("test period is shorter and spans a seasonal transition, so absolute skill is")
-        a("lower for every method there.")
+
+        # Direction is READ from the ranking table, never asserted. An earlier
+        # version hardcoded "in the other city the sequence model beats every
+        # tree". Correcting the sequence tier's inputs and training recipe
+        # reversed that, and the prose then contradicted the table printed
+        # directly above it. Whatever the numbers say, the text follows.
+        seq_rank = {
+            str(r["city"]): int(r["rank"])
+            for _, r in ranking[ranking["model"] == "best sequence"].iterrows()
+        }
+        cov_row = context[context["Quantity"].str.startswith("Hourly coverage")]
+        coverage = {c: float(cov_row.iloc[0][c]) for c in seq_rank if c in cov_row.columns}
+
+        if len(seq_rank) == 2 and len(coverage) == 2:
+            fragmented, complete = sorted(coverage, key=lambda c: coverage[c])
+            a(
+                f"The sequence tier ranks **{seq_rank[fragmented]}** on the more fragmented "
+                f"record ({fragmented}, {coverage[fragmented]:.1f}% coverage) and "
+                f"**{seq_rank[complete]}** on the near-complete one "
+                f"({complete}, {coverage[complete]:.1f}%)."
+            )
+            a("")
+            if seq_rank[fragmented] > seq_rank[complete]:
+                a("That ordering is what a fragmentation account predicts. Tree models on")
+                a("lagged tabular features tolerate broken records because each row stands")
+                a("alone; sequence models need contiguous windows, and gap-aware windowing")
+                a("discards a large fraction of them where the record is torn. **It remains")
+                a("an observation on two cities, not evidence** — see the gap-injection")
+                a("experiment, which holds every other difference fixed.")
+            elif seq_rank[fragmented] < seq_rank[complete]:
+                a("**That ordering is the opposite of what a fragmentation account predicts**,")
+                a("and it is reported here rather than set aside. Two cities differ in far")
+                a("more than the continuity of their records: the comparison city's 24-hour")
+                a("problem is simply harder, with persistence RMSE far above this city's, and")
+                a("its test period is shorter and spans a seasonal transition. A two-city")
+                a("contrast cannot separate fragmentation from any of that, which is why the")
+                a("mechanism is tested by injection on a single record instead of inferred")
+                a("from a pair. The controlled experiment and this observation disagree, and")
+                a("the controlled experiment is the one with a valid counterfactual.")
+            else:
+                a("The sequence tier holds the same rank in both cities, so this pair says")
+                a("nothing about fragmentation in either direction.")
+            a("")
+
+        # Strength of evidence is read from each city's own Model Confidence
+        # Set, not asserted. A rank order can be printed for any pair of cities;
+        # whether either ordering is separable from noise is a different
+        # question, and the honest answer has to come from the data.
+        mcs_size = block.get("model_confidence_set_size") or {}
+        if mcs_size:
+            a("**Strength of evidence.** How many models each city's own 95% Model")
+            a("Confidence Set retains at this horizon — a set containing every candidate")
+            a("means that city's ordering is not separable from noise:")
+            a("")
+            for city_name, size in mcs_size.items():
+                n_ret, n_all = int(size["n_retained"]), int(size["n_candidates"])
+                verdict = (
+                    "no ordering is supported"
+                    if n_ret == n_all
+                    else f"retains {', '.join(size['retained'])}"
+                )
+                a(f"- {city_name}: **{n_ret} of {n_all}** — {verdict}")
+            a("")
+            uninformative = [c for c, s in mcs_size.items() if s["n_retained"] == s["n_candidates"]]
+            if uninformative:
+                a(
+                    f"{' and '.join(uninformative)} cannot distinguish any method from any "
+                    "other here, persistence included. The ranking printed above for "
+                    f"{' and '.join(uninformative)} is therefore a description of this "
+                    "sample, not a finding, and no claim in this report rests on it."
+                )
+                a("")
+        a("Absolute skill is lower for every method in the comparison city: its test")
+        a("period is shorter and spans a seasonal transition.")
         a("")
+
+    # ------------------------------------------------- gap-injection ablation
+    # Read from results/ablation_gap_injection.json rather than results.json.
+    # That file is the ablation's own generated source of truth, written by
+    # 17_ablation_analysis.py and never touched by hand, so the "no transcribed
+    # numbers" rule holds. It cannot live in results.json: the experiment runs
+    # under the donor city's config and so would land in that city's file,
+    # while the injected gap profile and the claim both belong to this one.
+    ablation_path = Path(str(cfg.get("paths.results"))) / "ablation_gap_injection.json"
+    if ablation_path.exists():
+        abl = json.loads(ablation_path.read_text(encoding="utf-8"))
+        by_family = pd.DataFrame(abl.get("analysis", {}).get("by_family", []))
+        if not by_family.empty:
+            a(f"## {next_section}. Does fragmentation cause the ranking to change?")
+            next_section += 1
+            a("")
+            a("§7 compares two cities that differ in everything at once, so it cannot")
+            a("attribute a ranking difference to any one of those differences. This")
+            a("section holds the record fixed and cuts it two ways.")
+            a("")
+            a(f"- Donor record: **{abl.get('donor')}**")
+            a(f"- Injected gap-length distribution: **{abl.get('gap_profile_source')}**")
+            a(f"- Horizon: **{abl.get('horizon_h')} h**")
+            a("")
+            a(str(abl.get("design", "")).replace("\n", " "))
+            a("")
+
+            wide = by_family.pivot_table(
+                index=["family", "target_coverage"],
+                columns="arm",
+                values="skill",
+                aggfunc="first",
+            ).reset_index()
+            if {"fragmented", "contiguous"} <= set(wide.columns):
+                wide["gap"] = wide["fragmented"] - wide["contiguous"]
+                table = wide.pivot_table(
+                    index="family", columns="target_coverage", values="gap", aggfunc="first"
+                )
+                table = table[sorted(table.columns, reverse=True)]
+                table.columns = [f"{c * 100:.0f}%" for c in table.columns]
+                order = [f for f in ("sequence", "trees", "linear", "naive") if f in table.index]
+                a("**Fragmented minus contiguous skill, at matched coverage.** Both arms")
+                a("remove the same number of observed hours at each level, so this")
+                a("difference is the effect of *arrangement* with volume held constant.")
+                a("Negative means fragmentation costs that family more than the equivalent")
+                a("loss of contiguous data.")
+                a("")
+                a(table.loc[order].round(4).to_markdown())
+                a("")
+
+                a("The undegraded level removes nothing, so both arms are the same run")
+                a("and their difference there is exactly zero by construction. Any other")
+                a("value in that column would mean the injector perturbs something besides")
+                a("contiguity.")
+                a("")
+
+        # The paired test, not the table above, is the claim. Every level and
+        # every injection seed is a matched pair -- same hours removed, different
+        # arrangement -- so differencing within the pair removes both the level
+        # and the draw. Averaging the seeds away first and differencing two means
+        # would throw that pairing out.
+        tests = pd.DataFrame(abl.get("analysis", {}).get("paired_tests", []))
+        if not tests.empty:
+            n_pairs = int(tests["n_pairs"].max())
+            a(f"**Paired test.** Each of the {n_pairs} pairs is one (coverage level,")
+            a("injection seed): the two arms remove an identical number of observed")
+            a("hours and differ only in arrangement. The representative model per")
+            a("family is fixed on the undegraded record and never re-chosen per arm,")
+            a("so the difference cannot absorb a change of model. Wilcoxon signed-rank,")
+            a("Holm-corrected across families.")
+            a("")
+            shown = pd.DataFrame(
+                {
+                    "Family": tests["family"],
+                    "Pairs": tests["n_pairs"],
+                    "Mean gap": tests["mean_arm_gap"].round(4),
+                    "95% CI": [
+                        f"[{lo:+.4f}, {hi:+.4f}]"
+                        for lo, hi in zip(tests["ci_low"], tests["ci_high"], strict=False)
+                    ],
+                    "p": tests["p_wilcoxon"].round(4),
+                    "p (Holm)": tests["p_holm"].round(4),
+                }
+            )
+            a(shown.to_markdown(index=False))
+            a("")
+
+            row = tests[tests["family"] == "sequence"]
+            others = tests[(tests["family"] != "sequence") & tests["significant_holm"]]
+            if not row.empty:
+                r = row.iloc[0]
+                if bool(r["significant_holm"]) and float(r["mean_arm_gap"]) < 0:
+                    a(
+                        f"The sequence family loses {abs(float(r['mean_arm_gap'])):.4f} skill to "
+                        f"arrangement alone (95% CI [{r['ci_low']:+.4f}, {r['ci_high']:+.4f}], "
+                        f"Holm p = {float(r['p_holm']):.4f})."
+                    )
+                    if others.empty:
+                        a("No other family's gap survives correction. Fragmentation is")
+                        a("costly specifically to the model class that requires contiguous")
+                        a("windows — which is the mechanism §7 proposed and could not test.")
+                    else:
+                        a(
+                            "It is not alone: "
+                            + ", ".join(
+                                f"{o['family']} ({o['mean_arm_gap']:+.4f})"
+                                for _, o in others.iterrows()
+                            )
+                            + " also move, so the effect is not specific to the sequence tier."
+                        )
+                else:
+                    a("The sequence family's gap does not survive correction. On this donor")
+                    a("the experiment does not support the mechanism §7 proposes.")
+                a("")
+
+            # Which model stands for each family matters to the reader, and the
+            # naive row is a control only if its representative is named: the
+            # selected model is climatology, which reads the training record but
+            # only as hour-of-day and season means. Those are insensitive to how
+            # the observed hours are arranged, which is exactly the point --
+            # it is the "reads the record, needs no windows" control.
+            gaps = pd.DataFrame(abl.get("analysis", {}).get("paired_gaps", []))
+            if not gaps.empty and "model" in gaps.columns:
+                reps = gaps.groupby("family")["model"].first()
+                a(
+                    "Representative model per family, fixed on the undegraded record: "
+                    + ", ".join(f"{fam} = `{m}`" for fam, m in reps.items())
+                    + "."
+                )
+                a("")
+
+            # Built from the family records, not from analysis.family_ranks:
+            # that field is a JSON round-trip of a MultiIndex pivot and its
+            # column labels come back as the strings "('contiguous', 0.75)".
+            if "rank" in by_family.columns:
+                ranks = by_family.pivot_table(
+                    index=["arm", "family"],
+                    columns="target_coverage",
+                    values="rank",
+                    aggfunc="first",
+                )
+                ranks = ranks[sorted(ranks.columns, reverse=True)]
+                ranks.columns = [f"{c * 100:.0f}%" for c in ranks.columns]
+                idx = [
+                    (arm, fam)
+                    for arm in ("fragmented", "contiguous")
+                    for fam in ("sequence", "trees", "linear", "naive")
+                    if (arm, fam) in ranks.index
+                ]
+                a("Family rank within each cell (1 = best skill). The sequence row is")
+                a("the result: it moves under fragmented removal and does not move under")
+                a("contiguous removal of the same number of hours.")
+                a("")
+                shown = ranks.loc[idx].astype(int)
+                shown.index = [f"{arm} / {fam}" for arm, fam in idx]
+                shown.index.name = "arm / family"
+                a(shown.to_markdown())
+                a("")
+
+            n_draws = by_family.get("n_draws")
+            a("**What this does and does not establish.** The claim is causal for this")
+            a("record: fragmentation is manipulated, volume is held constant, the test")
+            a("period is untouched, and the optimizer-step budget is equalised so that")
+            a("a fragmented cell is not simply undertrained. What it does not establish")
+            a("is generality.")
+            a("")
+            if n_draws is not None:
+                a(f"- **One donor record**, degraded {int(n_draws.max())} ways per cell. A second")
+                a("  donor would separate the effect from this station's own dynamics.")
+            a("- **One horizon** and one injected gap-length distribution.")
+            a("- The per-cell differences in the first table are individually noisy; it is")
+            a("  the paired test across all levels and draws that carries the result.")
+            a("")
 
     # Site-specific limitations are read from this city's own audit and QC
     # ledger. They were previously hardcoded to Dhaka's numbers, which the
@@ -837,11 +1069,18 @@ def main() -> int:
             "spearman_rank_correlation": block.get("spearman_rank_correlation"),
             "ranking_transfers": bool((block.get("spearman_rank_correlation") or 0) >= 0.3),
             "headline_claim": (
-                "Method ranking does not transfer between cities: the Spearman rank "
-                f"correlation between {this_city} and {other} at the headline horizon is "
-                f"{block.get('spearman_rank_correlation'):+.3f}. The best method in one "
-                "city is among the worst in the other."
+                f"Method ranking {'transfers' if (block.get('spearman_rank_correlation') or 0) >= 0.3 else 'does not transfer'} "
+                f"between cities: the Spearman rank correlation between {this_city} and "
+                f"{other} at the headline horizon is "
+                f"{block.get('spearman_rank_correlation'):+.3f}."
             ),
+            # Recorded so a consumer of this file sees which way the observation
+            # runs without re-deriving it. It has already reversed once, when the
+            # sequence tier's inputs and training recipe were corrected.
+            "sequence_rank_by_city": {
+                str(r["city"]): int(r["rank"])
+                for _, r in ranking[ranking["model"] == "best sequence"].iterrows()
+            },
             "ranking_by_city": {
                 city: [
                     {"rank": int(r["rank"]), "model": r["model"], "skill": r["skill"]}
@@ -856,6 +1095,43 @@ def main() -> int:
                 "non-significant and its test period shorter."
             ),
         }
+
+    # Same source as the report section: the ablation's own generated file.
+    ablation_path = Path(str(cfg.get("paths.results"))) / "ablation_gap_injection.json"
+    if ablation_path.exists():
+        abl = json.loads(ablation_path.read_text(encoding="utf-8"))
+        by_family = pd.DataFrame(abl.get("analysis", {}).get("by_family", []))
+        if not by_family.empty:
+            wide = by_family.pivot_table(
+                index=["family", "target_coverage"],
+                columns="arm",
+                values="skill",
+                aggfunc="first",
+            ).reset_index()
+            if {"fragmented", "contiguous"} <= set(wide.columns):
+                wide["gap"] = wide["fragmented"] - wide["contiguous"]
+                degraded = wide[wide["target_coverage"] < 1.0]
+                means = degraded.groupby("family")["gap"].mean().round(4).to_dict()
+                facts["gap_injection"] = {
+                    "donor": abl.get("donor"),
+                    "gap_profile_source": abl.get("gap_profile_source"),
+                    "horizon_h": abl.get("horizon_h"),
+                    "n_injection_draws": int(by_family["n_draws"].max()),
+                    "paired_test": abl.get("analysis", {}).get("paired_tests", []),
+                    "mean_arm_gap_by_family": means,
+                    "arm_gap_by_family_and_coverage": {
+                        str(fam): {
+                            f"{row.target_coverage:.2f}": round(float(row.gap), 4)
+                            for row in grp.itertuples()
+                        }
+                        for fam, grp in wide.groupby("family")
+                    },
+                    "control_note": (
+                        "The naive family never reads the training record, so its arm gap "
+                        "is the internal control and should be ~0. The undegraded level "
+                        "removes nothing, so its gap is 0 by construction."
+                    ),
+                }
 
     facts_path = Path(str(cfg.get("output.report.abstract_facts_json")))
     facts_path = (

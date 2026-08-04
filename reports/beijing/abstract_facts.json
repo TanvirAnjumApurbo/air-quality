@@ -34,57 +34,57 @@
   ],
   "headline_horizon_h": 24,
   "best_model": {
-    "name": "lstm_h64_l1",
-    "input_window_h": 168,
-    "n_parameters": 41537,
+    "name": "gru_h32_l1",
+    "input_window_h": 24,
+    "n_parameters": 4929,
     "n_seeds": 5,
     "parameter_budget": 100000
   },
   "per_horizon": {
     "1": {
       "model": "lstm_h64_l1",
-      "rmse": 21.461,
-      "rmse_std_across_seeds": 0.844,
-      "mae": 11.256,
-      "r2": 0.9478,
-      "smape": 20.085,
-      "skill_vs_persistence": -0.0085
+      "rmse": 19.893,
+      "rmse_std_across_seeds": 0.27,
+      "mae": 10.636,
+      "r2": 0.9552,
+      "smape": 19.544,
+      "skill_vs_persistence": 0.0652
     },
     "3": {
       "model": "lstm_h64_l1",
-      "rmse": 42.111,
-      "rmse_std_across_seeds": 1.191,
-      "mae": 23.764,
-      "r2": 0.7996,
-      "smape": 34.219,
-      "skill_vs_persistence": 0.0069
+      "rmse": 40.175,
+      "rmse_std_across_seeds": 0.218,
+      "mae": 23.231,
+      "r2": 0.8177,
+      "smape": 33.575,
+      "skill_vs_persistence": 0.0525
     },
     "6": {
-      "model": "gru_h128_l1",
-      "rmse": 59.705,
-      "rmse_std_across_seeds": 0.913,
-      "mae": 35.892,
-      "r2": 0.5988,
-      "smape": 48.02,
-      "skill_vs_persistence": 0.0094
+      "model": "lstm_h64_l1",
+      "rmse": 57.119,
+      "rmse_std_across_seeds": 1.107,
+      "mae": 35.169,
+      "r2": 0.6327,
+      "smape": 47.315,
+      "skill_vs_persistence": 0.0524
     },
     "12": {
-      "model": "gru_h128_l1",
-      "rmse": 74.542,
-      "rmse_std_across_seeds": 1.553,
-      "mae": 47.279,
-      "r2": 0.3793,
-      "smape": 61.834,
-      "skill_vs_persistence": 0.0443
+      "model": "lstm_h64_l1",
+      "rmse": 75.713,
+      "rmse_std_across_seeds": 5.942,
+      "mae": 47.523,
+      "r2": 0.3567,
+      "smape": 61.949,
+      "skill_vs_persistence": 0.0293
     },
     "24": {
-      "model": "lstm_h64_l1",
-      "rmse": 91.555,
-      "rmse_std_across_seeds": 0.752,
-      "mae": 60.827,
-      "r2": 0.0786,
-      "smape": 78.201,
-      "skill_vs_persistence": 0.059
+      "model": "gru_h32_l1",
+      "rmse": 92.994,
+      "rmse_std_across_seeds": 1.978,
+      "mae": 59.533,
+      "r2": 0.0492,
+      "smape": 76.931,
+      "skill_vs_persistence": 0.0442
     }
   },
   "persistence_rmse_by_horizon": {
@@ -95,11 +95,11 @@
     "24": 97.292
   },
   "green": {
-    "best_model_params": 74817,
-    "best_model_macs": 12730432,
-    "best_model_latency_ms": 0.34797,
-    "best_model_train_kwh": 0.00015820349101366765,
-    "best_model_train_gco2e_bd_grid": 0.11013,
+    "best_model_params": 75393,
+    "best_model_macs": 3661952,
+    "best_model_latency_ms": 0.33232,
+    "best_model_train_kwh": 0.00011923167220521799,
+    "best_model_train_gco2e_bd_grid": 0.083,
     "grid_intensity_gco2_per_kwh": 696.13,
     "grid_intensity_year": 2025,
     "grid_intensity_source": "Ember (2026), with major processing by Our World in Data",
@@ -124,11 +124,19 @@
   "significance": {
     "test": "Diebold-Mariano",
     "horizon_h": 24,
-    "model_a": "lstm_h64_l1",
+    "model_a": "gru_h32_l1",
     "model_b": "sarimax",
-    "statistic": 1.9429,
-    "p_value": 0.052102471474906986,
+    "statistic": 1.326,
+    "p_value": 0.18492430095567003,
+    "p_value_holm": 0.9246215047783501,
+    "multiplicity_correction": {
+      "method": "Holm-Bonferroni",
+      "family": "one DM test per horizon, best sequence vs best classical",
+      "n_tests": 5,
+      "alpha": 0.05
+    },
     "significant_at_5pct": false,
+    "significance_basis": "Holm-adjusted",
     "lower_loss": "sarimax"
   },
   "best_classical_by_horizon": {
@@ -143,9 +151,9 @@
       "skill_vs_persistence": -0.0497
     },
     "6": {
-      "model": "random_forest",
-      "rmse": 61.714,
-      "skill_vs_persistence": -0.0239
+      "model": "ridge",
+      "rmse": 57.521,
+      "skill_vs_persistence": 0.0457
     },
     "12": {
       "model": "random_forest",
@@ -153,9 +161,168 @@
       "skill_vs_persistence": -0.0096
     },
     "24": {
-      "model": "random_forest",
-      "rmse": 93.727,
-      "skill_vs_persistence": 0.0366
+      "model": "ridge",
+      "rmse": 91.363,
+      "skill_vs_persistence": 0.0609
     }
+  },
+  "model_confidence_set": {
+    "reference": "Hansen, Lunde and Nason (2011)",
+    "horizon_h": 24,
+    "alpha": 0.05,
+    "n_models": 9,
+    "n_retained": 9,
+    "retained": [
+      "gru_h32_l1",
+      "persistence",
+      "seasonal_naive",
+      "climatology",
+      "sarimax",
+      "ridge",
+      "random_forest",
+      "xgboost",
+      "lightgbm"
+    ],
+    "note": "Models in the set cannot be distinguished from the best at the 5% level. Their relative order is not evidence of an ordering, and the abstract must not name one of them as the winner over another."
+  },
+  "headline_rmse_intervals": {
+    "sarimax": {
+      "rmse": 85.149,
+      "ci_low": 74.292,
+      "ci_high": 97.717
+    },
+    "gru_h32_l1": {
+      "rmse": 91.051,
+      "ci_low": 74.964,
+      "ci_high": 108.342
+    },
+    "ridge": {
+      "rmse": 91.363,
+      "ci_low": 76.4,
+      "ci_high": 107.533
+    },
+    "xgboost": {
+      "rmse": 93.568,
+      "ci_low": 77.371,
+      "ci_high": 110.968
+    },
+    "random_forest": {
+      "rmse": 93.727,
+      "ci_low": 77.068,
+      "ci_high": 111.577
+    },
+    "lightgbm": {
+      "rmse": 94.171,
+      "ci_low": 77.068,
+      "ci_high": 111.939
+    },
+    "climatology": {
+      "rmse": 94.906,
+      "ci_low": 82.388,
+      "ci_high": 108.575
+    },
+    "persistence": {
+      "rmse": 97.292,
+      "ci_low": 85.327,
+      "ci_high": 109.723
+    },
+    "seasonal_naive": {
+      "rmse": 97.292,
+      "ci_low": 85.327,
+      "ci_high": 109.723
+    }
+  },
+  "gap_injection": {
+    "donor": "Beijing Wanliu (UCI Multi-Site, id 501)",
+    "gap_profile_source": "US Embassy Dhaka (OpenAQ 2445+8415)",
+    "horizon_h": 24,
+    "n_injection_draws": 3,
+    "paired_test": [
+      {
+        "family": "sequence",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.05273909098208121,
+        "median_arm_gap": -0.02781632478928446,
+        "ci_low": -0.08973871486633384,
+        "ci_high": -0.021914322726896005,
+        "p_wilcoxon": 0.00115966796875,
+        "p_holm": 0.004638671875,
+        "significant_holm": true
+      },
+      {
+        "family": "trees",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.011241810085135518,
+        "median_arm_gap": -0.0030838730817919213,
+        "ci_low": -0.030672620643907612,
+        "ci_high": 0.007298304728063719,
+        "p_wilcoxon": 0.359130859375,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "naive",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.010091419022946309,
+        "median_arm_gap": -0.0002890038905056791,
+        "ci_low": -0.029690705239955532,
+        "ci_high": 0.006659676755927576,
+        "p_wilcoxon": 0.5994873046875,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "linear",
+        "n_pairs": 15,
+        "mean_arm_gap": 0.010601413688339311,
+        "median_arm_gap": 0.008366555817728938,
+        "ci_low": 0.0018006510490679328,
+        "ci_high": 0.018839667838876983,
+        "p_wilcoxon": 0.02557373046875,
+        "p_holm": 0.07672119140625,
+        "significant_holm": false
+      }
+    ],
+    "mean_arm_gap_by_family": {
+      "linear": 0.008,
+      "naive": 0.0014,
+      "sequence": -0.0394,
+      "trees": 0.0032
+    },
+    "arm_gap_by_family_and_coverage": {
+      "linear": {
+        "0.75": -0.0133,
+        "0.82": 0.0275,
+        "0.85": 0.0037,
+        "0.90": 0.0159,
+        "0.95": 0.0061,
+        "1.00": 0.0
+      },
+      "naive": {
+        "0.75": 0.0,
+        "0.82": -0.0005,
+        "0.85": 0.0,
+        "0.90": 0.0136,
+        "0.95": -0.006,
+        "1.00": 0.0
+      },
+      "sequence": {
+        "0.75": -0.099,
+        "0.82": -0.0427,
+        "0.85": -0.0243,
+        "0.90": -0.0107,
+        "0.95": -0.0206,
+        "1.00": 0.0
+      },
+      "trees": {
+        "0.75": -0.0165,
+        "0.82": 0.0219,
+        "0.85": -0.0034,
+        "0.90": 0.0136,
+        "0.95": 0.0004,
+        "1.00": 0.0
+      }
+    },
+    "control_note": "The naive family never reads the training record, so its arm gap is the internal control and should be ~0. The undegraded level removes nothing, so its gap is 0 by construction."
   }
 }

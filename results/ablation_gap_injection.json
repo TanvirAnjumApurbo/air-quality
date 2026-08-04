@@ -5009,6 +5009,594 @@
         "sequence": 1.0,
         "trees": 3.0
       }
-    }
+    },
+    "paired_gaps": [
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.07008934848815329,
+        "fragmented": 0.03742405775193747,
+        "arm_gap": -0.032665290736215824
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.04183299560694642,
+        "fragmented": 0.03959235330620814,
+        "arm_gap": -0.0022406423007382825
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.07113926519909708,
+        "fragmented": 0.08269061591676352,
+        "arm_gap": 0.011551350717666442
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.07235824519921241,
+        "fragmented": 0.09841725096146003,
+        "arm_gap": 0.026059005762247622
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.044686064119308755,
+        "fragmented": 0.06812887853511984,
+        "arm_gap": 0.023442814415811086
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.06386714800520732,
+        "fragmented": 0.09695260777883152,
+        "arm_gap": 0.033085459773624204
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.06730629067104088,
+        "fragmented": 0.07499937492204967,
+        "arm_gap": 0.007693084251008786
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.04513434995815779,
+        "fragmented": 0.07761270306961054,
+        "arm_gap": 0.03247835311145275
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.07348519635038109,
+        "fragmented": 0.08286214196547248,
+        "arm_gap": 0.009376945615091392
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.06396759863739576,
+        "fragmented": 0.09639901652159533,
+        "arm_gap": 0.032431417884199565
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.05167095719915038,
+        "fragmented": 0.05862983223464102,
+        "arm_gap": 0.0069588750354906415
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.0644875906853033,
+        "fragmented": 0.07285414650303224,
+        "arm_gap": 0.008366555817728938
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.05967755609631864,
+        "fragmented": 0.06542523165245495,
+        "arm_gap": 0.005747675556136311
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.06203478318188138,
+        "fragmented": 0.05403508389314693,
+        "arm_gap": -0.007999699288734452
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.06543988949162505,
+        "fragmented": 0.07017518920194554,
+        "arm_gap": 0.004735299710320495
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": -0.0013550372934927335,
+        "fragmented": -0.09535565958921821,
+        "arm_gap": -0.09400062229572548
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": -0.03731152665793869,
+        "fragmented": -0.01756445088465397,
+        "arm_gap": 0.019747075773284717
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.0322733188628308,
+        "fragmented": -0.04897348612336283,
+        "arm_gap": -0.08124680498619363
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.005213334320399943,
+        "fragmented": -0.01971227082837168,
+        "arm_gap": -0.024925605148771623
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": -0.017436588063897362,
+        "fragmented": -0.02656093580036556,
+        "arm_gap": -0.009124347736468197
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.013737031925660337,
+        "fragmented": 0.030407671968664007,
+        "arm_gap": 0.01667064004300367
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.013105852532296347,
+        "fragmented": -0.012549174491752746,
+        "arm_gap": -0.025655027024049093
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": -0.0177227464018066,
+        "fragmented": -0.020923530225483544,
+        "arm_gap": -0.003200783823676945
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.00037357157778228345,
+        "fragmented": 0.02773190069545972,
+        "arm_gap": 0.027358329117677438
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.01675654587670694,
+        "fragmented": 0.016467541986201262,
+        "arm_gap": -0.0002890038905056791
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.003411219025575951,
+        "fragmented": 0.028553302850835238,
+        "arm_gap": 0.025142083825259287
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.010170337812745012,
+        "fragmented": 0.026230595275120616,
+        "arm_gap": 0.016060257462375604
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.012071098007068626,
+        "fragmented": 0.025168508562462444,
+        "arm_gap": 0.013097410555393818
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.009214235778436608,
+        "fragmented": 0.012328386813357572,
+        "arm_gap": 0.0031141510349209645
+      },
+      {
+        "family": "naive",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.023306130190863028,
+        "fragmented": -0.010812908059856463,
+        "arm_gap": -0.03411903825071949
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.12591328709347627,
+        "fragmented": -0.10296540390883487,
+        "arm_gap": -0.22887869100231112
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.09040366282866863,
+        "fragmented": -0.09475766188983344,
+        "arm_gap": -0.18516132471850205
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.10249880491759751,
+        "fragmented": 0.02014894874329635,
+        "arm_gap": -0.08234985617430116
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.12773051389091175,
+        "fragmented": 0.03979842261858731,
+        "arm_gap": -0.08793209127232443
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.07946025881106356,
+        "fragmented": 0.021452216337719543,
+        "arm_gap": -0.05800804247334401
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.09675502699401022,
+        "fragmented": 0.11469284908187587,
+        "arm_gap": 0.01793782208786565
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.10093459712242381,
+        "fragmented": 0.07311827233313935,
+        "arm_gap": -0.02781632478928446
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.09039658273127023,
+        "fragmented": 0.0507914792926721,
+        "arm_gap": -0.039605103438598126
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.1135270449245906,
+        "fragmented": 0.10799169232619699,
+        "arm_gap": -0.00553535259839362
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.12178381595593657,
+        "fragmented": 0.11312945600297068,
+        "arm_gap": -0.008654359952965887
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.09357587281207862,
+        "fragmented": 0.09712949322194626,
+        "arm_gap": 0.003553620409867647
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.11554918796956963,
+        "fragmented": 0.0885795662508837,
+        "arm_gap": -0.02696962171868593
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.12068079971453845,
+        "fragmented": 0.0773709363561323,
+        "arm_gap": -0.04330986335840614
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.13051400876304262,
+        "fragmented": 0.11228164945308894,
+        "arm_gap": -0.018232359309953677
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.10714457185623472,
+        "fragmented": 0.1070197554343539,
+        "arm_gap": -0.00012481642188082176
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.03861363409206142,
+        "fragmented": 0.047944859432832665,
+        "arm_gap": 0.009331225340771243
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.027023332907794573,
+        "fragmented": -0.012338681677301677,
+        "arm_gap": -0.03936201458509625
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.06024003019192725,
+        "fragmented": -0.03827131275035334,
+        "arm_gap": -0.09851134294228059
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.03948150057244393,
+        "fragmented": 0.04316766782700254,
+        "arm_gap": 0.0036861672545586144
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.03026558592509465,
+        "fragmented": -0.01476027278610359,
+        "arm_gap": -0.04502585871119824
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.04459490056030535,
+        "fragmented": 0.11683785085637421,
+        "arm_gap": 0.07224295029606886
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.03864290046097052,
+        "fragmented": -0.006117621768993553,
+        "arm_gap": -0.04476052222996407
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.024830192472950485,
+        "fragmented": -0.007104965111195627,
+        "arm_gap": -0.03193515758414611
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.07129640411311,
+        "fragmented": 0.06216831200365924,
+        "arm_gap": -0.009128092109450758
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.02897774556233823,
+        "fragmented": 0.02589387248054631,
+        "arm_gap": -0.0030838730817919213
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.027782766308562912,
+        "fragmented": 0.037232776533413614,
+        "arm_gap": 0.009450010224850702
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.04344422181908425,
+        "fragmented": 0.05069696502389265,
+        "arm_gap": 0.007252743204808398
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.03293055234019027,
+        "fragmented": 0.04878010305241853,
+        "arm_gap": 0.015849550712228266
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.04212501407822378,
+        "fragmented": 0.043842262744120175,
+        "arm_gap": 0.0017172486658963981
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.06073625716279285,
+        "fragmented": 0.04438607143050555,
+        "arm_gap": -0.016350185732287303
+      }
+    ],
+    "paired_tests": [
+      {
+        "family": "sequence",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.05273909098208121,
+        "median_arm_gap": -0.02781632478928446,
+        "ci_low": -0.08973871486633384,
+        "ci_high": -0.021914322726896005,
+        "p_wilcoxon": 0.00115966796875,
+        "p_holm": 0.004638671875,
+        "significant_holm": true
+      },
+      {
+        "family": "trees",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.011241810085135518,
+        "median_arm_gap": -0.0030838730817919213,
+        "ci_low": -0.030672620643907612,
+        "ci_high": 0.007298304728063719,
+        "p_wilcoxon": 0.359130859375,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "naive",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.010091419022946309,
+        "median_arm_gap": -0.0002890038905056791,
+        "ci_low": -0.029690705239955532,
+        "ci_high": 0.006659676755927576,
+        "p_wilcoxon": 0.5994873046875,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "linear",
+        "n_pairs": 15,
+        "mean_arm_gap": 0.010601413688339311,
+        "median_arm_gap": 0.008366555817728938,
+        "ci_low": 0.0018006510490679328,
+        "ci_high": 0.018839667838876983,
+        "p_wilcoxon": 0.02557373046875,
+        "p_holm": 0.07672119140625,
+        "significant_holm": false
+      }
+    ]
   }
 }

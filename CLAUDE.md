@@ -20,8 +20,10 @@ dependencies installed and fails at `import pandas`.
 .\make.ps1 help            # PowerShell shim; `make help` if GNU make is on PATH
 .\make.ps1 all             # full Dhaka pipeline
 .\make.ps1 beijing         # same pipeline again on the cross-city record
+.\make.ps1 beijing-post    # Beijing 08-11 only, after a resumed sweep
 .\make.ps1 cross-city      # rank-transfer comparison (needs `all` and `beijing`)
-.\make.ps1 everything      # all + beijing + cross-city + report
+.\make.ps1 ablation        # gap-injection experiment (needs `beijing`)
+.\make.ps1 everything      # all + beijing + cross-city + ablation + report
 ```
 
 Lint and format (ruff config lives in `pyproject.toml`; docstrings and type
@@ -77,6 +79,13 @@ in it — if a phase has not run, its section is omitted rather than invented. N
 add a number to `RESULTS.md` or `abstract_facts.json` that does not come from
 `results.json`. The Beijing run writes to `results/results_beijing.json` and its
 reports to `reports/beijing/`.
+
+There is exactly one other source, and it is deliberate: §8 of `RESULTS.md` reads
+`results/ablation_gap_injection.json`, which `17_ablation_analysis.py` generates
+and nothing writes by hand. It cannot live in `results.json` — the experiment runs
+under the *donor* city's config, so it would land in `results_beijing.json`, while
+the injected gap profile and the claim both belong to the primary city. The rule
+that matters (no transcribed numbers) still holds. Do not add a third source.
 
 ### Data flow
 
@@ -214,6 +223,12 @@ state-space projection now lives in
 
 `results.json` stamps `git_commit` at the time the *results* were computed, not when
 the report was rendered — so `RESULTS.md` can legitimately show an older, `-dirty`
-hash than `HEAD`. That is intended. Current values are `ca05363…-dirty` (Dhaka) and
-`f430abf…-dirty` (Beijing); making them clean requires re-running the sweeps, which
-was considered and declined.
+hash than `HEAD`. That is intended. Current values are `26d8a27…-dirty` (Dhaka,
+stamped when the sweep ran) and `548e95d…-dirty` (Beijing, restamped when
+`beijing-post` re-ran stages 08–11 against the same records); making them clean
+requires re-running the sweeps, which was considered and declined.
+
+Note the asymmetry: `save_results` restamps `git_commit` on **every** write, so any
+downstream stage that touches a city's `results.json` moves that city's hash forward
+without a single model having been retrained. The hash records when the file was last
+written, not when the numbers in it were produced.

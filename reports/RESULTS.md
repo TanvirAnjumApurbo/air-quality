@@ -319,16 +319,6 @@ Validation-selected sequence configuration per city:
 
 ### What this changes
 
-Read alone, the primary result says a compact recurrent model loses to tuned
-gradient boosting. The second city shows that conclusion is **not a property
-of compact recurrent models**: in the other city the sequence model beats
-every tree, while the trees collapse to near-worthless skill.
-
-The record characteristics point at the mechanism. Tree models on lagged
-tabular features tolerate fragmentation well, because each row stands alone.
-Sequence models need contiguous windows, and gap-aware windowing discards a
-large fraction of them where the record is broken.
-
 | Quantity             |    Dhaka |   Beijing |
 |:---------------------|---------:|----------:|
 | Usable years         |    7.439 |     3.956 |
@@ -339,13 +329,109 @@ large fraction of them where the record is broken.
 | PM2.5 median (ug/m3) |   66     |    59     |
 | Hours > 65 ug/m3 (%) |   50.4   |    46.14  |
 
-**Caveat on strength of evidence.** The ranking *reversal* is the robust
-claim. The identity of the winner in the comparison city is not: its
-Diebold-Mariano tests are mostly not significant at the 5% level, and its
-test period is shorter and spans a seasonal transition, so absolute skill is
-lower for every method there.
+The sequence tier ranks **1** on the more fragmented record (Dhaka, 82.3% coverage) and **3** on the near-complete one (Beijing, 98.9%).
 
-## 8. Limitations
+**That ordering is the opposite of what a fragmentation account predicts**,
+and it is reported here rather than set aside. Two cities differ in far
+more than the continuity of their records: the comparison city's 24-hour
+problem is simply harder, with persistence RMSE far above this city's, and
+its test period is shorter and spans a seasonal transition. A two-city
+contrast cannot separate fragmentation from any of that, which is why the
+mechanism is tested by injection on a single record instead of inferred
+from a pair. The controlled experiment and this observation disagree, and
+the controlled experiment is the one with a valid counterfactual.
+
+**Strength of evidence.** How many models each city's own 95% Model
+Confidence Set retains at this horizon — a set containing every candidate
+means that city's ordering is not separable from noise:
+
+- Dhaka: **5 of 9** — retains gru_h64_l1, ridge, random_forest, xgboost, lightgbm
+- Beijing: **9 of 9** — no ordering is supported
+
+Beijing cannot distinguish any method from any other here, persistence included. The ranking printed above for Beijing is therefore a description of this sample, not a finding, and no claim in this report rests on it.
+
+Absolute skill is lower for every method in the comparison city: its test
+period is shorter and spans a seasonal transition.
+
+## 8. Does fragmentation cause the ranking to change?
+
+§7 compares two cities that differ in everything at once, so it cannot
+attribute a ranking difference to any one of those differences. This
+section holds the record fixed and cuts it two ways.
+
+- Donor record: **Beijing Wanliu (UCI Multi-Site, id 501)**
+- Injected gap-length distribution: **US Embassy Dhaka (OpenAQ 2445+8415)**
+- Horizon: **24 h**
+
+Both arms remove an identical number of observed hours at each coverage level; only their arrangement differs. The test period is never degraded, so every cell is scored on the same rows. Hyperparameters are fixed at the undegraded record's selections.
+
+**Fragmented minus contiguous skill, at matched coverage.** Both arms
+remove the same number of observed hours at each level, so this
+difference is the effect of *arrangement* with volume held constant.
+Negative means fragmentation costs that family more than the equivalent
+loss of contiguous data.
+
+| family   |   100% |     95% |     90% |     85% |     82% |     75% |
+|:---------|-------:|--------:|--------:|--------:|--------:|--------:|
+| sequence |      0 | -0.0206 | -0.0107 | -0.0243 | -0.0427 | -0.099  |
+| trees    |      0 |  0.0004 |  0.0136 | -0.0034 |  0.0219 | -0.0165 |
+| linear   |      0 |  0.0061 |  0.0159 |  0.0037 |  0.0275 | -0.0133 |
+| naive    |      0 | -0.006  |  0.0136 |  0      | -0.0005 |  0      |
+
+The undegraded level removes nothing, so both arms are the same run
+and their difference there is exactly zero by construction. Any other
+value in that column would mean the injector perturbs something besides
+contiguity.
+
+**Paired test.** Each of the 15 pairs is one (coverage level,
+injection seed): the two arms remove an identical number of observed
+hours and differ only in arrangement. The representative model per
+family is fixed on the undegraded record and never re-chosen per arm,
+so the difference cannot absorb a change of model. Wilcoxon signed-rank,
+Holm-corrected across families.
+
+| Family   |   Pairs |   Mean gap | 95% CI             |      p |   p (Holm) |
+|:---------|--------:|-----------:|:-------------------|-------:|-----------:|
+| sequence |      15 |    -0.0527 | [-0.0897, -0.0219] | 0.0012 |     0.0046 |
+| trees    |      15 |    -0.0112 | [-0.0307, +0.0073] | 0.3591 |     0.7183 |
+| naive    |      15 |    -0.0101 | [-0.0297, +0.0067] | 0.5995 |     0.7183 |
+| linear   |      15 |     0.0106 | [+0.0018, +0.0188] | 0.0256 |     0.0767 |
+
+The sequence family loses 0.0527 skill to arrangement alone (95% CI [-0.0897, -0.0219], Holm p = 0.0046).
+No other family's gap survives correction. Fragmentation is
+costly specifically to the model class that requires contiguous
+windows — which is the mechanism §7 proposed and could not test.
+
+Representative model per family, fixed on the undegraded record: linear = `ridge`, naive = `climatology`, sequence = `gru_h64_l2`, trees = `xgboost`.
+
+Family rank within each cell (1 = best skill). The sequence row is
+the result: it moves under fragmented removal and does not move under
+contiguous removal of the same number of hours.
+
+| arm / family          |   100% |   95% |   90% |   85% |   82% |   75% |
+|:----------------------|-------:|------:|------:|------:|------:|------:|
+| fragmented / sequence |      1 |     1 |     1 |     2 |     3 |     3 |
+| fragmented / trees    |      3 |     3 |     3 |     3 |     2 |     2 |
+| fragmented / linear   |      2 |     2 |     2 |     1 |     1 |     1 |
+| fragmented / naive    |      4 |     4 |     4 |     4 |     4 |     4 |
+| contiguous / sequence |      1 |     1 |     1 |     1 |     1 |     1 |
+| contiguous / trees    |      3 |     3 |     3 |     3 |     3 |     3 |
+| contiguous / linear   |      2 |     2 |     2 |     2 |     2 |     2 |
+| contiguous / naive    |      4 |     4 |     4 |     4 |     4 |     4 |
+
+**What this does and does not establish.** The claim is causal for this
+record: fragmentation is manipulated, volume is held constant, the test
+period is untouched, and the optimizer-step budget is equalised so that
+a fragmented cell is not simply undertrained. What it does not establish
+is generality.
+
+- **One donor record**, degraded 3 ways per cell. A second
+  donor would separate the effect from this station's own dynamics.
+- **One horizon** and one injected gap-length distribution.
+- The per-cell differences in the first table are individually noisy; it is
+  the paired test across all levels and draws that carries the result.
+
+## 9. Limitations
 
 - **Energy figures are estimates.** See §5. They should not be reported as measurements.
 - **One monitoring site.** The target series comes from a single monitor —

@@ -66,6 +66,7 @@ Targets:
   report      Phase 6: RESULTS.md + abstract_facts.json
   all         Everything above, in order
   beijing     Cross-city: whole pipeline again on the Beijing record
+  beijing-post  Beijing stages 08-11 only (after a resumed sweep)
   cross-city  Rank-transfer comparison (needs 'all' and 'beijing')
   tune        Choose the sequence training recipe on val loss, before 'deep'
   ablation    Gap-injection experiment + figure (needs 'beijing')
@@ -102,6 +103,17 @@ Targets:
         Invoke-Step '05_run_baselines.py'    $commonB
         Invoke-Step '06_train_sequence.py'   ($commonB + @('--resume', 'auto') + $Rest)
         Invoke-Step '07_train_classifier.py' ($commonB + @('--resume', 'auto') + $Rest)
+        Invoke-Step '08_green_measure.py'    $commonB
+        Invoke-Step '09_evaluate.py'         $commonB
+        Invoke-Step '10_make_figures.py'     $commonB
+        Invoke-Step '11_make_report.py'      $commonB
+    }
+    'beijing-post' {
+        # Everything downstream of the Beijing sweep, without re-fitting the
+        # baselines. Needed on its own because a resumed sweep updates
+        # results_beijing.json but leaves the evaluation and report stale --
+        # which is how Beijing ended up with no bootstrap CIs and no MCS while
+        # the primary city had both.
         Invoke-Step '08_green_measure.py'    $commonB
         Invoke-Step '09_evaluate.py'         $commonB
         Invoke-Step '10_make_figures.py'     $commonB

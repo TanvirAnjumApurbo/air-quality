@@ -68864,7 +68864,35 @@
           "Dhaka": 50.4,
           "Beijing": 46.14
         }
-      ]
+      ],
+      "model_confidence_set_size": {
+        "Dhaka": {
+          "n_candidates": 9,
+          "n_retained": 5,
+          "retained": [
+            "gru_h64_l1",
+            "ridge",
+            "random_forest",
+            "xgboost",
+            "lightgbm"
+          ]
+        },
+        "Beijing": {
+          "n_candidates": 9,
+          "n_retained": 9,
+          "retained": [
+            "gru_h32_l1",
+            "persistence",
+            "seasonal_naive",
+            "climatology",
+            "sarimax",
+            "ridge",
+            "random_forest",
+            "xgboost",
+            "lightgbm"
+          ]
+        }
+      }
     }
   },
   "sequence_recipe_search": {

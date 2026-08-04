@@ -204,11 +204,42 @@ def main() -> int:
         ),
     )
 
+    # How many models each city's own Model Confidence Set retains at the
+    # headline horizon. Without this the comparison invites a reading it cannot
+    # support: a rank order can be reported for any pair of cities, but if one
+    # city's MCS retains every candidate then its ordering is noise and the
+    # "reversal" there is not evidence of anything. Recorded per city so the
+    # report states it rather than leaving the reader to assume significance.
+    def _mcs_size(payload: dict) -> dict | None:
+        entries = [
+            e
+            for e in (payload.get("significance", {}).get("model_confidence_set") or [])
+            if int(e.get("horizon_h", -1)) == headline
+        ]
+        if not entries:
+            return None
+        return {
+            "n_candidates": len(entries),
+            "n_retained": sum(1 for e in entries if e.get("in_confidence_set")),
+            "retained": [e["model"] for e in entries if e.get("in_confidence_set")],
+        }
+
     payload_a = load_results(cfg_a)
+    payload_b = load_results(cfg_b)
+    mcs = {
+        label: size
+        for label, size in (
+            (label_a, _mcs_size(payload_a)),
+            (label_b, _mcs_size(payload_b)),
+        )
+        if size is not None
+    }
+
     payload_a.setdefault("cross_city", {})[label_b] = {
         "ranking": ranking.to_dict(orient="records"),
         "spearman_rank_correlation": correlation,
         "context": context.to_dict(orient="records"),
+        "model_confidence_set_size": mcs,
     }
     (cfg_a.path_for("results")).mkdir(parents=True, exist_ok=True)
     Path(cfg_a.path_for("results_json")).write_text(

@@ -27,7 +27,7 @@ CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures report all lint fmt clean clean-results \
-        beijing cross-city tune ablation everything
+        beijing beijing-post cross-city tune ablation everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -47,6 +47,7 @@ help:  ## List available targets
 	@echo "  report      Phase 6: RESULTS.md + abstract_facts.json"
 	@echo "  all         Everything above, in order"
 	@echo "  beijing     Cross-city: whole pipeline again on the Beijing record"
+	@echo "  beijing-post  Beijing stages 08-11 only (after a resumed sweep)"
 	@echo "  cross-city  Rank-transfer comparison (needs 'all' and 'beijing')"
 	@echo "  everything  all + beijing + cross-city + report (final artefacts)"
 	@echo "  lint        ruff check + format check"
@@ -109,6 +110,15 @@ beijing:  ## Cross-city: run the whole pipeline again on the Beijing record
 	$(PY) $(SCRIPTS)/05_run_baselines.py   --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/06_train_sequence.py  --config $(CONFIG_B) --resume auto
 	$(PY) $(SCRIPTS)/07_train_classifier.py --config $(CONFIG_B) --resume auto
+	$(PY) $(SCRIPTS)/08_green_measure.py   --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/11_make_report.py     --config $(CONFIG_B)
+
+# Needed on its own because a resumed sweep updates results_beijing.json but
+# leaves the evaluation and report stale -- which is how Beijing ended up with
+# no bootstrap CIs and no MCS while the primary city had both.
+beijing-post:  ## Beijing stages 08-11 only, after a resumed sweep
 	$(PY) $(SCRIPTS)/08_green_measure.py   --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)

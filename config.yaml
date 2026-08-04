@@ -656,7 +656,10 @@ ablation:
     horizon_h: 24
     coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
     arms: [fragmented, contiguous]
-    injection_seeds: [42, 1337, 2024]
+    # Kept identical to config_beijing.yaml, which is where this experiment
+    # actually runs. See the note there on why the seed count is the sample
+    # size of the paired test.
+    injection_seeds: [42, 1337, 2024, 7, 31415, 101, 2718, 8191, 60613, 4096]
     contiguous_blocks: 8
     # Equalise the OPTIMIZER-STEP budget across cells, not the epoch budget.
     # Fragmentation shrinks the training set, so at a fixed 60 epochs a

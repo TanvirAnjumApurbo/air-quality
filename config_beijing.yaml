@@ -628,8 +628,12 @@ ablation:
     # the undegraded reference cell. 0.82 is Dhaka's measured coverage.
     coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
     arms: [fragmented, contiguous]
-    # Three draws per cell so a ranking change cannot be one lucky arrangement.
-    injection_seeds: [42, 1337, 2024]
+    # Ten draws per cell. Three was enough to see the trend but not to test it:
+    # the analysis pairs each (coverage level, injection seed) across the two
+    # arms and runs a Wilcoxon signed-rank on the differences, so the number of
+    # seeds IS the sample size of the paper's central test. Five levels x 10
+    # seeds gives 50 matched pairs per family instead of 15.
+    injection_seeds: [42, 1337, 2024, 7, 31415, 101, 2718, 8191, 60613, 4096]
     # Several blocks, not one. A single block large enough to remove 25% of a
     # multi-year record would delete whole seasons, confounding fragmentation
     # with seasonal composition -- the arms have to differ in contiguity ONLY.

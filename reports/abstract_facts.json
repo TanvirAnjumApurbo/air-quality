@@ -237,7 +237,11 @@
     "comparison_city": "Beijing",
     "spearman_rank_correlation": 0.19999999999999998,
     "ranking_transfers": false,
-    "headline_claim": "Method ranking does not transfer between cities: the Spearman rank correlation between Dhaka and Beijing at the headline horizon is +0.200. The best method in one city is among the worst in the other.",
+    "headline_claim": "Method ranking does not transfer between cities: the Spearman rank correlation between Dhaka and Beijing at the headline horizon is +0.200.",
+    "sequence_rank_by_city": {
+      "Beijing": 3,
+      "Dhaka": 1
+    },
     "ranking_by_city": {
       "Beijing": [
         {
@@ -372,5 +376,98 @@
       }
     ],
     "note": "The ranking reversal is the robust claim; the identity of the winner in the comparison city is weaker, its significance tests being mostly non-significant and its test period shorter."
+  },
+  "gap_injection": {
+    "donor": "Beijing Wanliu (UCI Multi-Site, id 501)",
+    "gap_profile_source": "US Embassy Dhaka (OpenAQ 2445+8415)",
+    "horizon_h": 24,
+    "n_injection_draws": 3,
+    "paired_test": [
+      {
+        "family": "sequence",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.05273909098208121,
+        "median_arm_gap": -0.02781632478928446,
+        "ci_low": -0.08973871486633384,
+        "ci_high": -0.021914322726896005,
+        "p_wilcoxon": 0.00115966796875,
+        "p_holm": 0.004638671875,
+        "significant_holm": true
+      },
+      {
+        "family": "trees",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.011241810085135518,
+        "median_arm_gap": -0.0030838730817919213,
+        "ci_low": -0.030672620643907612,
+        "ci_high": 0.007298304728063719,
+        "p_wilcoxon": 0.359130859375,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "naive",
+        "n_pairs": 15,
+        "mean_arm_gap": -0.010091419022946309,
+        "median_arm_gap": -0.0002890038905056791,
+        "ci_low": -0.029690705239955532,
+        "ci_high": 0.006659676755927576,
+        "p_wilcoxon": 0.5994873046875,
+        "p_holm": 0.71826171875,
+        "significant_holm": false
+      },
+      {
+        "family": "linear",
+        "n_pairs": 15,
+        "mean_arm_gap": 0.010601413688339311,
+        "median_arm_gap": 0.008366555817728938,
+        "ci_low": 0.0018006510490679328,
+        "ci_high": 0.018839667838876983,
+        "p_wilcoxon": 0.02557373046875,
+        "p_holm": 0.07672119140625,
+        "significant_holm": false
+      }
+    ],
+    "mean_arm_gap_by_family": {
+      "linear": 0.008,
+      "naive": 0.0014,
+      "sequence": -0.0394,
+      "trees": 0.0032
+    },
+    "arm_gap_by_family_and_coverage": {
+      "linear": {
+        "0.75": -0.0133,
+        "0.82": 0.0275,
+        "0.85": 0.0037,
+        "0.90": 0.0159,
+        "0.95": 0.0061,
+        "1.00": 0.0
+      },
+      "naive": {
+        "0.75": 0.0,
+        "0.82": -0.0005,
+        "0.85": 0.0,
+        "0.90": 0.0136,
+        "0.95": -0.006,
+        "1.00": 0.0
+      },
+      "sequence": {
+        "0.75": -0.099,
+        "0.82": -0.0427,
+        "0.85": -0.0243,
+        "0.90": -0.0107,
+        "0.95": -0.0206,
+        "1.00": 0.0
+      },
+      "trees": {
+        "0.75": -0.0165,
+        "0.82": 0.0219,
+        "0.85": -0.0034,
+        "0.90": 0.0136,
+        "0.95": 0.0004,
+        "1.00": 0.0
+      }
+    },
+    "control_note": "The naive family never reads the training record, so its arm gap is the internal control and should be ~0. The undegraded level removes nothing, so its gap is 0 by construction."
   }
 }
