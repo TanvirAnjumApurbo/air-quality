@@ -222,7 +222,9 @@ def main() -> int:
     cfg = load_config(args.config)
     log = setup_logging(cfg, "17_ablation_analysis")
 
-    path = Path(cfg.get("paths.results")) / "ablation_gap_injection.json"
+    path = Path(cfg.get("paths.results")) / str(
+        cfg.get("ablation.gap_injection.output_name", "ablation_gap_injection.json")
+    )
     if not path.exists():
         log.error("%s not found -- run scripts/16_gap_injection.py first", path)
         return 1

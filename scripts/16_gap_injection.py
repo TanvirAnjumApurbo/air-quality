@@ -218,7 +218,9 @@ def main() -> int:
         (arm, cov, seed) for cov in coverages for arm in arms for seed in seeds if arm != "none"
     ]
 
-    out_path = Path(cfg.get("paths.results")) / "ablation_gap_injection.json"
+    out_path = Path(cfg.get("paths.results")) / str(
+        cfg.get("ablation.gap_injection.output_name", "ablation_gap_injection.json")
+    )
     payload = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
     cells = payload.get("cells", {})
 

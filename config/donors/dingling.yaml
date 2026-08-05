@@ -31,10 +31,8 @@
 # =============================================================================
 
 project:
-  name: dhaka-pm25-shortterm-beijing-check
-  title: >-
-    Cross-City Generalisation Check: the Dhaka PM2.5 Pipeline Applied Unchanged
-    to the Beijing Multi-Site Record
+  name: donor-dingling
+  title: "Gap-Injection Donor Replication: the Dingling Station of the Beijing Multi-Site Record"
   timezone_local: Asia/Shanghai     # UTC+08:00, no DST
   timezone_data: UTC                # all merges happen in UTC
 
@@ -43,16 +41,16 @@ project:
 # -----------------------------------------------------------------------------
 paths:
   data_raw: data/raw
-  data_interim: data/interim/beijing
-  data_processed: data/processed/beijing
+  data_interim: data/interim/donors/dingling
+  data_processed: data/processed/donors/dingling
   results: results
-  tables: results/tables/beijing
-  figures: results/figures/beijing
+  tables: results/tables/donors/dingling
+  figures: results/figures/donors/dingling
   logs: results/logs
-  results_json: results/results_beijing.json
+  results_json: results/results_donor_dingling.json
   reports: reports
-  checkpoints: data/interim/beijing/checkpoints    # gitignored; *.ckpt also ignored
-  cache: data/interim/beijing/cache                # memmap / feather tensor cache
+  checkpoints: data/interim/donors/dingling/checkpoints    # gitignored; *.ckpt also ignored
+  cache: data/interim/donors/dingling/cache                # memmap / feather tensor cache
 
 # -----------------------------------------------------------------------------
 # Reproducibility
@@ -159,7 +157,7 @@ data:
     # on this path and kept only so the two configs stay diffable.
     location_ids: null
     combine_as_single_site: true
-    site_label: "Beijing Wanliu (UCI Multi-Site, id 501)"
+    site_label: "Beijing Dingling (UCI Multi-Site, id 501)"
     request:
       max_retries: 5
       backoff_base_s: 1.5
@@ -219,7 +217,7 @@ data:
     # relative to it. If the archive ever shifted which station is most complete,
     # a null here would silently move the donor and invalidate the comparison.
     # Wanliu is what null resolved to (98.91%, the most complete of the 12).
-    station: "Wanliu"
+    station: "Dingling"
 
   # --- interim filenames -----------------------------------------------------
   # Named here rather than hardcoded so a second city can reuse every downstream
@@ -635,7 +633,7 @@ ablation:
     # has hit most often -- here it would silently destroy the very experiment
     # the second donor exists to replicate. scripts/14_make_donor_configs.py
     # overrides this per donor.
-    output_name: ablation_gap_injection.json
+    output_name: ablation_gap_injection_dingling.json
     # 0.99 is a no-op on this record (it already sits at 0.9894) and serves as
     # the undegraded reference cell. 0.82 is Dhaka's measured coverage.
     coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
@@ -817,6 +815,6 @@ output:
     # Separate directory from the Dhaka run. Both configs previously wrote to
     # reports/RESULTS.md, so running the comparison city overwrote the primary
     # city's report -- silently, because the file is regenerated wholesale.
-    results_md: reports/beijing/RESULTS.md
-    data_audit_md: reports/beijing/DATA_AUDIT.md
-    abstract_facts_json: reports/beijing/abstract_facts.json
+    results_md: reports/donors/dingling/RESULTS.md
+    data_audit_md: reports/donors/dingling/DATA_AUDIT.md
+    abstract_facts_json: reports/donors/dingling/abstract_facts.json

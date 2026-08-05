@@ -27,7 +27,7 @@ CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures report all lint fmt clean clean-results \
-        beijing beijing-post cross-city tune ablation everything
+        beijing beijing-post cross-city tune ablation donor-configs donors everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -123,6 +123,27 @@ beijing-post:  ## Beijing stages 08-11 only, after a resumed sweep
 	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/11_make_report.py     --config $(CONFIG_B)
+
+# Replication donors for the gap-injection experiment: further stations of the
+# same UCI archive, so nothing is downloaded again. 06_train_sequence is
+# deliberately absent -- the ablation's sequence specs are fixed in the config
+# and only tier2 needs a donor-specific fit, which is what makes a donor cheap.
+DONORS := $(shell sed -n 's/^[[:space:]]*-[[:space:]]*slug:[[:space:]]*//p' donors.yaml)
+
+donor-configs:  ## Generate config/donors/*.yaml from donors.yaml
+	$(PY) $(SCRIPTS)/14_make_donor_configs.py
+
+donors: donor-configs  ## Prep + gap injection for every replication donor
+	@for slug in $(DONORS); do \
+	  echo "===== donor: $$slug ====="; \
+	  $(PY) $(SCRIPTS)/02_fetch_data.py       --config config/donors/$$slug.yaml --skip openaq power; \
+	  $(PY) $(SCRIPTS)/12_prepare_beijing.py  --config config/donors/$$slug.yaml --source data/interim/donors/$$slug/uci_beijing_hourly.parquet; \
+	  $(PY) $(SCRIPTS)/03_data_audit.py       --config config/donors/$$slug.yaml; \
+	  $(PY) $(SCRIPTS)/04_build_features.py   --config config/donors/$$slug.yaml; \
+	  $(PY) $(SCRIPTS)/05_run_baselines.py    --config config/donors/$$slug.yaml; \
+	  $(PY) $(SCRIPTS)/16_gap_injection.py    --config config/donors/$$slug.yaml --profile-config $(CONFIG) --progress plain; \
+	  $(PY) $(SCRIPTS)/17_ablation_analysis.py --config config/donors/$$slug.yaml; \
+	done
 
 cross-city:  ## Rank-transfer comparison (requires `all` and `beijing` first)
 	$(PY) $(SCRIPTS)/13_cross_city.py --config $(CONFIG) --config-b $(CONFIG_B)

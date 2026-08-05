@@ -1,0 +1,57 @@
+# =============================================================================
+# DONOR REGISTRY for the gap-injection experiment (scripts/16_gap_injection.py)
+#
+# The experiment degrades a near-complete record and measures how each model
+# family responds. Run on one record it establishes nothing about generality --
+# a family's sensitivity to fragmentation could be a property of that station's
+# dynamics rather than of the family. These are the additional donors.
+#
+# Every entry is a station of the SAME UCI Beijing Multi-Site archive
+# (data.uci.repo_id 501) that the primary comparison city already uses, so no
+# new download is needed and the schema, span and meteorology instruments are
+# identical. That similarity is the point AND the limitation:
+#
+#   * it is a real replication test -- it can show the result is specific to
+#     Wanliu, which is the cheapest way to kill the finding;
+#   * it is NOT independent evidence of generality. All 12 stations share one
+#     4-year window, one regional weather regime, and PM2.5 fields over Beijing
+#     are strongly spatially correlated. Report it as a station-robustness
+#     check, never as a multi-city panel.
+#
+# Stations are chosen to bracket the primary donor's pollution regime rather
+# than to match it, since a donor that behaves identically tests nothing.
+# Mean PM2.5 over the archive, ug/m3:
+#
+#   Dingling       66.0   suburban north-west, lowest of the 12
+#   Wanliu         83.4   PRIMARY DONOR (config_beijing.yaml), urban west
+#   Dongsi         86.2   urban core, highest of the 12
+#
+# Coverage is 97.3-98.9% at every station, so all are usable as donors; see
+# results/tables/uci_station_coverage.csv once scripts/14_make_donor_configs.py
+# has run.
+#
+# Generate the configs with:
+#   .venv/Scripts/python.exe scripts/14_make_donor_configs.py
+# =============================================================================
+
+# Every donor config is derived from this base by targeted line edit, so it
+# inherits the base's comments, citations and verified constants. Deriving from
+# the Beijing config rather than the Dhaka one means timezone, season months,
+# meteorology variables and split boundaries are already correct -- the only
+# differences between Beijing stations are the station name and the paths.
+base_config: config_beijing.yaml
+output_dir: config/donors
+
+donors:
+  - slug: dingling
+    station: Dingling
+    note: >-
+      Suburban north-west. Lowest mean PM2.5 of the 12 stations, so if the
+      arm gap is a function of the absolute pollution level rather than of
+      record structure, this is where it should differ from Wanliu.
+
+  - slug: dongsi
+    station: Dongsi
+    note: >-
+      Urban core. Highest mean PM2.5 of the 12 stations, and the opposite
+      bracket to Dingling around the primary donor.

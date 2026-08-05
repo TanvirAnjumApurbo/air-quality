@@ -654,6 +654,10 @@ ablation:
   gap_injection:
     enabled: false
     horizon_h: 24
+    # Kept in step with config_beijing.yaml, where the experiment runs. Unused
+    # on this path (enabled: false) but present so the key cannot be absent on
+    # one config and inherited on the other.
+    output_name: ablation_gap_injection.json
     coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
     arms: [fragmented, contiguous]
     # Kept identical to config_beijing.yaml, which is where this experiment

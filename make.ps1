@@ -39,6 +39,16 @@ function Invoke-Step {
     elseif ($LASTEXITCODE -ne 0) { throw "scripts/$Script failed with exit code $LASTEXITCODE" }
 }
 
+function Get-DonorSlugs {
+    # Read from donors.yaml rather than hardcoded, so adding a donor is a
+    # registry edit and not a change in two places that can disagree.
+    $registry = Join-Path $Root 'donors.yaml'
+    if (-not (Test-Path $registry)) { throw "donors.yaml not found at $registry" }
+    Get-Content $registry |
+        Select-String -Pattern '^\s*-\s*slug:\s*(\S+)' |
+        ForEach-Object { $_.Matches[0].Groups[1].Value }
+}
+
 $common = @('--config', $Cfg)
 
 # Cross-city generalisation check. Same pipeline, same grid, same seeds; only
@@ -70,6 +80,8 @@ Targets:
   cross-city  Rank-transfer comparison (needs 'all' and 'beijing')
   tune        Choose the sequence training recipe on val loss, before 'deep'
   ablation    Gap-injection experiment + figure (needs 'beijing')
+  donor-configs  Generate config/donors/*.yaml from donors.yaml
+  donors      Replication donors: prep + gap injection for each (needs 'beijing')
   everything  all + beijing + cross-city + ablation + report
   lint        ruff check + format check
   clean       Remove caches and checkpoints (keeps raw data)
@@ -118,6 +130,31 @@ Targets:
         Invoke-Step '09_evaluate.py'         $commonB
         Invoke-Step '10_make_figures.py'     $commonB
         Invoke-Step '11_make_report.py'      $commonB
+    }
+    'donor-configs' {
+        Invoke-Step '14_make_donor_configs.py' $Rest
+    }
+    'donors' {
+        # Replication donors for the gap-injection experiment. Each is another
+        # station of the SAME UCI archive, so nothing is downloaded again; only
+        # the station selection and the output paths differ.
+        #
+        # 06_train_sequence is deliberately NOT run: the ablation's sequence
+        # specs are fixed in the config, and only tier2 needs a donor-specific
+        # fit for its best_params. That is what makes a donor cheap.
+        Invoke-Step '14_make_donor_configs.py'
+        foreach ($slug in (Get-DonorSlugs)) {
+            $cfgD = Join-Path $Root "config/donors/$slug.yaml"
+            $commonD = @('--config', $cfgD)
+            Write-Host "===== donor: $slug =====" -ForegroundColor Green
+            Invoke-Step '02_fetch_data.py'      ($commonD + @('--skip', 'openaq', 'power'))
+            Invoke-Step '12_prepare_beijing.py' ($commonD + @('--source', "data/interim/donors/$slug/uci_beijing_hourly.parquet"))
+            Invoke-Step '03_data_audit.py'      $commonD
+            Invoke-Step '04_build_features.py'  $commonD
+            Invoke-Step '05_run_baselines.py'   $commonD
+            Invoke-Step '16_gap_injection.py'   ($commonD + @('--profile-config', $Cfg, '--progress', 'plain') + $Rest)
+            Invoke-Step '17_ablation_analysis.py' $commonD
+        }
     }
     'tune'      { Invoke-Step '06_train_sequence.py' ($common + @('--tune', '--progress', 'plain') + $Rest) }
     'ablation' {

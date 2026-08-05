@@ -662,7 +662,9 @@ def main() -> int:
     # numbers" rule holds. It cannot live in results.json: the experiment runs
     # under the donor city's config and so would land in that city's file,
     # while the injected gap profile and the claim both belong to this one.
-    ablation_path = Path(str(cfg.get("paths.results"))) / "ablation_gap_injection.json"
+    ablation_path = Path(str(cfg.get("paths.results"))) / str(
+        cfg.get("ablation.gap_injection.output_name", "ablation_gap_injection.json")
+    )
     if ablation_path.exists():
         abl = json.loads(ablation_path.read_text(encoding="utf-8"))
         by_family = pd.DataFrame(abl.get("analysis", {}).get("by_family", []))
@@ -1137,7 +1139,9 @@ def main() -> int:
         }
 
     # Same source as the report section: the ablation's own generated file.
-    ablation_path = Path(str(cfg.get("paths.results"))) / "ablation_gap_injection.json"
+    ablation_path = Path(str(cfg.get("paths.results"))) / str(
+        cfg.get("ablation.gap_injection.output_name", "ablation_gap_injection.json")
+    )
     if ablation_path.exists():
         abl = json.loads(ablation_path.read_text(encoding="utf-8"))
         by_family = pd.DataFrame(abl.get("analysis", {}).get("by_family", []))

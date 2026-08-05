@@ -13,3 +13,6 @@
 11:12:48 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
 11:12:50 | INFO    | 03_data_audit | figures written
 11:12:50 | INFO    | 03_data_audit | wrote F:\BUP\reports\beijing\DATA_AUDIT.md
+13:14:59 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
+13:15:01 | INFO    | 03_data_audit | figures written
+13:15:01 | INFO    | 03_data_audit | wrote F:\BUP\reports\donors\dingling\DATA_AUDIT.md
