@@ -82,6 +82,7 @@ Targets:
   ablation    Gap-injection experiment + figure (needs 'beijing')
   donor-configs  Generate config/donors/*.yaml from donors.yaml
   donors      Replication donors: prep + gap injection for each (needs 'beijing')
+  replication Cross-donor comparison only (needs 'ablation' and 'donors')
   everything  all + beijing + cross-city + ablation + report
   lint        ruff check + format check
   clean       Remove caches and checkpoints (keeps raw data)
@@ -155,6 +156,11 @@ Targets:
             Invoke-Step '16_gap_injection.py'   ($commonD + @('--profile-config', $Cfg, '--progress', 'plain') + $Rest)
             Invoke-Step '17_ablation_analysis.py' $commonD
         }
+        # Cross-donor comparison last: it needs every grid on disk.
+        Invoke-Step '18_donor_replication.py' $commonB
+    }
+    'replication' {
+        Invoke-Step '18_donor_replication.py' $commonB
     }
     'tune'      { Invoke-Step '06_train_sequence.py' ($common + @('--tune', '--progress', 'plain') + $Rest) }
     'ablation' {

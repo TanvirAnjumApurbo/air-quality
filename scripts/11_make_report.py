@@ -847,13 +847,90 @@ def main() -> int:
             a("a fragmented cell is not simply undertrained. What it does not establish")
             a("is generality.")
             a("")
-            if n_draws is not None:
+            rep_path = Path(str(cfg.get("paths.results"))) / "donor_replication.json"
+            if n_draws is not None and not rep_path.exists():
                 a(f"- **One donor record**, degraded {int(n_draws.max())} ways per cell. A second")
                 a("  donor would separate the effect from this station's own dynamics.")
             a("- **One horizon** and one injected gap-length distribution.")
             a("- The per-cell differences in the first table are individually noisy; it is")
             a("  the paired test across all levels and draws that carries the result.")
             a("")
+
+            # ---------------------------------------------- donor replication
+            # Same rule as the section above: written by 18_donor_replication.py,
+            # read here, never transcribed. Absent until the replication donors
+            # have run, in which case this subsection simply does not appear.
+            if rep_path.exists():
+                rep = json.loads(rep_path.read_text(encoding="utf-8"))
+                rep_verdict = pd.DataFrame(rep.get("verdict", []))
+                rep_tests = pd.DataFrame(rep.get("per_donor_tests", []))
+                if not rep_verdict.empty and not rep_tests.empty:
+                    rep_donor_names = list(rep.get("donors", []))
+                    a(f"### {next_section - 1}b. Does it replicate on another record?")
+                    a("")
+                    a(
+                        "The same experiment on "
+                        f"{len(rep_donor_names)} donor records: {', '.join(rep_donor_names)}."
+                    )
+                    a("")
+                    a(str(rep.get("scope_note", "")))
+                    a("")
+                    rep_grid = rep_tests.pivot_table(
+                        index="family", columns="donor", values="mean_arm_gap", aggfunc="first"
+                    )
+                    rep_flag = rep_tests.pivot_table(
+                        index="family",
+                        columns="donor",
+                        values="significant_holm",
+                        aggfunc="first",
+                    )
+                    rep_fam_order = [
+                        f for f in ("sequence", "trees", "linear", "naive") if f in rep_grid.index
+                    ]
+                    rep_by_family = rep_verdict.set_index("family")
+                    rep_shown = pd.DataFrame({"Family": rep_fam_order})
+                    for d in rep_donor_names:
+                        if d in rep_grid.columns:
+                            rep_shown[d] = [
+                                f"{rep_grid.loc[f, d]:+.4f}{'*' if bool(rep_flag.loc[f, d]) else ''}"
+                                for f in rep_fam_order
+                            ]
+                    rep_shown["Replicates"] = [
+                        "**yes**" if bool(rep_by_family.loc[f, "replicates"]) else "no"
+                        for f in rep_fam_order
+                    ]
+                    a(rep_shown.to_markdown(index=False))
+                    a("")
+                    a("`*` marks Holm significance within that donor. **Replicates** requires")
+                    a(str(rep.get("replication_rule", "")).lower())
+                    a("")
+
+                    rep_yes = [f for f in rep_fam_order if bool(rep_by_family.loc[f, "replicates"])]
+                    rep_seq_ok = "sequence" in rep_yes
+                    rep_others = [f for f in rep_yes if f not in ("sequence", "linear")]
+                    if rep_seq_ok and not rep_others:
+                        a("The sequence family's gap is the only one that survives on every")
+                        a("donor. On this evidence fragmentation is costly specifically to the")
+                        a("model class that requires contiguous windows.")
+                    elif rep_seq_ok and rep_others:
+                        a(
+                            "The sequence family replicates, but so does "
+                            + ", ".join(rep_others)
+                            + ". Fragmentation is not costly to the windowed model class alone,"
+                        )
+                        a("and the claim this section can support is the weaker one: it costs")
+                        a("the sequence tier *most*, and costs it first as coverage falls.")
+                    elif not rep_seq_ok:
+                        a("**The sequence family's gap does not replicate across donors.** The")
+                        a("effect seen on the primary donor is not established as a property of")
+                        a("fragmentation, and no claim in this report should rest on it.")
+                    a("")
+                    if rep.get("incomplete_donors"):
+                        a(
+                            "> ⚠ Provisional for "
+                            f"{', '.join(rep['incomplete_donors'])}: rep_grid incomplete."
+                        )
+                        a("")
 
     # Site-specific limitations are read from this city's own audit and QC
     # ledger. They were previously hardcoded to Dhaka's numbers, which the

@@ -27,7 +27,8 @@ CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures report all lint fmt clean clean-results \
-        beijing beijing-post cross-city tune ablation donor-configs donors everything
+        beijing beijing-post cross-city tune ablation donor-configs donors \
+        replication everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -144,6 +145,10 @@ donors: donor-configs  ## Prep + gap injection for every replication donor
 	  $(PY) $(SCRIPTS)/16_gap_injection.py    --config config/donors/$$slug.yaml --profile-config $(CONFIG) --progress plain; \
 	  $(PY) $(SCRIPTS)/17_ablation_analysis.py --config config/donors/$$slug.yaml; \
 	done
+	$(PY) $(SCRIPTS)/18_donor_replication.py --config $(CONFIG_B)
+
+replication:  ## Cross-donor comparison only (requires `ablation` and `donors`)
+	$(PY) $(SCRIPTS)/18_donor_replication.py --config $(CONFIG_B)
 
 cross-city:  ## Rank-transfer comparison (requires `all` and `beijing` first)
 	$(PY) $(SCRIPTS)/13_cross_city.py --config $(CONFIG) --config-b $(CONFIG_B)

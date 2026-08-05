@@ -80,12 +80,23 @@ add a number to `RESULTS.md` or `abstract_facts.json` that does not come from
 `results.json`. The Beijing run writes to `results/results_beijing.json` and its
 reports to `reports/beijing/`.
 
-There is exactly one other source, and it is deliberate: §8 of `RESULTS.md` reads
-`results/ablation_gap_injection.json`, which `17_ablation_analysis.py` generates
-and nothing writes by hand. It cannot live in `results.json` — the experiment runs
-under the *donor* city's config, so it would land in `results_beijing.json`, while
-the injected gap profile and the claim both belong to the primary city. The rule
-that matters (no transcribed numbers) still holds. Do not add a third source.
+The gap-injection experiment is the one deliberate exception, and it owns two
+files rather than one: §8 of `RESULTS.md` reads
+`results/ablation_gap_injection*.json` (one per donor, named by
+`ablation.gap_injection.output_name`), and §8b reads
+`results/donor_replication.json`. Both are generated — by `17_ablation_analysis.py`
+and `18_donor_replication.py` — and neither is ever written by hand. They cannot
+live in `results.json`: the experiment spans several donor configs, so it would
+land in whichever donor happened to run last, while the injected gap profile and
+the claim both belong to the primary city. The rule that matters (no transcribed
+numbers) still holds. Do not add a source outside this experiment.
+
+`16_gap_injection.py` **rebuilds its output file from scratch on every cell**, which
+drops the `analysis` block `17` wrote. That is intentional — an analysis computed
+over a different cell set is worse than none, because it looks finished. Always
+re-run `17` after `16`. `11_make_report.py` warns rather than silently omitting §8
+when it finds cells with no analysis, because omitting it once renumbered
+Limitations over the top of the study's central section.
 
 ### Data flow
 
