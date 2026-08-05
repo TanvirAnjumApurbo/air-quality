@@ -318,3 +318,111 @@
 17:26:39 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\donors\dongsi\uci_beijing_hourly.parquet (35064 rows, 12 cols)
 17:26:39 | INFO    | 02_fetch_data | ======================================================================
 17:26:39 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\donors\dongsi\fetch_summary.json
+17:28:59 | INFO    | 02_fetch_data | disk check passed: 28.1 GB free
+17:28:59 | INFO    | 02_fetch_data | ======================================================================
+17:28:59 | INFO    | 02_fetch_data | OPENAQ PM2.5  locations=[2445, 8415]
+17:28:59 | INFO    | 02_fetch_data | ======================================================================
+17:29:00 | INFO    | 02_fetch_data | location 2445: 9 month partitions in S3
+17:29:00 | INFO    | 02_fetch_data | location 2445: 9/9 months
+17:29:00 | INFO    | 02_fetch_data | location 2445: 5848 raw records
+17:29:04 | INFO    | 02_fetch_data | location 8415: 98 month partitions in S3
+17:29:04 | INFO    | 02_fetch_data | location 8415: 12/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 24/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 36/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 48/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 60/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 72/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 84/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 96/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 98/98 months
+17:29:04 | INFO    | 02_fetch_data | location 8415: 75960 raw records
+17:29:04 | INFO    | 02_fetch_data | QC raw records                                       81808
+17:29:04 | INFO    | 02_fetch_data | QC parameter != pm25            removed   11525  remaining   70283 
+17:29:04 | INFO    | 02_fetch_data | QC units observed: ['µg/m³'] -> all micrograms per cubic metre
+17:29:04 | INFO    | 02_fetch_data | QC value is NaN                 removed       0  remaining   70283 
+17:29:04 | INFO    | 02_fetch_data | QC negative value               removed    5056  remaining   65227 
+17:29:04 | INFO    | 02_fetch_data | QC exact zero (sensor fault)    removed      13  remaining   65214 
+17:29:04 | INFO    | 02_fetch_data | QC above sanity cap 1000        removed       0  remaining   65214 
+17:29:05 | INFO    | 02_fetch_data | QC flatline run > 12            removed       0  remaining   65214 (consecutive identical values = stuck sensor)
+17:29:05 | INFO    | 02_fetch_data | QC duplicate timestamps         removed       0  remaining   65214 (overlap between concatenated location IDs)
+17:29:05 | INFO    | 02_fetch_data | hourly grid: 65214 of 79216 hours observed (82.3%), 2016-03-10 22:00:00+00:00 to 2025-03-24 13:00:00+00:00
+17:29:05 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\openaq_pm25_hourly.parquet (79216 rows)
+17:29:05 | INFO    | 02_fetch_data | wrote QC ledger to F:\BUP\data\interim\openaq_qc_ledger.json
+17:29:05 | INFO    | 02_fetch_data | ======================================================================
+17:29:05 | INFO    | 02_fetch_data | NASA POWER meteorology
+17:29:05 | INFO    | 02_fetch_data | ======================================================================
+17:29:05 | INFO    | 02_fetch_data | POWER 2016: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2017: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2018: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2019: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2020: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2021: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2022: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2023: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2024: cached
+17:29:05 | INFO    | 02_fetch_data | POWER 2025: cached
+17:29:05 | INFO    | 02_fetch_data | POWER: 87672 hourly rows, 2016-01-01 00:00:00+00:00 to 2025-12-31 23:00:00+00:00, time standard UTC
+17:29:05 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\power_hourly.parquet (87672 rows, 8 cols)
+17:29:05 | INFO    | 02_fetch_data | ======================================================================
+17:29:05 | INFO    | 02_fetch_data | UCI Beijing Multi-Site (fallback + cross-city check)
+17:29:05 | INFO    | 02_fetch_data | ======================================================================
+17:29:05 | INFO    | 02_fetch_data | UCI Beijing: cached at F:\BUP\data\raw\uci\beijing_multisite_raw.parquet
+17:29:05 | INFO    | 02_fetch_data | UCI Beijing: station not configured; selected 'Wanliu' with 34682 non-missing PM2.5 values (most complete of 12 stations)
+17:29:05 | INFO    | 02_fetch_data | UCI Beijing station Wanliu: 35064 hourly rows, 2013-02-28 16:00:00+00:00 to 2017-02-28 15:00:00+00:00
+17:29:05 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\uci_beijing_hourly.parquet (35064 rows, 12 cols)
+17:29:05 | INFO    | 02_fetch_data | ======================================================================
+17:29:05 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\fetch_summary.json
+18:00:51 | INFO    | 02_fetch_data | disk check passed: 28.1 GB free
+18:00:51 | INFO    | 02_fetch_data | ======================================================================
+18:00:51 | INFO    | 02_fetch_data | OPENAQ PM2.5  locations=[2445, 8415]
+18:00:51 | INFO    | 02_fetch_data | ======================================================================
+18:00:52 | INFO    | 02_fetch_data | location 2445: 9 month partitions in S3
+18:00:52 | INFO    | 02_fetch_data | location 2445: 9/9 months
+18:00:52 | INFO    | 02_fetch_data | location 2445: 5848 raw records
+18:00:56 | INFO    | 02_fetch_data | location 8415: 98 month partitions in S3
+18:00:56 | INFO    | 02_fetch_data | location 8415: 12/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 24/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 36/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 48/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 60/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 72/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 84/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 96/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 98/98 months
+18:00:56 | INFO    | 02_fetch_data | location 8415: 75960 raw records
+18:00:57 | INFO    | 02_fetch_data | QC raw records                                       81808
+18:00:57 | INFO    | 02_fetch_data | QC parameter != pm25            removed   11525  remaining   70283 
+18:00:57 | INFO    | 02_fetch_data | QC units observed: ['µg/m³'] -> all micrograms per cubic metre
+18:00:57 | INFO    | 02_fetch_data | QC value is NaN                 removed       0  remaining   70283 
+18:00:57 | INFO    | 02_fetch_data | QC negative value               removed    5056  remaining   65227 
+18:00:57 | INFO    | 02_fetch_data | QC exact zero (sensor fault)    removed      13  remaining   65214 
+18:00:57 | INFO    | 02_fetch_data | QC above sanity cap 1000        removed       0  remaining   65214 
+18:00:57 | INFO    | 02_fetch_data | QC flatline run > 12            removed       0  remaining   65214 (consecutive identical values = stuck sensor)
+18:00:57 | INFO    | 02_fetch_data | QC duplicate timestamps         removed       0  remaining   65214 (overlap between concatenated location IDs)
+18:00:57 | INFO    | 02_fetch_data | hourly grid: 65214 of 79216 hours observed (82.3%), 2016-03-10 22:00:00+00:00 to 2025-03-24 13:00:00+00:00
+18:00:57 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\openaq_pm25_hourly.parquet (79216 rows)
+18:00:57 | INFO    | 02_fetch_data | wrote QC ledger to F:\BUP\data\interim\openaq_qc_ledger.json
+18:00:57 | INFO    | 02_fetch_data | ======================================================================
+18:00:57 | INFO    | 02_fetch_data | NASA POWER meteorology
+18:00:57 | INFO    | 02_fetch_data | ======================================================================
+18:00:57 | INFO    | 02_fetch_data | POWER 2016: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2017: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2018: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2019: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2020: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2021: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2022: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2023: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2024: cached
+18:00:57 | INFO    | 02_fetch_data | POWER 2025: cached
+18:00:57 | INFO    | 02_fetch_data | POWER: 87672 hourly rows, 2016-01-01 00:00:00+00:00 to 2025-12-31 23:00:00+00:00, time standard UTC
+18:00:57 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\power_hourly.parquet (87672 rows, 8 cols)
+18:00:57 | INFO    | 02_fetch_data | ======================================================================
+18:00:57 | INFO    | 02_fetch_data | UCI Beijing Multi-Site (fallback + cross-city check)
+18:00:57 | INFO    | 02_fetch_data | ======================================================================
+18:00:57 | INFO    | 02_fetch_data | UCI Beijing: cached at F:\BUP\data\raw\uci\beijing_multisite_raw.parquet
+18:00:57 | INFO    | 02_fetch_data | UCI Beijing: station not configured; selected 'Wanliu' with 34682 non-missing PM2.5 values (most complete of 12 stations)
+18:00:57 | INFO    | 02_fetch_data | UCI Beijing station Wanliu: 35064 hourly rows, 2013-02-28 16:00:00+00:00 to 2017-02-28 15:00:00+00:00
+18:00:57 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\uci_beijing_hourly.parquet (35064 rows, 12 cols)
+18:00:57 | INFO    | 02_fetch_data | ======================================================================
+18:00:57 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\fetch_summary.json

@@ -955,3 +955,48 @@ def test_control_resume_refuses_a_record_predating_width_tracking():
         )
         is None
     )
+
+
+# ---------------------------------------------------------------------------
+# The build shim
+# ---------------------------------------------------------------------------
+
+
+def test_make_shim_does_not_declare_a_powershell_automatic_variable():
+    """No make.ps1 parameter may shadow a PowerShell automatic variable.
+
+    ``param([string[]]$Args)`` is accepted by PowerShell and lands in
+    ``$PSBoundParameters``, but ``$Args`` read by name always returns the
+    *automatic* variable -- empty, since everything bound to a declared
+    parameter. ``& $Py $path @Args`` therefore splatted nothing and every step
+    ran bare, falling back to its argparse ``--config`` default. That silently
+    made ``donors`` re-run the primary city and ``beijing`` write Dhaka results
+    into Beijing's slot, and it hid for the whole project because those defaults
+    match the ``all`` target.
+    """
+    import re
+    from pathlib import Path
+
+    reserved = {
+        "args",
+        "input",
+        "error",
+        "host",
+        "home",
+        "matches",
+        "pid",
+        "profile",
+        "psitem",
+        "pwd",
+        "this",
+    }
+    shim = Path(__file__).resolve().parents[1] / "make.ps1"
+    declared = re.findall(
+        r"\$(\w+)\s*(?:=|,|\))",
+        "\n".join(re.findall(r"param\((.*?)\)", shim.read_text(encoding="utf-8"), re.S)),
+    )
+    offenders = sorted({d for d in declared if d.lower() in reserved})
+    assert not offenders, (
+        f"make.ps1 declares parameter(s) {offenders} that shadow PowerShell "
+        "automatic variables; they bind but read back empty"
+    )

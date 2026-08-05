@@ -224,6 +224,28 @@ def main() -> int:
     payload = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
     cells = payload.get("cells", {})
 
+    # Resume keys on (arm, coverage, injection seed) and says nothing about WHICH
+    # record produced the cell. If two configs ever resolve to one output path,
+    # every cell reads as "already recorded" and the run reports a complete grid
+    # for a station it never touched -- which is exactly what happened when the
+    # make shim dropped --config and three stations resumed off Wanliu's file.
+    # The donor label is the identity that matters, so disagreement is fatal
+    # rather than a warning: a silently mislabelled grid is worse than no grid.
+    this_donor = str(cfg.get("data.openaq.site_label") or cfg.get("data.site.city"))
+    recorded_donor = str(payload.get("donor", this_donor))
+    if cells and recorded_donor != this_donor:
+        log.error(
+            "%s holds %d cells recorded for %r, but this config is %r. Resuming "
+            "would attribute another record's results to this one. Point "
+            "ablation.gap_injection.output_name at a distinct file, or delete "
+            "the existing one to recompute.",
+            out_path,
+            len(cells),
+            recorded_donor,
+            this_donor,
+        )
+        return 1
+
     if args.dry_run:
         print(f"\n{len(grid)} cells would run at h={horizon}:")
         for arm, cov, seed in grid:

@@ -183,6 +183,21 @@ The five rules in the README are enforced at these points:
 
 ## Invariants that will corrupt results if broken
 
+**No `make.ps1` parameter may be named after a PowerShell automatic variable.**
+`param([string[]]$Args)` binds — the value is there in `$PSBoundParameters` — but
+`$Args` read by name returns the *automatic* variable, which is empty because
+everything bound to a declared parameter. `& $Py $path @Args` therefore splatted
+nothing, and from the first commit until `HEAD` **every `make.ps1` step ran with no
+arguments**, falling back to its argparse `--config` default. It hid for the whole
+project because those defaults match the `all` target; it surfaced only when
+`donors` silently re-ran the *primary* city (`03_data_audit` reporting 79,216 rows
+— Dhaka's, not a donor's) and `16_gap_injection` resumed off Wanliu's grid in
+0.0 min. `beijing` and `beijing-post` had the same defect and would have written
+Dhaka results into Beijing's slot; those stages were only ever safe because they
+were run as explicit `python scripts/…` commands. The parameter is now `$StepArgs`,
+and `test_make_shim_does_not_declare_a_powershell_automatic_variable` fails if any
+reserved name comes back.
+
 **Never write `config.yaml` with `yaml.safe_dump`.** It discards all 212 comment
 lines, which hold the citations, source quotations, and the record of two verified
 API discrepancies. `04_build_features.py::write_back_boundaries` does a targeted

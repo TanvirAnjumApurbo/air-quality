@@ -34,3 +34,9 @@
 17:26:54 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
 17:26:56 | INFO    | 03_data_audit | figures written
 17:26:56 | INFO    | 03_data_audit | wrote F:\BUP\reports\donors\dongsi\DATA_AUDIT.md
+17:29:07 | INFO    | 03_data_audit | loaded PM2.5 (79216 rows) and meteorology (87672 rows)
+17:29:09 | INFO    | 03_data_audit | figures written
+17:29:09 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md
+18:00:59 | INFO    | 03_data_audit | loaded PM2.5 (79216 rows) and meteorology (87672 rows)
+18:01:01 | INFO    | 03_data_audit | figures written
+18:01:01 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md

@@ -27,10 +27,19 @@ if (-not (Test-Path $Py)) {
 }
 
 function Invoke-Step {
-    param([string]$Script, [string[]]$Args = @())
+    # The parameter is NOT named $Args. `$Args` is a PowerShell automatic
+    # variable, and inside a function it always reads as the *unbound* argument
+    # list -- empty here, because everything binds to a declared parameter. A
+    # parameter named `Args` therefore accepts a value into $PSBoundParameters
+    # and is unreadable by name, so `@Args` splatted nothing and every step ran
+    # bare. Scripts then fell back to their argparse --config defaults, which
+    # silently made `donors` re-run the PRIMARY city and `beijing` write Dhaka
+    # results into Beijing's slot. This shipped in the first commit and hid for
+    # the whole project, because the defaults happen to match the `all` target.
+    param([string]$Script, [string[]]$StepArgs = @())
     $path = Join-Path $Root "scripts\$Script"
-    Write-Host "==> python scripts/$Script $($Args -join ' ')" -ForegroundColor Cyan
-    & $Py $path @Args
+    Write-Host "==> python scripts/$Script $($StepArgs -join ' ')" -ForegroundColor Cyan
+    & $Py $path @StepArgs
     # -1073740791 (0xC0000409) = STATUS_STACK_BUFFER_OVERRUN: benign crash
     # during Python/PyTorch interpreter shutdown on Windows; work is done.
     if ($LASTEXITCODE -eq -1073740791) {
