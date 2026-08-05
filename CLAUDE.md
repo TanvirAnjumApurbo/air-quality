@@ -2,10 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-`README.md` covers setup, the phase-by-phase pipeline table, training flags and the
-five methodological rules. Read it first. This file covers what the README does not:
-the architecture you have to read several files to see, and the invariants that will
-silently corrupt a result if you break them.
+`README.md` covers setup, the phase-by-phase pipeline table, training flags, the
+five methodological rules and the gap-injection experiment. Read it first. This file
+covers what the README does not: the architecture you have to read several files to
+see, and the invariants that will silently corrupt a result if you break them.
+
+The README documents stages 00–13 and stops there — it has no section on the
+replication donors (`14`, `18`), the selection-stability diagnostic (`19`), or the
+`donors`/`stability`/`replication` targets. Those live here until someone folds
+them back into it.
 
 ## Commands
 
@@ -23,8 +28,22 @@ dependencies installed and fails at `import pandas`.
 .\make.ps1 beijing-post    # Beijing 08-11 only, after a resumed sweep
 .\make.ps1 cross-city      # rank-transfer comparison (needs `all` and `beijing`)
 .\make.ps1 ablation        # gap-injection experiment (needs `beijing`)
+.\make.ps1 donor-list      # print the donor slugs; 2 s, run before `donors`
+.\make.ps1 donors          # prep + gap injection for every replication donor
+.\make.ps1 replication     # cross-donor comparison only (needs `ablation` + `donors`)
+.\make.ps1 stability       # tier-3 selection stability; reads existing runs, no refit
 .\make.ps1 everything      # all + beijing + cross-city + ablation + report
 ```
+
+`stability` (19) must precede `report` (11), which renders its subsection; `all`
+and both Beijing chains already order them.
+
+**`donors` is the expensive target: budget ~3 h per donor**, measured — the
+101-cell grid took 154 min (Dingling) and 162 min (Dongsi), plus ~23 min of tier-2
+fitting each. Two donors is most of a night. It is also the only one of these that
+trains. `stability`, `replication` and `cross-city` are pure analysis over records
+already on disk and finish in seconds; `ablation` on an existing grid resumes every
+cell and returns in 0.0 min, which is what a correct no-op looks like here.
 
 Lint and format (ruff config lives in `pyproject.toml`; docstrings and type
 annotations on public functions are enforced by `D` and `ANN` rules):
@@ -35,7 +54,7 @@ annotations on public functions are enforced by `D` and `ANN` rules):
 .venv/Scripts/python.exe -m ruff format src scripts tests     # writes
 ```
 
-Tests — all 37 live in `tests/test_leakage.py`:
+Tests — all 43 live in `tests/test_leakage.py`:
 
 ```powershell
 .venv/Scripts/python.exe -m pytest tests -q
@@ -44,9 +63,10 @@ Tests — all 37 live in `tests/test_leakage.py`:
 ```
 
 Markers are declared in `pyproject.toml` under `--strict-markers`: `leakage`,
-`slow`, `network`. Four tests are negative controls — they inject the forbidden
-mistake and assert the guard fires. If you relax a guard, those fail, which is the
-point.
+`slow`, `network`. Seven tests (`def test_control_*`) are negative controls — they
+inject the forbidden mistake and assert the guard fires. If you relax a guard,
+those fail, which is the point. When you add a guard, add its negative control in
+the same commit; a guard with no control is untested and will silently rot.
 
 ## Architecture
 
@@ -98,9 +118,36 @@ re-run `17` after `16`. `11_make_report.py` warns rather than silently omitting 
 when it finds cells with no analysis, because omitting it once renumbered
 Limitations over the top of the study's central section.
 
+### Replication donors are generated configs, not hand-maintained ones
+
+`donors.yaml` is the registry; `14_make_donor_configs.py` generates
+`config/donors/<slug>.yaml` from `config_beijing.yaml` by section-scoped regex line
+edits, then verifies the result parses, differs in exactly the intended keys, and
+preserves the comment count. Section scoping is required, not defensive: `tables`
+and `figures` each appear at indent 2 under **both** `paths` and `output`, so an
+unscoped replacement hits two lines and the verifier refuses.
+
+Each donor needs its own `ablation.gap_injection.output_name`. Two donors sharing
+one output path is the defect this repo hits most often, and here it is worst:
+`16`'s resume keys on `(arm, coverage, injection_seed)` and knows nothing about
+which *record* produced a cell, so a shared path makes every cell read as "already
+recorded" and the run reports a complete grid for a station it never touched. `16`
+now refuses to resume when the payload's `donor` label disagrees with the config's
+station, and that check is fatal rather than a warning.
+
+**Donors are further stations of one archive** (UCI Beijing Multi-Site, id 501):
+one four-year window, one weather regime, spatially correlated PM2.5. It is a
+station-robustness check that can falsify a donor-specific effect — which is the
+cheapest way to kill a wrong claim — and it is **not** evidence of generality.
+Never describe it as a multi-city panel. `donors.yaml` says this too; keep both.
+
+`src/eval/ablation.py` holds the shared paired-test code (`paired_arm_gaps`,
+`test_arm_gaps`, the family map) so `17` and `18` cannot compute the arm gap two
+different ways and make a disagreement between donors look real.
+
 ### Data flow
 
-```
+```text
 02_fetch_data      -> data/interim/*.parquet        (target, meteorology, QC ledger)
 03_data_audit      -> reports/DATA_AUDIT.md          HARD GATE, prints a verdict
 04_build_features  -> data/processed/features.parquet + features_meta.json + scaler.json
@@ -108,6 +155,10 @@ Limitations over the top of the study's central section.
 08..09 (green/eval)-> results.json green/significance/stratified
 10, 11             -> results/figures, results/tables, reports/
 13_cross_city      -> results.json cross_city{}      (must run before the final report)
+14_make_donor_cfgs -> config/donors/*.yaml           (from donors.yaml)
+16_gap_injection   -> results/ablation_gap_injection*.json  cells{}   (one per donor)
+17_ablation_analys -> same file, analysis{}          (ALWAYS re-run after 16)
+18_donor_replicat  -> results/donor_replication.json (needs >=2 donor grids)
 19_selection_stab  -> results.json selection_stability[]  (before 11; §3 renders it)
 ```
 
@@ -165,7 +216,10 @@ Every run record carries a `tier`, and selection logic branches on it:
 - **tier1** — persistence, seasonal-naive, climatology, SARIMAX. No hyperparameters.
 - **tier2** — Ridge, RandomForest, XGBoost, LightGBM via `RandomizedSearchCV` +
   `TimeSeriesSplit` over train+val.
-- **tier3** — GRU/LSTM under a 100k-parameter budget, 5 seeds each.
+- **tier3** — GRU, LSTM, DLinear and NLinear under a 100k-parameter budget, 5 seeds
+  each. The two linear architectures (Zeng et al., AAAI 2023) are baselines a
+  time-series reviewer checks for first, and a linear model beating the recurrent
+  one is a result, not a bug.
 
 ### Leakage rules are structural, not conventional
 
@@ -199,16 +253,28 @@ were run as explicit `python scripts/…` commands. The parameter is now `$StepA
 and `test_make_shim_does_not_declare_a_powershell_automatic_variable` fails if any
 reserved name comes back.
 
-**Never write `config.yaml` with `yaml.safe_dump`.** It discards all 212 comment
-lines, which hold the citations, source quotations, and the record of two verified
-API discrepancies. `04_build_features.py::write_back_boundaries` does a targeted
-regex line edit and verifies the round-trip. That is deliberate, not laziness.
+**Never write `config.yaml` with `yaml.safe_dump`.** It discards all 335 comment
+lines (323 in `config_beijing.yaml`), which hold the citations, source quotations,
+and the record of two verified API discrepancies.
+`04_build_features.py::write_back_boundaries` and `14_make_donor_configs.py` both do
+targeted regex line edits and verify the round-trip. That is deliberate, not
+laziness.
 
 **Never select a model on test RMSE.** `_best_per_horizon` in `11_make_report.py`
 ranks tier3 by mean validation loss, tier2 by CV score, and tier1 by test RMSE only
 because those have no hyperparameters and therefore no selection to bias. Ranking
 candidates by test error and then reporting that error is circular and biases the
 headline downward by the spread of the pool.
+
+`19_selection_stability.py` is the one place that reads test error *next to* the
+selection rule, because selection regret is defined against it. Its `_select` takes
+validation loss only and regret is computed after the choice is fixed; a leakage
+test hands `_select` a frame whose test column is poisoned to invert the ranking and
+asserts the choice does not move. Preserve that separation if you touch the file.
+The diagnostic exists because the winner's *identity* is unstable — at h=24 on Dhaka
+no single seed picks the reported architecture alone and 10 candidates win at least
+once — while the *cost* is +0.05 RMSE. Report tier-level claims, not
+architecture-level ones.
 
 **Citations gate the numbers that depend on them.** `config.yaml` holds a
 `citations:` block where every externally-sourced constant carries
@@ -250,10 +316,10 @@ state-space projection now lives in
 
 `results.json` stamps `git_commit` at the time the *results* were computed, not when
 the report was rendered — so `RESULTS.md` can legitimately show an older, `-dirty`
-hash than `HEAD`. That is intended. Current values are `26d8a27…-dirty` (Dhaka,
-stamped when the sweep ran) and `548e95d…-dirty` (Beijing, restamped when
-`beijing-post` re-ran stages 08–11 against the same records); making them clean
-requires re-running the sweeps, which was considered and declined.
+hash than `HEAD`. That is intended. Both cities currently read `ec5336c…-dirty`,
+stamped when `19_selection_stability.py` last wrote them, **not** when their sweeps
+ran; the sweeps themselves predate that by days. Making the hashes clean requires
+re-running the sweeps, which was considered and declined.
 
 Note the asymmetry: `save_results` restamps `git_commit` on **every** write, so any
 downstream stage that touches a city's `results.json` moves that city's hash forward
