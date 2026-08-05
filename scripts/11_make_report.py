@@ -36,6 +36,21 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
+def _fmt_p(p: float) -> str:
+    """Format a p-value without rounding a small one to zero.
+
+    Args:
+        p: Raw p-value.
+
+    Returns:
+        A display string; "<0.0001" rather than "0.0000".
+    """
+    value = float(p)
+    if value != value:  # NaN
+        return "—"
+    return "<0.0001" if value < 1e-4 else f"{value:.4f}"
+
+
 def _runs_frame(payload: dict) -> pd.DataFrame:
     """Flatten the run records into a table."""
     runs = payload.get("runs", [])
@@ -742,8 +757,10 @@ def main() -> int:
                         f"[{lo:+.4f}, {hi:+.4f}]"
                         for lo, hi in zip(tests["ci_low"], tests["ci_high"], strict=False)
                     ],
-                    "p": tests["p_wilcoxon"].round(4),
-                    "p (Holm)": tests["p_holm"].round(4),
+                    # Not .round(4): round(7e-06, 4) is 0.0 and prints "0.0000",
+                    # which is not a p-value -- no test returns zero probability.
+                    "p": [_fmt_p(v) for v in tests["p_wilcoxon"]],
+                    "p (Holm)": [_fmt_p(v) for v in tests["p_holm"]],
                 }
             )
             a(shown.to_markdown(index=False))

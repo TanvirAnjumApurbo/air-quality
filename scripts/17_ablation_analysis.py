@@ -74,6 +74,23 @@ def family_of(model: str) -> str:
     return "other"
 
 
+def _fmt_p(p: float) -> str:
+    """Format a p-value without rounding a small one to zero.
+
+    ``round(7e-06, 4)`` is ``0.0`` and prints as "0.0000", which is not a
+    p-value -- no test returns zero probability. Small values get a threshold.
+
+    Args:
+        p: Raw p-value.
+
+    Returns:
+        A display string.
+    """
+    if not np.isfinite(p):
+        return "—"
+    return "<0.0001" if p < 1e-4 else f"{p:.4f}"
+
+
 def paired_arm_gaps(frame: pd.DataFrame) -> pd.DataFrame:
     """Difference the two arms within each matched (coverage, injection seed).
 
@@ -431,8 +448,8 @@ def main() -> int:
                     f"[{lo:+.4f}, {hi:+.4f}]"
                     for lo, hi in zip(tests["ci_low"], tests["ci_high"], strict=False)
                 ],
-                "p (Wilcoxon)": tests["p_wilcoxon"].round(4),
-                "p (Holm)": tests["p_holm"].round(4),
+                "p (Wilcoxon)": tests["p_wilcoxon"].map(_fmt_p),
+                "p (Holm)": tests["p_holm"].map(_fmt_p),
             }
         )[["Family", "Pairs", "Mean gap", "95% CI", "p (Wilcoxon)", "p (Holm)"]]
         write_table(
