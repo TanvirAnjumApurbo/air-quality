@@ -82,6 +82,7 @@ Targets:
   green       Phase 5: complexity, latency, energy, CO2e
   eval        Phase 5: stratified eval, skill scores, Diebold-Mariano
   figures     Phase 6: all figures (png + pdf, 300 dpi)
+  stability   Phase 6: tier-3 selection stability (no retraining)
   report      Phase 6: RESULTS.md + abstract_facts.json
   all         Everything above, in order
   beijing     Cross-city: whole pipeline again on the Beijing record
@@ -116,6 +117,7 @@ Targets:
     'green'     { Invoke-Step '08_green_measure.py'   $common }
     'eval'      { Invoke-Step '09_evaluate.py'        $common }
     'figures'   { Invoke-Step '10_make_figures.py'    $common }
+    'stability' { Invoke-Step '19_selection_stability.py' $common }
     'report'    { Invoke-Step '11_make_report.py'     $common }
     'beijing' {
         # Reuses the Beijing frame already downloaded by the 'data' target; every
@@ -129,6 +131,7 @@ Targets:
         Invoke-Step '08_green_measure.py'    $commonB
         Invoke-Step '09_evaluate.py'         $commonB
         Invoke-Step '10_make_figures.py'     $commonB
+        Invoke-Step '19_selection_stability.py' $commonB
         Invoke-Step '11_make_report.py'      $commonB
     }
     'beijing-post' {
@@ -140,6 +143,7 @@ Targets:
         Invoke-Step '08_green_measure.py'    $commonB
         Invoke-Step '09_evaluate.py'         $commonB
         Invoke-Step '10_make_figures.py'     $commonB
+        Invoke-Step '19_selection_stability.py' $commonB
         Invoke-Step '11_make_report.py'      $commonB
     }
     'donor-configs' {
@@ -212,7 +216,7 @@ Targets:
         & $Py -m ruff check --fix (Join-Path $Root 'src') (Join-Path $Root 'scripts') (Join-Path $Root 'tests')
     }
     'all' {
-        foreach ($t in @('check','data','audit','features','test','baselines','deep','classify','green','eval','figures','report')) {
+        foreach ($t in @('check','data','audit','features','test','baselines','deep','classify','green','eval','figures','stability','report')) {
             & $PSCommandPath $t
             if ($LASTEXITCODE -ne 0) { throw "target '$t' failed" }
         }

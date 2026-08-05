@@ -375,6 +375,110 @@ def main() -> int:
                 a(f"- `{e['name']}` — {e['params']:,} parameters")
         a("")
 
+    # ------------------------------------------------------ selection stability
+    # The selection rule is defensible; the question is whether the split it
+    # runs on can actually separate the candidates. Reporting the winner without
+    # reporting how often the winner wins would overstate the architecture claim
+    # by exactly the amount this subsection measures.
+    stability = payload.get("selection_stability", [])
+    if stability:
+        stab = pd.DataFrame(stability)
+        a("### Is the selected architecture stable?")
+        a("")
+        a("Tier 3 is ranked by mean validation loss across seeds, never by test")
+        a("error. This validation split is thin, so the rule was re-run on single")
+        a("seeds, on leave-one-seed-out subsets, and on 2,000 resamples of the")
+        a("seeds, to see how often it returns the same winner.")
+        a("")
+        stab_show = pd.DataFrame(
+            {
+                "Horizon": [f"{int(h)} h" for h in stab["horizon_h"]],
+                "Selected": stab["selected"],
+                "Single seed": [f"{v:.0%}" for v in stab["single_seed_agreement"]],
+                "Leave-one-out": [f"{v:.0%}" for v in stab["loso_agreement"]],
+                "Seed bootstrap": [f"{v:.0%}" for v in stab["bootstrap_selection_frequency"]],
+                "Distinct winners": stab["n_distinct_winners"],
+                "ρ(val, test)": [f"{v:+.2f}" for v in stab["spearman_val_test"]],
+                "Regret (RMSE)": [f"{v:+.2f}" for v in stab["regret_rmse"]],
+            }
+        )
+        # disable_numparse: tabulate otherwise re-parses these pre-formatted
+        # strings as numbers and drops the signs and trailing zeros, so a column
+        # of "+0.40" values prints as "0.4".
+        a(stab_show.to_markdown(index=False, disable_numparse=True))
+        a("")
+        stab_head = stab[stab["horizon_h"] == headline]
+        if not stab_head.empty:
+            s = stab_head.iloc[0]
+            a(
+                f"**The identity of the winner is not stable.** At {headline} h the "
+                f"reported architecture wins {s['bootstrap_selection_frequency']:.0%} of "
+                f"seed resamples, {int(s['n_distinct_winners'])} different candidates win "
+                f"at least once, and {int(s['n_indistinguishable'])} of "
+                f"{int(s['n_candidates'])} sit inside the winner's own between-seed spread."
+            )
+            a("")
+            # Whether the instability matters depends on two numbers, and both
+            # differ by city: how much the choice costs, and whether validation
+            # loss tracks test error at all. Asserting "bounded and informative"
+            # would be false on a record where rho goes negative, so both halves
+            # are derived.
+            rho = float(s["spearman_val_test"])
+            small_regret = abs(float(s["regret_pct"])) < 1.0
+            a(
+                (
+                    "**The consequence is bounded.** "
+                    if small_regret
+                    else "**The consequence is not negligible.** "
+                )
+                + f"Selecting on validation rather than on test costs "
+                f"{s['regret_rmse']:+.2f} RMSE at this horizon "
+                f"({s['regret_pct']:+.2f}% of the best available)"
+                + (
+                    ", because the candidates it cannot separate are near-ties — the "
+                    "same conclusion the Model Confidence Set reaches in §1."
+                    if small_regret
+                    else ", which is larger than the spread this section can dismiss as a tie."
+                )
+            )
+            a("")
+            if rho >= 0.4:
+                a(
+                    f"Validation loss remains informative here (Spearman ρ = {rho:+.2f} "
+                    "against the test ranking); it is simply not sharp enough to "
+                    "discriminate within the leading band."
+                )
+            elif rho > 0.0:
+                a(
+                    f"Validation loss is only weakly informative here (Spearman ρ = "
+                    f"{rho:+.2f} against the test ranking), so the selection carries "
+                    "correspondingly little evidence about which candidate is best."
+                )
+            else:
+                a(
+                    f"**Validation loss does not track test error at this horizon** "
+                    f"(Spearman ρ = {rho:+.2f}). The selection is therefore not "
+                    "evidence that the reported architecture is the best one, and no "
+                    "architecture-level claim should be made from this record at this "
+                    "horizon. It is the same reading the Model Confidence Set gives in "
+                    "§1, arrived at independently."
+                )
+            a("")
+            a(
+                "Read `gru`/`lstm` results as *a* member of that band rather than as the "
+                "uniquely correct architecture. The paper's claims rest on tier-level "
+                "comparisons, which this does not disturb; a claim that one recurrent "
+                "configuration beats another would not survive it."
+            )
+            a("")
+        worst = stab.loc[stab["regret_rmse"].idxmax()]
+        if int(worst["horizon_h"]) != headline:
+            a(
+                f"Largest regret across horizons: {worst['regret_rmse']:+.2f} RMSE at "
+                f"{int(worst['horizon_h'])} h ({worst['regret_pct']:+.2f}%)."
+            )
+            a("")
+
     # ---------------------------------------------------------------- stratified
     a("## 4. Stratified performance")
     a("")

@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\caption{Stability of the tier-3 selection rule, which ranks candidates by mean validation loss across seeds. 'Seeds agreeing' is the share of single seeds that would pick the reported winner alone; 'LOSO' drops one seed at a time; 'bootstrap win rate' resamples the seeds and re-runs the selection. 'Regret' is the test RMSE of the selected candidate minus the best test RMSE in the pool -- the cost of selecting on this validation split, computed after selection and never used to make it. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:selection_stability}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Horizon (h) & Selected & Seeds agreeing & LOSO agreeing & Bootstrap win rate & Distinct winners & Margin / seed SD & Spearman val-test & Regret (RMSE) \\
+\midrule
+1 & gru\_h64\_l2\_w24 & 80\% & 100\% & 78\% & 2 & 0.27 & +0.25 & +0.76 \\
+3 & gru\_h64\_l1\_w24 & 40\% & 40\% & 49\% & 6 & 0.02 & +0.62 & +0.62 \\
+6 & gru\_h64\_l1\_w24 & 20\% & 60\% & 33\% & 5 & 0.07 & +0.71 & +0.08 \\
+12 & gru\_h64\_l1\_w168 & 0\% & 60\% & 47\% & 7 & 0.13 & +0.40 & +1.57 \\
+24 & gru\_h64\_l1\_w24 & 0\% & 60\% & 45\% & 10 & 0.07 & +0.54 & +0.05 \\
+\bottomrule
+\end{tabular}
+\end{table}

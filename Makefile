@@ -26,7 +26,7 @@ CONFIG := config.yaml
 CONFIG_B := config_beijing.yaml
 
 .PHONY: help env check discover data audit features test baselines deep \
-        classify green eval figures report all lint fmt clean clean-results \
+        classify green eval figures stability report all lint fmt clean clean-results \
         beijing beijing-post cross-city tune ablation donor-configs donors \
         replication donor-list everything
 
@@ -96,10 +96,13 @@ eval:  ## Phase 5 stratified evaluation + significance tests
 figures:  ## Phase 6 figures
 	$(PY) $(SCRIPTS)/10_make_figures.py --config $(CONFIG)
 
+stability:  ## Phase 6 tier-3 selection stability (reads existing runs, no refit)
+	$(PY) $(SCRIPTS)/19_selection_stability.py --config $(CONFIG)
+
 report:  ## Phase 6 RESULTS.md + abstract_facts.json
 	$(PY) $(SCRIPTS)/11_make_report.py --config $(CONFIG)
 
-all: check data audit features test baselines deep classify green eval figures report  ## Full pipeline
+all: check data audit features test baselines deep classify green eval figures stability report  ## Full pipeline
 
 # ---- cross-city generalisation check ---------------------------------------
 # Reuses the Beijing frame already downloaded by `make data`; every stage after
@@ -114,6 +117,7 @@ beijing:  ## Cross-city: run the whole pipeline again on the Beijing record
 	$(PY) $(SCRIPTS)/08_green_measure.py   --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/19_selection_stability.py --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/11_make_report.py     --config $(CONFIG_B)
 
 # Needed on its own because a resumed sweep updates results_beijing.json but
@@ -123,6 +127,7 @@ beijing-post:  ## Beijing stages 08-11 only, after a resumed sweep
 	$(PY) $(SCRIPTS)/08_green_measure.py   --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/09_evaluate.py        --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/10_make_figures.py    --config $(CONFIG_B)
+	$(PY) $(SCRIPTS)/19_selection_stability.py --config $(CONFIG_B)
 	$(PY) $(SCRIPTS)/11_make_report.py     --config $(CONFIG_B)
 
 # Replication donors for the gap-injection experiment: further stations of the

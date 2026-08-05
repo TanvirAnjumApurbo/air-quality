@@ -1000,3 +1000,48 @@ def test_make_shim_does_not_declare_a_powershell_automatic_variable():
         f"make.ps1 declares parameter(s) {offenders} that shadow PowerShell "
         "automatic variables; they bind but read back empty"
     )
+
+
+@pytest.mark.leakage
+def test_selection_stability_selector_never_sees_a_test_metric():
+    """The tier-3 selector must rank on validation loss alone.
+
+    ``19_selection_stability.py`` reports selection *regret*, which needs test
+    RMSE, next to the selection rule itself. That adjacency is where a later
+    edit would quietly start ranking on test error -- the exact circularity
+    ``_best_per_horizon`` is built to avoid. So the selector is handed a frame
+    whose test column is poisoned to invert the ranking: if the choice moves,
+    test error has entered the selection path.
+    """
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "scripts" / "19_selection_stability.py"
+    spec = importlib.util.spec_from_file_location("_sel_stability", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    frame = pd.DataFrame(
+        {
+            "candidate": ["good", "good", "bad", "bad"],
+            "seed": [1, 2, 1, 2],
+            "val_loss": [0.10, 0.12, 0.30, 0.32],
+            "test_rmse": [99.0, 99.0, 1.0, 1.0],  # inverted on purpose
+        }
+    )
+    assert module._select(frame, [1, 2]) == "good"
+    assert module._select(frame, [1]) == "good"
+
+
+@pytest.mark.leakage
+def test_control_selector_would_flip_if_it_ranked_on_test():
+    """Negative control: the poisoned frame really does invert under test ranking."""
+    frame = pd.DataFrame(
+        {
+            "candidate": ["good", "good", "bad", "bad"],
+            "val_loss": [0.10, 0.12, 0.30, 0.32],
+            "test_rmse": [99.0, 99.0, 1.0, 1.0],
+        }
+    )
+    assert frame.groupby("candidate")["val_loss"].mean().idxmin() == "good"
+    assert frame.groupby("candidate")["test_rmse"].mean().idxmin() == "bad"

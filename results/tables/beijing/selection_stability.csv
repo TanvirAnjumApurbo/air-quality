@@ -1,0 +1,6 @@
+Horizon (h),Selected,Seeds agreeing,LOSO agreeing,Bootstrap win rate,Distinct winners,Margin / seed SD,Spearman val-test,Regret (RMSE)
+1,lstm_h64_l1_w48,0%,0%,20%,9,0.02,+0.43,+0.10
+3,lstm_h64_l1_w168,40%,80%,68%,5,0.25,+0.81,+0.39
+6,lstm_h64_l1_w168,0%,20%,32%,7,0.04,+0.58,+0.43
+12,lstm_h64_l1_w168,40%,40%,51%,9,0.15,+0.29,+4.43
+24,gru_h32_l1_w24,20%,80%,62%,7,0.22,-0.25,+6.63

@@ -108,6 +108,7 @@ Limitations over the top of the study's central section.
 08..09 (green/eval)-> results.json green/significance/stratified
 10, 11             -> results/figures, results/tables, reports/
 13_cross_city      -> results.json cross_city{}      (must run before the final report)
+19_selection_stab  -> results.json selection_stability[]  (before 11; §3 renders it)
 ```
 
 `features.parquet` is the handoff. It carries every predictor, a `split` column, and

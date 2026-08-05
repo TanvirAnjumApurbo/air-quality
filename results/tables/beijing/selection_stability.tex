@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\caption{Stability of the tier-3 selection rule, which ranks candidates by mean validation loss across seeds. 'Seeds agreeing' is the share of single seeds that would pick the reported winner alone; 'LOSO' drops one seed at a time; 'bootstrap win rate' resamples the seeds and re-runs the selection. 'Regret' is the test RMSE of the selected candidate minus the best test RMSE in the pool -- the cost of selecting on this validation split, computed after selection and never used to make it. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:selection_stability}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Horizon (h) & Selected & Seeds agreeing & LOSO agreeing & Bootstrap win rate & Distinct winners & Margin / seed SD & Spearman val-test & Regret (RMSE) \\
+\midrule
+1 & lstm\_h64\_l1\_w48 & 0\% & 0\% & 20\% & 9 & 0.02 & +0.43 & +0.10 \\
+3 & lstm\_h64\_l1\_w168 & 40\% & 80\% & 68\% & 5 & 0.25 & +0.81 & +0.39 \\
+6 & lstm\_h64\_l1\_w168 & 0\% & 20\% & 32\% & 7 & 0.04 & +0.58 & +0.43 \\
+12 & lstm\_h64\_l1\_w168 & 40\% & 40\% & 51\% & 9 & 0.15 & +0.29 & +4.43 \\
+24 & gru\_h32\_l1\_w24 & 20\% & 80\% & 62\% & 7 & 0.22 & -0.25 & +6.63 \\
+\bottomrule
+\end{tabular}
+\end{table}
