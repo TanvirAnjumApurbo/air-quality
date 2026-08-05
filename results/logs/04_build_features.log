@@ -234,3 +234,37 @@
 18:01:02 | INFO    | 04_build_features | scaler fitted on 55451 training rows over 102 predictors
 18:01:03 | INFO    | 04_build_features | wrote F:\BUP\data\processed\features.parquet (79216 rows, 169 cols)
 18:01:03 | INFO    | 04_build_features | wrote resolved boundaries back into config.yaml
+19:04:34 | INFO    | 04_build_features | loaded PM2.5 (35064, 1) and meteorology (35064, 7)
+19:04:34 | INFO    | 04_build_features | contiguity: 44 runs after 3h ffill, longest 4141 h
+19:04:34 | INFO    | 04_build_features | h=  1:  28376 valid rows  (rejected: no-run 424, short-history 5953, target-past-run-end 32, target-imputed 279)
+19:04:34 | INFO    | 04_build_features | h=  3:  28314 valid rows  (rejected: no-run 424, short-history 5953, target-past-run-end 96, target-imputed 277)
+19:04:34 | INFO    | 04_build_features | h=  6:  28220 valid rows  (rejected: no-run 424, short-history 5953, target-past-run-end 192, target-imputed 275)
+19:04:34 | INFO    | 04_build_features | h= 12:  28029 valid rows  (rejected: no-run 424, short-history 5953, target-past-run-end 384, target-imputed 274)
+19:04:34 | INFO    | 04_build_features | h= 24:  27655 valid rows  (rejected: no-run 424, short-history 5953, target-past-run-end 766, target-imputed 266)
+19:04:34 | INFO    | 04_build_features | built 96 predictor columns (max backward dependency 168 h)
+19:04:34 | INFO    | 04_build_features | split: train 2013-02-28 to 2015-12-18, val to 2016-07-24, test to 2017-02-28 (chronological, no shuffling)
+19:04:34 | INFO    | 04_build_features | h=  1: boundary purge removed 158 rows (28376 -> 28218)
+19:04:34 | INFO    | 04_build_features | h=  3: boundary purge removed 158 rows (28314 -> 28156)
+19:04:34 | INFO    | 04_build_features | h=  6: boundary purge removed 158 rows (28220 -> 28062)
+19:04:34 | INFO    | 04_build_features | h= 12: boundary purge removed 158 rows (28029 -> 27871)
+19:04:34 | INFO    | 04_build_features | h= 24: boundary purge removed 160 rows (27655 -> 27495)
+19:04:34 | INFO    | 04_build_features | scaler fitted on 24545 training rows over 96 predictors
+19:04:34 | INFO    | 04_build_features | wrote F:\BUP\data\processed\donors\dingling\features.parquet (35064 rows, 158 cols)
+19:04:34 | INFO    | 04_build_features | wrote resolved boundaries back into F:\BUP\config\donors\dingling.yaml
+22:05:33 | INFO    | 04_build_features | loaded PM2.5 (35064, 1) and meteorology (35064, 7)
+22:05:33 | INFO    | 04_build_features | contiguity: 40 runs after 3h ffill, longest 3299 h
+22:05:33 | INFO    | 04_build_features | h=  1:  28910 valid rows  (rejected: no-run 509, short-history 5314, target-past-run-end 26, target-imputed 305)
+22:05:33 | INFO    | 04_build_features | h=  3:  28858 valid rows  (rejected: no-run 509, short-history 5314, target-past-run-end 78, target-imputed 305)
+22:05:33 | INFO    | 04_build_features | h=  6:  28780 valid rows  (rejected: no-run 509, short-history 5314, target-past-run-end 156, target-imputed 305)
+22:05:33 | INFO    | 04_build_features | h= 12:  28625 valid rows  (rejected: no-run 509, short-history 5314, target-past-run-end 312, target-imputed 304)
+22:05:33 | INFO    | 04_build_features | h= 24:  28330 valid rows  (rejected: no-run 509, short-history 5314, target-past-run-end 614, target-imputed 297)
+22:05:33 | INFO    | 04_build_features | built 96 predictor columns (max backward dependency 168 h)
+22:05:33 | INFO    | 04_build_features | split: train 2013-02-28 to 2015-12-18, val to 2016-07-24, test to 2017-02-28 (chronological, no shuffling)
+22:05:34 | INFO    | 04_build_features | h=  1: boundary purge removed 168 rows (28910 -> 28742)
+22:05:34 | INFO    | 04_build_features | h=  3: boundary purge removed 170 rows (28858 -> 28688)
+22:05:34 | INFO    | 04_build_features | h=  6: boundary purge removed 173 rows (28780 -> 28607)
+22:05:34 | INFO    | 04_build_features | h= 12: boundary purge removed 179 rows (28625 -> 28446)
+22:05:34 | INFO    | 04_build_features | h= 24: boundary purge removed 190 rows (28330 -> 28140)
+22:05:34 | INFO    | 04_build_features | scaler fitted on 24545 training rows over 96 predictors
+22:05:34 | INFO    | 04_build_features | wrote F:\BUP\data\processed\donors\dongsi\features.parquet (35064 rows, 158 cols)
+22:05:34 | INFO    | 04_build_features | wrote resolved boundaries back into F:\BUP\config\donors\dongsi.yaml

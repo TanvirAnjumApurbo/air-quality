@@ -426,3 +426,21 @@
 18:00:57 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\uci_beijing_hourly.parquet (35064 rows, 12 cols)
 18:00:57 | INFO    | 02_fetch_data | ======================================================================
 18:00:57 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\fetch_summary.json
+19:04:29 | INFO    | 02_fetch_data | disk check passed: 28.1 GB free
+19:04:29 | INFO    | 02_fetch_data | ======================================================================
+19:04:29 | INFO    | 02_fetch_data | UCI Beijing Multi-Site (fallback + cross-city check)
+19:04:29 | INFO    | 02_fetch_data | ======================================================================
+19:04:29 | INFO    | 02_fetch_data | UCI Beijing: cached at F:\BUP\data\raw\uci\beijing_multisite_raw.parquet
+19:04:29 | INFO    | 02_fetch_data | UCI Beijing station Dingling: 35064 hourly rows, 2013-02-28 16:00:00+00:00 to 2017-02-28 15:00:00+00:00
+19:04:29 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\donors\dingling\uci_beijing_hourly.parquet (35064 rows, 12 cols)
+19:04:29 | INFO    | 02_fetch_data | ======================================================================
+19:04:29 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\donors\dingling\fetch_summary.json
+22:05:29 | INFO    | 02_fetch_data | disk check passed: 27.8 GB free
+22:05:29 | INFO    | 02_fetch_data | ======================================================================
+22:05:29 | INFO    | 02_fetch_data | UCI Beijing Multi-Site (fallback + cross-city check)
+22:05:29 | INFO    | 02_fetch_data | ======================================================================
+22:05:29 | INFO    | 02_fetch_data | UCI Beijing: cached at F:\BUP\data\raw\uci\beijing_multisite_raw.parquet
+22:05:29 | INFO    | 02_fetch_data | UCI Beijing station Dongsi: 35064 hourly rows, 2013-02-28 16:00:00+00:00 to 2017-02-28 15:00:00+00:00
+22:05:29 | INFO    | 02_fetch_data | wrote F:\BUP\data\interim\donors\dongsi\uci_beijing_hourly.parquet (35064 rows, 12 cols)
+22:05:29 | INFO    | 02_fetch_data | ======================================================================
+22:05:29 | INFO    | 02_fetch_data | wrote fetch summary to F:\BUP\data\interim\donors\dongsi\fetch_summary.json

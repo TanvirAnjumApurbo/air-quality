@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\caption{Paired arm gap (fragmented minus contiguous skill) by model family and donor record, each from its own matched (coverage level, injection seed) pairs. An asterisk marks significance under Holm within that donor. 'Replicates' requires the same sign and Holm significance on every donor, so a family significant on one record and null on another is reported as not replicating. All donors are stations of one archive: this is a station-robustness check, not a multi-city panel. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:donor_replication}
+\begin{tabular}{lrrrr}
+\toprule
+Family & Wanliu & Dingling & Dongsi & Replicates \\
+\midrule
+sequence & -0.0394* & -0.0200* & -0.0273* & yes \\
+trees & -0.0263* & -0.0120 & -0.0179* & no \\
+linear & -0.0016 & -0.0298* & -0.0205* & no \\
+naive & -0.0358* & -0.0024 & -0.0211* & no \\
+\bottomrule
+\end{tabular}
+\end{table}

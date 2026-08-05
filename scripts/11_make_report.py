@@ -901,17 +901,48 @@ def main() -> int:
                     ]
                     a(rep_shown.to_markdown(index=False))
                     a("")
-                    a("`*` marks Holm significance within that donor. **Replicates** requires")
-                    a(str(rep.get("replication_rule", "")).lower())
+                    a("`*` marks Holm significance within that donor. **Replicates** is the")
+                    a("strict rule: " + str(rep.get("replication_rule", "")))
                     a("")
 
                     rep_yes = [f for f in rep_fam_order if bool(rep_by_family.loc[f, "replicates"])]
                     rep_seq_ok = "sequence" in rep_yes
                     rep_others = [f for f in rep_yes if f not in ("sequence", "linear")]
+                    # Whether every family's point estimate is negative on every
+                    # donor decides how strong a claim the table licenses. If it
+                    # is, fragmentation is not costless for anything and the
+                    # sequence result is about CONSISTENCY, not exclusivity --
+                    # stating otherwise would overclaim off a significance
+                    # threshold rather than off an effect.
+                    rep_all_negative = all(
+                        float(rep_by_family.loc[f, "max_gap"]) < 0.0 for f in rep_fam_order
+                    )
+                    rep_seq_mean = float(rep_by_family.loc["sequence", "mean_gap_across_donors"])
+                    rep_seq_largest = all(
+                        rep_seq_mean <= float(rep_by_family.loc[f, "mean_gap_across_donors"])
+                        for f in rep_fam_order
+                    )
                     if rep_seq_ok and not rep_others:
-                        a("The sequence family's gap is the only one that survives on every")
-                        a("donor. On this evidence fragmentation is costly specifically to the")
-                        a("model class that requires contiguous windows.")
+                        a("The sequence family's gap is the only one Holm-significant on every")
+                        a("donor.")
+                        if rep_all_negative:
+                            a("")
+                            a(
+                                "Every family's point estimate is negative on every donor, so "
+                                "this is not a finding that fragmentation costs the others "
+                                "nothing. What separates the sequence tier is that its gap is "
+                                "the one that appears *reliably* rather than on some records "
+                                "and not others"
+                                + (
+                                    f", and it is the largest mean gap across donors "
+                                    f"({rep_seq_mean:+.4f})."
+                                    if rep_seq_largest
+                                    else f" (mean across donors {rep_seq_mean:+.4f})."
+                                )
+                            )
+                        else:
+                            a("On this evidence fragmentation is costly specifically to the")
+                            a("model class that requires contiguous windows.")
                     elif rep_seq_ok and rep_others:
                         a(
                             "The sequence family replicates, but so does "
@@ -924,6 +955,50 @@ def main() -> int:
                         a("**The sequence family's gap does not replicate across donors.** The")
                         a("effect seen on the primary donor is not established as a property of")
                         a("fragmentation, and no claim in this report should rest on it.")
+
+                    # The naive row at the most severe level is the internal
+                    # control, and on one donor alone it is the reading that
+                    # would sink the specificity claim: models that never touch
+                    # the training record should not care how that record is
+                    # arranged. Reporting whether that collapse reproduces is
+                    # the whole reason a second and third donor were run.
+                    rep_levels = pd.DataFrame(rep.get("per_level_gaps", []))
+                    if not rep_levels.empty and "naive" in set(rep_levels["family"]):
+                        rep_worst = float(rep_levels["target_coverage"].min())
+                        rep_naive = rep_levels[
+                            (rep_levels["family"] == "naive")
+                            & (rep_levels["target_coverage"] == rep_worst)
+                        ].set_index("donor")["arm_gap"]
+                        rep_spread = ", ".join(
+                            f"{d} {float(rep_naive[d]):+.4f}"
+                            for d in rep_donor_names
+                            if d in rep_naive.index
+                        )
+                        a("")
+                        a(
+                            f"**The naive control at the severest level ({rep_worst * 100:.0f}% "
+                            f"coverage):** {rep_spread}. "
+                        )
+                        if float(rep_naive.max()) - float(rep_naive.min()) > abs(
+                            float(rep_naive.mean())
+                        ):
+                            a(
+                                "These disagree by more than their own average, so the naive "
+                                "collapse visible on the largest-gap donor is a property of that "
+                                "record rather than of fragmentation. Read on one donor alone it "
+                                "would have argued that fragmentation degrades anything estimated "
+                                "from the record, windowed or not; it does not survive the other "
+                                "donors, and that is the specific thing a second and third record "
+                                "were run to test."
+                            )
+                        else:
+                            a(
+                                "These agree in magnitude across donors, so severe fragmentation "
+                                "penalises even models that never read the training record. The "
+                                "control is therefore not clean at this level, and the section's "
+                                "claim must be read as relative across families rather than as "
+                                "an effect absent from the baselines."
+                            )
                     a("")
                     if rep.get("incomplete_donors"):
                         a(

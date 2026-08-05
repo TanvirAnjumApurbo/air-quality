@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\caption{Paired arm gap by model family. Each pair is one (coverage level, injection seed): both arms remove the same number of observed hours and differ only in arrangement, so the within-pair difference is the effect of fragmentation with volume held constant. The representative model per family is fixed on the undegraded record, never re-chosen per arm. Wilcoxon signed-rank, Holm-corrected across families. The naive family is the control: it never reads the training record, so its gap should not differ from zero. Beijing Dongsi (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:ablation_paired_test}
+\begin{tabular}{lrrrrr}
+\toprule
+Family & Pairs & Mean gap & 95\% CI & p (Wilcoxon) & p (Holm) \\
+\midrule
+sequence & 50 & -0.027 & [-0.0412, -0.0139] & 0.0005 & 0.0015 \\
+naive & 50 & -0.021 & [-0.0331, -0.0106] & 0.0003 & 0.0014 \\
+linear & 50 & -0.021 & [-0.0322, -0.0092] & 0.0011 & 0.0022 \\
+trees & 50 & -0.018 & [-0.0326, -0.0026] & 0.0045 & 0.0045 \\
+\bottomrule
+\end{tabular}
+\end{table}

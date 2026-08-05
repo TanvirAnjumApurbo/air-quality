@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\caption{Tier 1 and Tier 2 at the headline 24-hour horizon. RMSE intervals are moving-block bootstrap (block 24 h), which respects the serial correlation an i.i.d. bootstrap would ignore. Beijing Dingling (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:tier1_tier2_h24}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & RMSE [95\textbackslash\{\}\% CI] & MAE & R2 & sMAPE & Skill \\
+\midrule
+persistence & 79.93 [68.4, 93.1] & 52.660 & -0.243 & 89.240 & 0.000 \\
+seasonal\_naive & 79.93 [68.4, 93.1] & 52.660 & -0.243 & 89.240 & 0.000 \\
+climatology & 76.77 [65.4, 90.7] & 58.270 & -0.147 & 95.000 & 0.040 \\
+sarimax & 66.17 [56.4, 77.3] & 48.390 & 0.153 & 86.380 & 0.172 \\
+ridge & 69.55 [56.2, 85.1] & 43.060 & 0.059 & 79.840 & 0.130 \\
+random\_forest & 70.19 [55.7, 87.8] & 43.430 & 0.041 & 80.020 & 0.122 \\
+xgboost & 71.98 [57.4, 89.1] & 44.130 & -0.008 & 81.060 & 0.099 \\
+lightgbm & 72.46 [57.5, 90.2] & 44.120 & -0.022 & 81.160 & 0.093 \\
+\bottomrule
+\end{tabular}
+\end{table}

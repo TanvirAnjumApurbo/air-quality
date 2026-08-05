@@ -1,0 +1,565 @@
+{
+  "donors": [
+    "Wanliu",
+    "Dingling",
+    "Dongsi"
+  ],
+  "incomplete_donors": [],
+  "grids": [
+    "ablation_gap_injection.json",
+    "ablation_gap_injection_dingling.json",
+    "ablation_gap_injection_dongsi.json"
+  ],
+  "per_donor_tests": [
+    {
+      "donor": "Wanliu",
+      "family": "sequence",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.03942791812469932,
+      "median_arm_gap": -0.030210307088299984,
+      "ci_low": -0.05647977084139017,
+      "ci_high": -0.023628805420261117,
+      "p_wilcoxon": 6.725303951071737e-06,
+      "p_holm": 2.690121580428695e-05,
+      "significant_holm": true
+    },
+    {
+      "donor": "Wanliu",
+      "family": "naive",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.035762489295106184,
+      "median_arm_gap": -0.00916445855721254,
+      "ci_low": -0.06085982243927048,
+      "ci_high": -0.014009673574890934,
+      "p_wilcoxon": 0.004316904154682888,
+      "p_holm": 0.008633808309365776,
+      "significant_holm": true
+    },
+    {
+      "donor": "Wanliu",
+      "family": "trees",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.02630838776620914,
+      "median_arm_gap": -0.03200688217997222,
+      "ci_low": -0.03926519756318954,
+      "ci_high": -0.012544000018695224,
+      "p_wilcoxon": 0.00010381446904439429,
+      "p_holm": 0.00031144340713318286,
+      "significant_holm": true
+    },
+    {
+      "donor": "Wanliu",
+      "family": "linear",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.0015553228353569915,
+      "median_arm_gap": 0.0020019981746998705,
+      "ci_low": -0.008106281052064046,
+      "ci_high": 0.00468891476837844,
+      "p_wilcoxon": 0.9542249738357711,
+      "p_holm": 0.9542249738357711,
+      "significant_holm": false
+    },
+    {
+      "donor": "Dingling",
+      "family": "linear",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.029824228860385417,
+      "median_arm_gap": -0.022729864294139923,
+      "ci_low": -0.04265607089635767,
+      "ci_high": -0.018232538664688103,
+      "p_wilcoxon": 4.788532343980023e-06,
+      "p_holm": 1.9154129375920093e-05,
+      "significant_holm": true
+    },
+    {
+      "donor": "Dingling",
+      "family": "sequence",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.019959026364370816,
+      "median_arm_gap": -0.01804079953115162,
+      "ci_low": -0.02998769618411165,
+      "ci_high": -0.010784621572717366,
+      "p_wilcoxon": 0.00010867611974241242,
+      "p_holm": 0.0003260283592272373,
+      "significant_holm": true
+    },
+    {
+      "donor": "Dingling",
+      "family": "trees",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.011962806205875203,
+      "median_arm_gap": -0.005756274554258589,
+      "ci_low": -0.020505088315997788,
+      "ci_high": -0.0039723100641661895,
+      "p_wilcoxon": 0.02898427633581413,
+      "p_holm": 0.05796855267162826,
+      "significant_holm": false
+    },
+    {
+      "donor": "Dingling",
+      "family": "naive",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.0024115170867100534,
+      "median_arm_gap": 0.01723968055382602,
+      "ci_low": -0.027292759155193188,
+      "ci_high": 0.021541711461044343,
+      "p_wilcoxon": 0.19095974436218555,
+      "p_holm": 0.19095974436218555,
+      "significant_holm": false
+    },
+    {
+      "donor": "Dongsi",
+      "family": "sequence",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.027285484723823444,
+      "median_arm_gap": -0.02447755051762871,
+      "ci_low": -0.04117713137934967,
+      "ci_high": -0.013910785061036688,
+      "p_wilcoxon": 0.0005086665780176247,
+      "p_holm": 0.0015259997340528741,
+      "significant_holm": true
+    },
+    {
+      "donor": "Dongsi",
+      "family": "naive",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.021076203183670084,
+      "median_arm_gap": -0.009323788391257803,
+      "ci_low": -0.03307877971276755,
+      "ci_high": -0.010562201516541678,
+      "p_wilcoxon": 0.0003378810943459598,
+      "p_holm": 0.0013515243773838392,
+      "significant_holm": true
+    },
+    {
+      "donor": "Dongsi",
+      "family": "linear",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.020530636125903123,
+      "median_arm_gap": -0.022603319997268688,
+      "ci_low": -0.03222818772060263,
+      "ci_high": -0.009223780251832892,
+      "p_wilcoxon": 0.0011051033525024678,
+      "p_holm": 0.0022102067050049357,
+      "significant_holm": true
+    },
+    {
+      "donor": "Dongsi",
+      "family": "trees",
+      "n_pairs": 50,
+      "mean_arm_gap": -0.01792823411503873,
+      "median_arm_gap": -0.0202205345439313,
+      "ci_low": -0.03261471377209504,
+      "ci_high": -0.002637719668824081,
+      "p_wilcoxon": 0.004459422606641894,
+      "p_holm": 0.004459422606641894,
+      "significant_holm": true
+    }
+  ],
+  "per_level_gaps": [
+    {
+      "family": "linear",
+      "target_coverage": 0.75,
+      "arm_gap": -0.004151671944512691,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.82,
+      "arm_gap": -0.001525773936038599,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.85,
+      "arm_gap": 0.001368496507002881,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.9,
+      "arm_gap": -0.0013683567057765078,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.95,
+      "arm_gap": -0.00209930809746004,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.75,
+      "arm_gap": -0.09576916302329744,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.82,
+      "arm_gap": -0.05143901291273527,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.85,
+      "arm_gap": -0.035394438082152715,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.9,
+      "arm_gap": 0.0032557763811900562,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.95,
+      "arm_gap": 0.0005343911614644314,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.75,
+      "arm_gap": -0.09458737428608437,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.82,
+      "arm_gap": -0.03737847330062015,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.85,
+      "arm_gap": -0.03039660326863531,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.9,
+      "arm_gap": -0.02721060318485501,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.95,
+      "arm_gap": -0.007566536583301744,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.75,
+      "arm_gap": -0.04203316859182386,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.82,
+      "arm_gap": -0.032356567182699005,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.85,
+      "arm_gap": -0.03019932734491858,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.9,
+      "arm_gap": -0.01888732800791316,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.95,
+      "arm_gap": -0.008065547703691079,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.75,
+      "arm_gap": -0.0941920121691191,
+      "donor": "Dingling"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.82,
+      "arm_gap": -0.017530482343717308,
+      "donor": "Dingling"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.85,
+      "arm_gap": -0.0181746311577905,
+      "donor": "Dingling"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.9,
+      "arm_gap": -0.01218144093516499,
+      "donor": "Dingling"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.95,
+      "arm_gap": -0.007042577696135167,
+      "donor": "Dingling"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.75,
+      "arm_gap": -0.0037884213053872573,
+      "donor": "Dingling"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.82,
+      "arm_gap": -0.021586853388558026,
+      "donor": "Dingling"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.85,
+      "arm_gap": -0.0025394652265557037,
+      "donor": "Dingling"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.9,
+      "arm_gap": 0.018516520921467362,
+      "donor": "Dingling"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.95,
+      "arm_gap": -0.0026593664345166412,
+      "donor": "Dingling"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.75,
+      "arm_gap": -0.046686157736593625,
+      "donor": "Dingling"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.82,
+      "arm_gap": -0.014205004009899599,
+      "donor": "Dingling"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.85,
+      "arm_gap": -0.013316062201172863,
+      "donor": "Dingling"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.9,
+      "arm_gap": -0.012522516760328872,
+      "donor": "Dingling"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.95,
+      "arm_gap": -0.013065391113859123,
+      "donor": "Dingling"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.75,
+      "arm_gap": -0.021519809184866068,
+      "donor": "Dingling"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.82,
+      "arm_gap": -0.010198670084350247,
+      "donor": "Dingling"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.85,
+      "arm_gap": -0.011006129011697863,
+      "donor": "Dingling"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.9,
+      "arm_gap": -0.009685562603174524,
+      "donor": "Dingling"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.95,
+      "arm_gap": -0.007403860145287311,
+      "donor": "Dingling"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.75,
+      "arm_gap": -0.02956804077899674,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.82,
+      "arm_gap": -0.010543213847904149,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.85,
+      "arm_gap": -0.03952404465344071,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.9,
+      "arm_gap": -0.007514919783963274,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "linear",
+      "target_coverage": 0.95,
+      "arm_gap": -0.015502961565210749,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.75,
+      "arm_gap": -0.03733581585067926,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.82,
+      "arm_gap": -0.028415381156383944,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.85,
+      "arm_gap": -0.018854823625864547,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.9,
+      "arm_gap": -0.013458667092753151,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "naive",
+      "target_coverage": 0.95,
+      "arm_gap": -0.007316328192669541,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.75,
+      "arm_gap": -0.04180254887652232,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.82,
+      "arm_gap": -0.0245791351248892,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.85,
+      "arm_gap": -0.03722774362492097,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.9,
+      "arm_gap": -0.01659321114812016,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "sequence",
+      "target_coverage": 0.95,
+      "arm_gap": -0.01622478484466458,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.75,
+      "arm_gap": 0.007071956815034475,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.82,
+      "arm_gap": -0.030795384682921888,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.85,
+      "arm_gap": -0.02825134884364393,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.9,
+      "arm_gap": -0.028522967753597684,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "trees",
+      "target_coverage": 0.95,
+      "arm_gap": -0.009143426110064612,
+      "donor": "Dongsi"
+    }
+  ],
+  "verdict": [
+    {
+      "family": "sequence",
+      "n_donors": 3,
+      "mean_gap_across_donors": -0.028890809737631196,
+      "min_gap": -0.03942791812469932,
+      "max_gap": -0.019959026364370816,
+      "n_donors_significant": 3,
+      "same_sign": true,
+      "replicates": true
+    },
+    {
+      "family": "trees",
+      "n_donors": 3,
+      "mean_gap_across_donors": -0.01873314269570769,
+      "min_gap": -0.02630838776620914,
+      "max_gap": -0.011962806205875203,
+      "n_donors_significant": 2,
+      "same_sign": true,
+      "replicates": false
+    },
+    {
+      "family": "linear",
+      "n_donors": 3,
+      "mean_gap_across_donors": -0.01730339594054851,
+      "min_gap": -0.029824228860385417,
+      "max_gap": -0.0015553228353569915,
+      "n_donors_significant": 2,
+      "same_sign": true,
+      "replicates": false
+    },
+    {
+      "family": "naive",
+      "n_donors": 3,
+      "mean_gap_across_donors": -0.019750069855162106,
+      "min_gap": -0.035762489295106184,
+      "max_gap": -0.0024115170867100534,
+      "n_donors_significant": 2,
+      "same_sign": true,
+      "replicates": false
+    }
+  ],
+  "replication_rule": "A family replicates only if its paired arm gap has the same sign on every donor and is significant under Holm on every donor.",
+  "scope_note": "All donors are stations of the UCI Beijing Multi-Site archive (id 501): one four-year window, one regional weather regime, spatially correlated PM2.5. This is a station-robustness check, not evidence of generality across records or cities."
+}
