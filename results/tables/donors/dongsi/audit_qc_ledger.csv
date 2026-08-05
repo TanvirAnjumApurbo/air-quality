@@ -1,0 +1,6 @@
+rule,removed,remaining,note
+raw records,0,34314,
+negative value,0,34314,
+exact zero (sensor fault),0,34314,
+above sanity cap 1000,0,34314,
+flatline run > 12,123,34191,(consecutive identical values = stuck sensor)

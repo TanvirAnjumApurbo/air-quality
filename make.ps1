@@ -81,6 +81,7 @@ Targets:
   tune        Choose the sequence training recipe on val loss, before 'deep'
   ablation    Gap-injection experiment + figure (needs 'beijing')
   donor-configs  Generate config/donors/*.yaml from donors.yaml
+  donor-list  Print the donor slugs parsed from donors.yaml
   donors      Replication donors: prep + gap injection for each (needs 'beijing')
   replication Cross-donor comparison only (needs 'ablation' and 'donors')
   everything  all + beijing + cross-city + ablation + report
@@ -135,6 +136,13 @@ Targets:
     'donor-configs' {
         Invoke-Step '14_make_donor_configs.py' $Rest
     }
+    'donor-list' {
+        # Exists because a foreach over an empty slug list is silent: the
+        # 'donors' target ran, skipped every donor, and reported success.
+        $slugs = @(Get-DonorSlugs)
+        if ($slugs.Count -eq 0) { throw "no donor slugs parsed from donors.yaml" }
+        Write-Host "$($slugs.Count) donor(s): $($slugs -join ', ')"
+    }
     'donors' {
         # Replication donors for the gap-injection experiment. Each is another
         # station of the SAME UCI archive, so nothing is downloaded again; only
@@ -144,7 +152,13 @@ Targets:
         # specs are fixed in the config, and only tier2 needs a donor-specific
         # fit for its best_params. That is what makes a donor cheap.
         Invoke-Step '14_make_donor_configs.py'
-        foreach ($slug in (Get-DonorSlugs)) {
+        # A foreach over an empty list is silent, so this target once ran to
+        # completion having trained nothing and reported success -- the failure
+        # only surfaced two steps later, when 18 found a single grid.
+        $slugs = @(Get-DonorSlugs)
+        if ($slugs.Count -eq 0) { throw "no donor slugs parsed from donors.yaml; nothing to run" }
+        Write-Host "donors to run: $($slugs -join ', ')" -ForegroundColor Green
+        foreach ($slug in $slugs) {
             $cfgD = Join-Path $Root "config/donors/$slug.yaml"
             $commonD = @('--config', $cfgD)
             Write-Host "===== donor: $slug =====" -ForegroundColor Green

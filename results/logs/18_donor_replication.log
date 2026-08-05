@@ -7,3 +7,5 @@
 14:50:36 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
 14:50:36 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
 14:50:37 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+16:10:50 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
+16:10:50 | ERROR   | 18_donor_replication | only 1 donor grid(s) usable; run scripts/16_gap_injection.py for the replication donors (see donors.yaml) before this script

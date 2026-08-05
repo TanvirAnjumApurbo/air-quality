@@ -28,7 +28,7 @@ CONFIG_B := config_beijing.yaml
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures report all lint fmt clean clean-results \
         beijing beijing-post cross-city tune ablation donor-configs donors \
-        replication everything
+        replication donor-list everything
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -134,7 +134,11 @@ DONORS := $(shell sed -n 's/^[[:space:]]*-[[:space:]]*slug:[[:space:]]*//p' dono
 donor-configs:  ## Generate config/donors/*.yaml from donors.yaml
 	$(PY) $(SCRIPTS)/14_make_donor_configs.py
 
-donors: donor-configs  ## Prep + gap injection for every replication donor
+donor-list:  ## Print the donor slugs parsed from donors.yaml
+	@test -n "$(DONORS)" || (echo "no donor slugs parsed from donors.yaml" && false)
+	@echo "donors: $(DONORS)"
+
+donors: donor-configs donor-list  ## Prep + gap injection for every replication donor
 	@for slug in $(DONORS); do \
 	  echo "===== donor: $$slug ====="; \
 	  $(PY) $(SCRIPTS)/02_fetch_data.py       --config config/donors/$$slug.yaml --skip openaq power; \
