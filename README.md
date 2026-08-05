@@ -2,23 +2,44 @@
 
 **A Lightweight Sequence Model on Fused OpenAQ and NASA POWER Data**
 
-Can a compact recurrent model (GRU/LSTM, ≤100k parameters) forecasting Dhaka
-PM2.5 at 1–24 hour horizons beat honest classical baselines when air-quality
-history is fused with meteorological drivers — and what is the
-accuracy-per-parameter / accuracy-per-gram-of-CO₂ tradeoff?
+Can a compact recurrent model (GRU/LSTM/DLinear/NLinear, ≤100k parameters)
+forecasting Dhaka PM2.5 at 1–24 hour horizons beat honest classical baselines when
+air-quality history is fused with meteorological drivers — and **does record
+fragmentation, rather than model class, decide which method wins?**
 
 **Contributions**
 
-1. A reproducible, Bangladesh-specific multi-horizon PM2.5 forecaster benchmarked
-   against the baselines air-quality papers usually omit — persistence,
-   seasonal-naïve, and climatology — with a **skill score vs persistence** as a
-   headline column.
-2. A green-AI efficiency analysis: accuracy vs parameter count vs *measured*
-   training energy vs estimated CO₂e, recomputed under Bangladesh's grid carbon
-   intensity.
+1. **A controlled gap-injection experiment** (§7 below; `RESULTS.md` §8), which is
+   the study's central claim. A near-complete record is degraded two ways that
+   remove an *identical* number of observed hours and differ only in arrangement,
+   so fragmentation is manipulated with data volume held constant. The sequence
+   tier loses −0.0394 skill to arrangement alone (50 matched pairs, Wilcoxon,
+   Holm p < 0.0001), and it is the only model family whose gap is significant on
+   **all three** donor records.
+2. **A corrected benchmark protocol.** Non-degenerate sequence inputs, modern
+   linear baselines (DLinear/NLinear, Zeng et al. 2023), block-bootstrap CIs,
+   Holm–Bonferroni across the full Diebold–Mariano matrix, and a Model Confidence
+   Set — so the paper states which models are *indistinguishable* from the best
+   rather than over-reading a rank order.
+3. **Multi-horizon forecasting benchmarked against the baselines air-quality papers
+   usually omit** — persistence, seasonal-naïve, climatology, SARIMAX — with a
+   skill score vs persistence as a headline column.
+4. **A cross-city rank-transfer check** (`RESULTS.md` §7) reporting that the ranking
+   does *not* transfer between Dhaka and Beijing (Spearman +0.20), together with the
+   evidence that the comparison city cannot support a ranking at all — its 95% Model
+   Confidence Set retains 9 of 9 candidates, persistence included.
 
-A secondary AQI-category classification task (next-day health advisory) is built
-from the same pipeline.
+A green-AI efficiency analysis (accuracy vs parameters vs estimated training CO₂e)
+and a secondary AQI-category classification task are built from the same pipeline
+and reported as subsections, not headline claims.
+
+**What the results currently say.** At 24 h the selected `gru_h64_l1` (16,193
+parameters) reaches RMSE 57.24 µg/m³ [52.38, 62.17] against random forest's 58.50,
+Diebold–Mariano p = 0.0123 (Holm-adjusted 0.037). The 95% Model Confidence Set
+nevertheless retains 5 of 9 candidates, so the sequence model and the tree
+ensembles are **not** separable on this record — the honest reading is a tier-level
+result, not an architecture-level one. See `reports/RESULTS.md`, which is generated
+and holds every number.
 
 ---
 
@@ -83,26 +104,46 @@ same targets:
 | 1 | `.\make.ps1 data` | `02_fetch_data.py` | OpenAQ + NASA POWER + UCI Beijing into `data/raw` |
 | 1 | `.\make.ps1 audit` | `03_data_audit.py` | `reports/DATA_AUDIT.md` — **hard gate before modelling** |
 | 2 | `.\make.ps1 features` | `04_build_features.py` | features + chronological splits |
-| 2 | `.\make.ps1 test` | `pytest tests` | leakage tests (must pass) |
+| 2 | `.\make.ps1 test` | `pytest tests` | 43 leakage + unit tests (must pass) |
 | 3 | `.\make.ps1 baselines` | `05_run_baselines.py` | Tier 1 baselines + Tier 2 classical ML |
-| 4 | `.\make.ps1 deep` | `06_train_sequence.py` | Tier 3 GRU/LSTM, all seeds |
+| 4 | `.\make.ps1 deep` | `06_train_sequence.py` | Tier 3 GRU/LSTM/DLinear/NLinear, all seeds |
 | 5 | `.\make.ps1 classify` | `07_train_classifier.py` | AQI-category classifier |
 | 5 | `.\make.ps1 green` | `08_green_measure.py` | params, MACs, latency, energy, CO₂e |
 | 5 | `.\make.ps1 eval` | `09_evaluate.py` | stratified metrics + Diebold-Mariano |
 | 6 | `.\make.ps1 figures` | `10_make_figures.py` | all figures, 300 dpi PNG + PDF |
+| 6 | `.\make.ps1 stability` | `19_selection_stability.py` | tier-3 selection stability — reads existing runs, no refit |
 | 6 | `.\make.ps1 report` | `11_make_report.py` | `RESULTS.md`, `abstract_facts.json` |
-| 7 | — | `16_gap_injection.py` | the gap-injection experiment (see §8) |
-| 7 | — | `17_ablation_analysis.py` | `fig11_gap_injection`, arm-gap table |
 
-`make all` reproduces everything from scratch with fixed seeds. The git commit
-hash is written into `results/results.json`.
+`make all` runs every row above in order, with fixed seeds. The git commit hash is
+written into `results/results.json`.
+
+### Cross-city, ablation and replication targets
+
+| Command | Script(s) | Deliverable |
+|---|---|---|
+| `.\make.ps1 beijing` | `12_prepare_beijing.py` then 03–11 | the whole pipeline again on the Beijing record |
+| `.\make.ps1 beijing-post` | 08–11 | Beijing's downstream stages only, after a resumed sweep |
+| `.\make.ps1 cross-city` | `13_cross_city.py` | rank-transfer comparison → §6 (needs `all` and `beijing`) |
+| `.\make.ps1 ablation` | `16_gap_injection.py`, `17_ablation_analysis.py` | the gap-injection grid → §7 (needs `beijing`) |
+| `.\make.ps1 donor-configs` | `14_make_donor_configs.py` | `config/donors/*.yaml` from `donors.yaml` |
+| `.\make.ps1 donor-list` | — | prints the donor slugs; 2 s, run this before `donors` |
+| `.\make.ps1 donors` | prep + `16`/`17` per donor | replication grids — **~3 h per donor** |
+| `.\make.ps1 replication` | `18_donor_replication.py` | cross-donor comparison → §7b (needs ≥2 grids) |
+| `.\make.ps1 everything` | all of the above | every result in the paper |
 
 ### Run order matters
 
-`08_green_measure.py` and `09_evaluate.py` read the sequence-model checkpoints,
-so `06_train_sequence.py` must have run first. `11_make_report.py` reads
-`results/results.json` and writes nothing that is not already in it — if a phase
-has not run, the corresponding section is omitted rather than invented.
+- `08_green_measure.py` and `09_evaluate.py` read the sequence-model checkpoints,
+  so `06_train_sequence.py` must have run first.
+- `19_selection_stability.py` must precede `11_make_report.py`, which renders its
+  subsection. `all` and both Beijing chains already order them.
+- **Always re-run `17_ablation_analysis.py` after `16_gap_injection.py`.** `16`
+  rebuilds its output file on every cell and drops the `analysis` block `17` wrote
+  — deliberately, because an analysis computed over a different cell set is worse
+  than none, since it looks finished.
+- `11_make_report.py` reads `results/results.json` and writes nothing that is not
+  already in it — if a phase has not run, the corresponding section is omitted
+  rather than invented.
 
 ---
 
@@ -191,33 +232,66 @@ assertion or a test in `tests/`.
    contiguous is rejected; the count of rejected windows is reported.
 5. **Direct multi-horizon.** A separate head/model per *h* ∈ {1, 3, 6, 12, 24}. No
    recursive rollout.
+6. **Never select a model on test error.** Tier 3 is ranked by mean validation loss,
+   Tier 2 by cross-validation score, and Tier 1 by test RMSE *only* because those
+   have no hyperparameters and therefore no selection to bias. Ranking candidates by
+   test error and then reporting that error is circular and biases the headline
+   downward by the spread of the pool.
 
 Split boundary dates are recorded in `config.yaml` and printed in every table
 caption.
+
+**Rule 6 has a cost, and the study measures it rather than assuming it away.**
+`19_selection_stability.py` re-runs the selection rule on single seeds, on
+leave-one-seed-out subsets, and on 2,000 seed resamples. At 24 h on Dhaka no single
+seed picks the reported architecture on its own and 10 candidates win at least once
+— the *identity* of the winner is not stable. The consequence is bounded: selecting
+on validation rather than test costs +0.05 RMSE, because the candidates validation
+cannot separate are near-ties, which is what the Model Confidence Set says too. On
+Beijing at 24 h the same diagnostic reads the other way (regret +6.63 RMSE, Spearman
+ρ = −0.25 against the test ranking), which is why no architecture-level claim is made
+from that record.
 
 ---
 
 ## 5. Layout
 
-```
-config.yaml         ALL hyperparameters, paths, seeds, horizons, citations
+```text
+config.yaml         ALL hyperparameters, paths, seeds, horizons, citations (Dhaka)
+config_beijing.yaml the cross-city record; derived by copying config.yaml
+config/donors/      generated per-donor configs — never hand-edited
+donors.yaml         the donor registry, and what a donor does and does not prove
 Makefile / make.ps1 pipeline targets
 src/
   data/       fetch_openaq.py, fetch_power.py, fetch_uci_fallback.py
-  features/   build_features.py
-  models/     baselines.py, trees.py, sequence.py, classifier.py
-  eval/       metrics.py, split.py, evaluate.py
+  features/   build_features.py, pipeline.py, gap_injection.py
+  models/     baselines.py, trees.py, sequence.py, classifier.py, data.py
+  eval/       metrics.py, split.py, evaluate.py, ablation.py
   green/      energy.py, complexity.py
   viz/        figures.py, tables.py
-scripts/      00_check_env.py … 11_make_report.py
+scripts/      00_check_env.py … 19_selection_stability.py
 results/      tables/*.csv + *.tex (booktabs), figures/*.png + *.pdf (300 dpi),
               logs/, results.json  <- single source of truth
+              ablation_gap_injection*.json, donor_replication.json  <- see below
 reports/      DATA_AUDIT.md, RESULTS.md, abstract_facts.json
 data/         raw/ interim/ processed/   (gitignored)
 ```
 
 Nothing is hardcoded in a script: horizons, lags, split dates, seeds, model
 sizes and learning rates all live in `config.yaml`.
+
+Two structural points worth knowing before editing:
+
+- **`results.json` is the only source of reported numbers.** The gap-injection
+  experiment is the one deliberate exception, because it spans several donor
+  configs and would otherwise land in whichever donor ran last. It owns
+  `ablation_gap_injection*.json` (one per donor) and `donor_replication.json`. Both
+  are generated; neither is ever written by hand, and the rule that matters — no
+  transcribed numbers — still holds.
+- **`src/features/pipeline.py::build_feature_matrix` is shared** by
+  `04_build_features.py` and the ablation, so a degraded matrix is rebuilt through
+  exactly the same code. The boundary purge and per-horizon validity masks are where
+  the leakage rules live; a second copy would be a second definition of a usable row.
 
 ---
 
@@ -236,11 +310,18 @@ sizes and learning rates all live in `config.yaml`.
 
 ## 7. The gap-injection experiment
 
-Across two cities it looks as though record **fragmentation**, not model class,
-decides which method wins: tree ensembles lead on Dhaka's broken record, the
-sequence model leads on Beijing's near-complete one. Two cities that differ in
-coverage, span, climate and instrument at once cannot establish that. This
-experiment makes fragmentation the manipulated variable on a single record.
+Two cities that differ in coverage, span, climate and instrument at once cannot
+establish what causes a ranking to change. This experiment makes fragmentation the
+manipulated variable on a single record.
+
+> **Read the observational contrast carefully — it runs the other way.** The
+> sequence tier ranks **1** on the *more fragmented* record (Dhaka, 82.3% coverage)
+> and **3** on the near-complete one (Beijing, 98.9%). That is the opposite of what
+> a fragmentation account predicts, and `RESULTS.md` §7 reports it rather than
+> setting it aside. The two-city contrast confounds fragmentation with a harder
+> 24-hour problem, a shorter test period and a seasonal transition; it has no valid
+> counterfactual. The injection experiment does, which is why the mechanism is
+> tested here instead of inferred from the pair.
 
 A near-complete donor is degraded to a series of coverage levels by two arms
 that remove **exactly the same number of observed hours** and differ only in how
@@ -264,14 +345,68 @@ Three controls make the comparison mean what it claims:
    the degradation cannot be undertraining in disguise.
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\16_gap_injection.py --config config_beijing.yaml --progress plain
+# --profile-config names the record whose gap-length distribution is injected;
+# --config names the donor being degraded. They are different cities on purpose.
+.\.venv\Scripts\python.exe scripts\16_gap_injection.py --config config_beijing.yaml `
+    --profile-config config.yaml --progress plain
 .\.venv\Scripts\python.exe scripts\17_ablation_analysis.py --config config_beijing.yaml
 ```
 
-The grid is resumable and skips cells already recorded in
-`results/ablation_gap_injection.json`. Each cell's feature matrix is deleted
-after scoring unless `--keep-cells` is given, because the full grid would
-otherwise hold several GB.
+Or `.\make.ps1 ablation`, which passes both. The grid is 101 cells (5 coverage
+levels × 2 arms × 10 injection seeds, plus one undegraded reference) and takes
+about 2.5 h. It is resumable and skips cells already recorded in the file named by
+`ablation.gap_injection.output_name`. Each cell's feature matrix is deleted after
+scoring unless `--keep-cells` is given, because the full grid would otherwise hold
+several GB.
+
+**Result.** Each (coverage level, injection seed) is one matched pair across the two
+arms, giving 50 pairs per family; the representative model per family is fixed on the
+undegraded record and never re-chosen per arm, so the difference cannot absorb a
+change of model. Wilcoxon signed-rank, Holm-corrected across families:
+
+| Family | Mean arm gap | 95% CI | p (Holm) |
+|---|---|---|---|
+| sequence | −0.0394 | [−0.0565, −0.0236] | <0.0001 |
+| naive | −0.0358 | [−0.0609, −0.0140] | 0.0086 |
+| trees | −0.0263 | [−0.0393, −0.0125] | 0.0003 |
+| linear | −0.0016 | [−0.0081, +0.0047] | 0.9542 |
+
+Negative means fragmentation costs that family more than the same hours removed
+contiguously.
+
+### 7b. Does it replicate on another record?
+
+One record cannot distinguish a property of fragmentation from a property of that
+station, so the experiment is repeated on further donors.
+
+```powershell
+.\make.ps1 donor-list      # confirm it will iterate before starting hours of work
+.\make.ps1 donors          # ~3 h per donor
+.\make.ps1 replication     # cross-donor comparison, seconds
+```
+
+Donors are registered in `donors.yaml`; `14_make_donor_configs.py` generates their
+configs. Replication is deliberately strict — same sign **and** Holm significance on
+every donor:
+
+| Family | Wanliu | Dingling | Dongsi | Replicates |
+|---|---|---|---|---|
+| sequence | −0.0394\* | −0.0200\* | −0.0273\* | **yes** |
+| trees | −0.0263\* | −0.0120 | −0.0179\* | no |
+| linear | −0.0016 | −0.0298\* | −0.0205\* | no |
+| naive | −0.0358\* | −0.0024 | −0.0211\* | no |
+
+The naive row is the internal control and the reason more than one donor was run:
+models that never read the training record should not care how it is arranged. On
+Wanliu alone it collapses to −0.0958 at 75% coverage, which would have argued that
+fragmentation degrades *anything* estimated from the record. It does not replicate
+(Dingling −0.0038, Dongsi −0.0373), so that collapse is a property of Wanliu.
+
+**Scope limit, and it matters.** All donors are stations of the *same* UCI Beijing
+Multi-Site archive (id 501) — one four-year window, one regional weather regime,
+spatially correlated PM2.5. This is a **station-robustness check**, not a multi-city
+panel. It can falsify a donor-specific effect, which is the cheapest way to kill a
+wrong claim; it cannot establish generality.
 
 ## 8. Data sources
 
@@ -280,4 +415,8 @@ otherwise hold several GB.
 | OpenAQ S3 archive | PM2.5 target | `s3://openaq-data-archive`, unsigned |
 | OpenAQ v3 REST API | monitor discovery only | free API key in `.env` |
 | NASA POWER hourly point | meteorological drivers | no key; values in **UTC**, `-999` = missing |
-| UCI Beijing Multi-Site (id 501) | fallback + cross-city check | `ucimlrepo` |
+| UCI Beijing Multi-Site (id 501) | fallback, cross-city check, **and all three gap-injection donors** | `ucimlrepo` |
+
+The donors are three stations of that one archive (Wanliu, Dingling, Dongsi), which
+is why §7b is a station-robustness check and not a multi-city panel — see
+`donors.yaml`, which records the same caveat next to the registry itself.

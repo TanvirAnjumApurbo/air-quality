@@ -2,15 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-`README.md` covers setup, the phase-by-phase pipeline table, training flags, the
-five methodological rules and the gap-injection experiment. Read it first. This file
-covers what the README does not: the architecture you have to read several files to
-see, and the invariants that will silently corrupt a result if you break them.
-
-The README documents stages 00–13 and stops there — it has no section on the
-replication donors (`14`, `18`), the selection-stability diagnostic (`19`), or the
-`donors`/`stability`/`replication` targets. Those live here until someone folds
-them back into it.
+`README.md` covers setup, the phase-by-phase pipeline table, every make target,
+training flags, the six methodological rules, the gap-injection experiment and its
+donor replication. Read it first. This file covers what the README does not: the
+architecture you have to read several files to see, and the invariants that will
+silently corrupt a result if you break them.
 
 ## Commands
 
