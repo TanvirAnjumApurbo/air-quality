@@ -271,3 +271,51 @@ sequence     50   -0.0273 [-0.0412, -0.0139]       0.0005   0.0015
    naive     50   -0.0211 [-0.0331, -0.0106]       0.0003   0.0014
   linear     50   -0.0205 [-0.0322, -0.0092]       0.0011   0.0022
    trees     50   -0.0179 [-0.0326, -0.0026]       0.0045   0.0045
+02:28:03 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+02:28:03 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  1.0  2.0  2.0  2.0
+naive                  4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        2.0  2.0  2.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        3.0  3.0  3.0  3.0  3.0  3.0
+02:28:04 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0287, 'trees': -0.0109, 'naive': -0.0051, 'linear': -0.0033}
+02:28:04 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI p (Wilcoxon) p (Holm)
+sequence     50   -0.0394 [-0.0565, -0.0236]      <0.0001  <0.0001
+   naive     50   -0.0358 [-0.0609, -0.0140]       0.0043   0.0086
+   trees     50   -0.0263 [-0.0393, -0.0125]       0.0001   0.0003
+  linear     50   -0.0016 [-0.0081, +0.0047]       0.9542   0.9542
+02:30:39 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+02:30:39 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        2.0  2.0  2.0  2.0  2.0  2.0
+naive                  4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        1.0  1.0  1.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        3.0  3.0  3.0  3.0  3.0  3.0
+02:30:39 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0187, 'linear': -0.0179, 'trees': -0.012, 'naive': 0.0019}
+02:30:39 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI p (Wilcoxon) p (Holm)
+  linear     50   -0.0298 [-0.0427, -0.0182]      <0.0001  <0.0001
+sequence     50   -0.0200 [-0.0300, -0.0108]       0.0001   0.0003
+   trees     50   -0.0120 [-0.0205, -0.0040]       0.0290   0.0580
+   naive     50   -0.0024 [-0.0273, +0.0215]       0.1910   0.1910
+02:30:45 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+02:30:45 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  2.0  1.0  2.0  2.0
+naive                  3.0  3.0  3.0  3.0  4.0  3.0        3.0  3.0  3.0  3.0  3.0  3.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        2.0  2.0  1.0  2.0  1.0  1.0
+trees                  4.0  4.0  4.0  4.0  3.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+02:30:45 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0234, 'linear': -0.0205, 'trees': -0.0163, 'naive': -0.0072}
+02:30:45 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+  Family  Pairs  Mean gap             95% CI p (Wilcoxon) p (Holm)
+sequence     50   -0.0273 [-0.0412, -0.0139]       0.0005   0.0015
+   naive     50   -0.0211 [-0.0331, -0.0106]       0.0003   0.0014
+  linear     50   -0.0205 [-0.0322, -0.0092]       0.0011   0.0022
+   trees     50   -0.0179 [-0.0326, -0.0026]       0.0045   0.0045

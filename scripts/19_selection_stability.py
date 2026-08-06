@@ -51,7 +51,7 @@ import pandas as pd
 from scipy import stats
 from src.results import load_results, save_results
 from src.utils import check_disk_space, load_config, setup_logging
-from src.viz.figures import save_figure, setup_style
+from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
 
 
@@ -260,7 +260,7 @@ def main() -> int:
     )
 
     palette = setup_style(cfg)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.6, 3.9))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(COL_DOUBLE, 2.7))
     x = np.arange(len(frame))
     width = 0.27
     for i, (col, label) in enumerate(
@@ -270,22 +270,43 @@ def main() -> int:
             ("bootstrap_selection_frequency", "seed bootstrap"),
         )
     ):
-        ax1.bar(x + (i - 1) * width, frame[col], width, label=label, color=palette[i])
+        ax1.bar(
+            x + (i - 1) * width,
+            frame[col],
+            width,
+            label=label,
+            color=palette[i],
+            edgecolor="white",
+            linewidth=0.3,
+        )
     ax1.set_xticks(x)
     ax1.set_xticklabels([f"{h} h" for h in frame["horizon_h"]])
     ax1.set_ylim(0, 1.05)
-    ax1.set_ylabel("Agreement with the reported winner")
-    ax1.set_xlabel("Horizon")
-    ax1.legend(frameon=False, fontsize=8)
-    ax1.set_title("Does the winner survive resampling the seeds?")
+    ax1.set_ylabel("Agreement with the\nreported winner")
+    ax1.set_xlabel("Forecast horizon")
+    ax1.legend(
+        ncol=3,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.0),
+        columnspacing=0.9,
+        handlelength=1.2,
+        fontsize=7.5,
+    )
 
-    ax2.bar(x, frame["regret_pct"], color=palette[3 % len(palette)])
-    ax2.axhline(0.0, color="#999999", linewidth=0.9)
+    ax2.bar(
+        x, frame["regret_pct"], color=palette[3 % len(palette)], edgecolor="white", linewidth=0.3
+    )
+    ax2.axhline(0.0, color="#999999", linewidth=0.8)
     ax2.set_xticks(x)
     ax2.set_xticklabels([f"{h} h" for h in frame["horizon_h"]])
-    ax2.set_ylabel("Selection regret (% of best test RMSE)")
-    ax2.set_xlabel("Horizon")
-    ax2.set_title("Cost of selecting on validation, not test")
+    ax2.set_ylabel("Selection regret\n(% of best test RMSE)")
+    ax2.set_xlabel("Forecast horizon")
+
+    # Both tags at the same height: (a) has to clear its legend, and a (b) sitting
+    # lower reads as a second row of panels rather than the same one.
+    panel_label(ax1, "(a)", y=1.20)
+    panel_label(ax2, "(b)", y=1.20)
+    fig.tight_layout(w_pad=1.8)
     written = save_figure(cfg, fig, "fig13_selection_stability")
     log.info("wrote %s", ", ".join(p.name for p in written))
     plt.close(fig)

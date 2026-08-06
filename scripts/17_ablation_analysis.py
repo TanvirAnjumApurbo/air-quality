@@ -36,7 +36,7 @@ import pandas as pd
 from src.eval.ablation import fmt_p as _fmt_p
 from src.eval.ablation import paired_arm_gaps, test_arm_gaps, tidy
 from src.utils import load_config, setup_logging
-from src.viz.figures import save_figure, setup_style
+from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
 
 
@@ -147,7 +147,7 @@ def main() -> int:
 
     # ---- the key figure ----------------------------------------------------
     palette = setup_style(cfg)
-    fig, (ax_skill, ax_rows) = plt.subplots(1, 2, figsize=(11.5, 4.6))
+    fig, (ax_skill, ax_rows) = plt.subplots(1, 2, figsize=(COL_DOUBLE, 3.0))
     order = ["sequence", "trees", "linear", "naive"]
     colours = dict(zip(order, palette, strict=False))
 
@@ -164,28 +164,32 @@ def main() -> int:
                 yerr=sub["skill_std"],
                 linestyle=style,
                 marker=marker,
-                markersize=4.5,
-                capsize=2.5,
-                linewidth=1.7,
+                markersize=3.2,
+                capsize=1.8,
+                elinewidth=0.7,
+                capthick=0.7,
+                linewidth=1.25,
                 color=colours.get(family, "#666666"),
                 label=f"{family} ({arm})",
             )
 
-    ax_skill.axhline(0.0, color="#999999", linewidth=0.9, zorder=0)
+    ax_skill.axhline(0.0, color="#999999", linewidth=0.8, zorder=0)
     ax_skill.set_xlabel("Coverage of the training record (%)")
     ax_skill.set_ylabel("Skill vs persistence")
     ax_skill.invert_xaxis()
-    ax_skill.set_title("Solid: fragmented removal.  Dashed: same hours, contiguous.")
     # Below the axes: the crossing point is the finding, and a legend box sitting
-    # in the middle of the panel lands squarely on it.
+    # in the middle of the panel lands squarely on it. Two rows of four keeps the
+    # fragmented/contiguous pair for each family adjacent in the same column.
     ax_skill.legend(
         frameon=False,
-        fontsize=8,
-        ncol=4,
+        fontsize=6.8,
+        ncol=2,
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.16),
-        columnspacing=1.0,
+        bbox_to_anchor=(0.5, -0.24),
+        columnspacing=0.9,
         handletextpad=0.4,
+        handlelength=1.8,
+        labelspacing=0.25,
     )
 
     for arm, style, marker in (("fragmented", "-", "o"), ("contiguous", "--", "s")):
@@ -199,22 +203,19 @@ def main() -> int:
             sub["train_rows"],
             style,
             marker=marker,
-            markersize=4.5,
-            linewidth=1.7,
+            markersize=3.2,
+            linewidth=1.25,
             color="#333333" if arm == "fragmented" else "#999999",
             label=arm,
         )
     ax_rows.set_xlabel("Coverage of the training record (%)")
     ax_rows.set_ylabel("Usable supervised training rows")
     ax_rows.invert_xaxis()
-    ax_rows.set_title("The mechanism: identical hours removed, different yield")
-    ax_rows.legend(frameon=False, fontsize=9)
+    ax_rows.legend(frameon=False, loc="lower left")
 
-    fig.suptitle(
-        "Record fragmentation, not data volume, reverses the method ranking",
-        fontsize=12,
-        y=1.02,
-    )
+    panel_label(ax_skill, "(a)")
+    panel_label(ax_rows, "(b)")
+    fig.tight_layout(w_pad=1.8)
     written = save_figure(cfg, fig, "fig11_gap_injection")
     log.info("wrote %s", ", ".join(str(p.name) for p in written))
     plt.close(fig)

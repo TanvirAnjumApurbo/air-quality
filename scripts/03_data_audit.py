@@ -40,7 +40,13 @@ from src.data.audit import (
     window_yield,
 )
 from src.utils import check_disk_space, load_config, setup_logging
-from src.viz.figures import save_figure, setup_style
+from src.viz.figures import (
+    COL_DOUBLE,
+    UNIT_PM25,
+    panel_label,
+    save_figure,
+    setup_style,
+)
 
 MIN_USABLE_YEARS = 2.0
 
@@ -148,52 +154,78 @@ def main() -> int:
 
     # ---------------------------------------------------------------- figures
     palette = list(cfg.get("output.figures.palette"))
-    figsize_wide = tuple(cfg.get("output.figures.figsize_wide"))
 
-    # Fig 1: data coverage timeline
-    fig, ax = plt.subplots(figsize=figsize_wide)
+    # Fig 1: data coverage timeline. Full page width, short: nine years of daily
+    # coverage is a wide, shallow signal and a taller panel only stretches it.
+    # The daily fill alone saturates to a solid block at this width, so the
+    # 30-day mean is drawn over it -- that line is what carries where coverage
+    # actually degraded as opposed to where a single day dropped out.
+    fig, ax = plt.subplots(figsize=(COL_DOUBLE, 1.95))
     present = pm25.notna().astype(float)
     daily = present.resample("1D").mean() * 100.0
-    ax.fill_between(daily.index, 0, daily.to_numpy(), color=palette[0], linewidth=0, alpha=0.85)
-    ax.set_ylabel("hours observed per day (%)")
-    ax.set_xlabel("date (UTC)")
+    ax.fill_between(
+        daily.index,
+        0,
+        daily.to_numpy(),
+        color=palette[0],
+        linewidth=0,
+        alpha=0.30,
+        label="daily",
+        rasterized=True,  # ~3400 vertices; vector form bloats the PDF for nothing
+    )
+    ax.plot(
+        daily.index,
+        daily.rolling(30, min_periods=1).mean().to_numpy(),
+        color=palette[0],
+        linewidth=1.1,
+        label="30-day mean",
+    )
+    ax.set_ylabel("Observed hours\nper day (%)")
+    ax.set_xlabel("Date (UTC)")
     ax.set_ylim(0, 100)
-    ax.set_title(f"PM2.5 data coverage -- {cfg.get('data.openaq.site_label')}")
+    ax.set_yticks([0, 25, 50, 75, 100])
+    ax.margins(x=0.01)
+    ax.legend(loc="lower left", ncol=2, framealpha=0.9, frameon=True, facecolor="white")
     save_figure(cfg, fig, "fig01_coverage_timeline")
 
-    # Fig 2: monthly missingness heatmap (sequential, single hue light->dark)
-    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    # Fig 2: monthly missingness heatmap (sequential, single hue light->dark).
+    # Only non-trivial cells are annotated: printing "0" in every complete month
+    # buries the handful of cells the audit is actually about.
+    fig, ax = plt.subplots(figsize=(COL_DOUBLE, 0.26 * len(monthly.index) + 1.15))
     data = monthly.reindex(columns=range(1, 13))
     im = ax.imshow(data.to_numpy(), aspect="auto", cmap="Blues", vmin=0, vmax=100)
     ax.set_xticks(range(12), [f"{m:02d}" for m in range(1, 13)])
     ax.set_yticks(range(len(data.index)), [str(y) for y in data.index])
-    ax.set_xlabel(f"month ({tz})")
-    ax.set_ylabel("year")
-    ax.set_title("PM2.5 missingness by month (%)")
+    ax.set_xlabel(f"Month ({tz})")
+    ax.set_ylabel("Year")
     ax.grid(False)
+    ax.tick_params(length=0)
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             v = data.to_numpy()[i, j]
-            if not np.isnan(v):
-                ax.text(
-                    j,
-                    i,
-                    f"{v:.0f}",
-                    ha="center",
-                    va="center",
-                    fontsize=6.5,
-                    color="white" if v > 55 else "#333333",
-                )
-    fig.colorbar(im, ax=ax, label="% missing", fraction=0.03, pad=0.02)
+            if np.isnan(v) or v < 0.5:
+                continue
+            ax.text(
+                j,
+                i,
+                f"{v:.0f}",
+                ha="center",
+                va="center",
+                fontsize=6.0,
+                color="white" if v > 55 else "#2B2B2B",
+            )
+    cbar = fig.colorbar(im, ax=ax, fraction=0.022, pad=0.015)
+    cbar.set_label("Missing (%)", fontsize=plt.rcParams["axes.labelsize"])
+    cbar.ax.tick_params(labelsize=plt.rcParams["ytick.labelsize"], length=2)
+    cbar.outline.set_linewidth(0.6)
     save_figure(cfg, fig, "fig02_monthly_missingness")
 
     # Fig 3: distribution (linear + log)
-    fig, axes = plt.subplots(1, 2, figsize=figsize_wide)
+    fig, axes = plt.subplots(1, 2, figsize=(COL_DOUBLE, 2.5))
     vals = pm25.dropna()
     axes[0].hist(vals, bins=120, color=palette[0], edgecolor="none")
-    axes[0].set_xlabel("PM2.5 (µg/m³)")
-    axes[0].set_ylabel("hours")
-    axes[0].set_title("distribution")
+    axes[0].set_xlabel(f"PM2.5 ({UNIT_PM25})")
+    axes[0].set_ylabel("Observed hours")
     for thr, colour, style in (
         (float(cfg.get("evaluation.stratify.by_pollution_level.threshold_ugm3")), palette[1], "-"),
         (
@@ -202,38 +234,54 @@ def main() -> int:
             "--",
         ),
     ):
-        axes[0].axvline(thr, color=colour, linestyle=style, linewidth=1.4, label=f"{thr:g} µg/m³")
-    axes[0].legend(title="BD standard")
+        axes[0].axvline(
+            thr, color=colour, linestyle=style, linewidth=1.2, label=f"{thr:g} {UNIT_PM25}"
+        )
+    axes[0].legend(title="BD standard", loc="upper right")
     axes[1].hist(np.log1p(vals), bins=120, color=palette[0], edgecolor="none")
-    axes[1].set_xlabel("log1p PM2.5")
-    axes[1].set_ylabel("hours")
-    axes[1].set_title("log1p distribution (modelling scale)")
-    fig.suptitle("PM2.5 distribution, observed hours only")
+    axes[1].set_xlabel("log1p PM2.5 (modelling scale)")
+    axes[1].set_ylabel("Observed hours")
+    panel_label(axes[0], "(a)")
+    panel_label(axes[1], "(b)")
+    fig.tight_layout(w_pad=1.6)
     save_figure(cfg, fig, "fig03_pm25_distribution")
 
     # Fig 4: diurnal + seasonal profiles
-    fig, axes = plt.subplots(1, 2, figsize=figsize_wide)
-    axes[0].plot(diurnal.index, diurnal["mean"], color=palette[0], marker="o", label="mean")
-    axes[0].plot(diurnal.index, diurnal["median"], color=palette[1], marker="s", label="median")
-    axes[0].set_xlabel(f"hour of day ({tz})")
-    axes[0].set_ylabel("PM2.5 (µg/m³)")
-    axes[0].set_title("diurnal profile")
+    fig, axes = plt.subplots(1, 2, figsize=(COL_DOUBLE, 2.6))
+    axes[0].plot(
+        diurnal.index, diurnal["mean"], color=palette[0], marker="o", label="mean", markersize=3.2
+    )
+    axes[0].plot(
+        diurnal.index,
+        diurnal["median"],
+        color=palette[1],
+        marker="s",
+        label="median",
+        markersize=3.0,
+    )
+    axes[0].set_xlabel(f"Hour of day ({tz})")
+    axes[0].set_ylabel(f"PM2.5 ({UNIT_PM25})")
     axes[0].set_xticks(range(0, 24, 3))
-    axes[0].legend()
+    axes[0].set_xlim(-0.6, 23.6)
+    axes[0].legend(loc="lower left")
 
     monsoon = set(cfg.get("features.season.monsoon_months"))
     bar_colours = [palette[2] if m in monsoon else palette[1] for m in seasonal.index]
     axes[1].bar(seasonal.index, seasonal["mean"], color=bar_colours, width=0.72)
-    axes[1].set_xlabel(f"month ({tz})")
-    axes[1].set_ylabel("PM2.5 (µg/m³)")
-    axes[1].set_title("seasonal profile")
+    axes[1].set_xlabel(f"Month ({tz})")
+    axes[1].set_ylabel(f"PM2.5 ({UNIT_PM25})")
     axes[1].set_xticks(range(1, 13))
+    # Headroom for the legend: the dry-season bars run to the top of the panel,
+    # and at "upper center" the box otherwise sits on January and December.
+    axes[1].set_ylim(0, float(seasonal["mean"].max()) * 1.30)
     handles = [
         plt.Rectangle((0, 0), 1, 1, color=palette[1], label="dry (Nov-Apr)"),
         plt.Rectangle((0, 0), 1, 1, color=palette[2], label="monsoon (May-Oct)"),
     ]
-    axes[1].legend(handles=handles)
-    fig.suptitle("PM2.5 diurnal and seasonal structure")
+    axes[1].legend(handles=handles, loc="upper center", ncol=2, handlelength=1.2)
+    panel_label(axes[0], "(a)")
+    panel_label(axes[1], "(b)")
+    fig.tight_layout(w_pad=1.6)
     save_figure(cfg, fig, "fig04_diurnal_seasonal")
 
     log.info("figures written")

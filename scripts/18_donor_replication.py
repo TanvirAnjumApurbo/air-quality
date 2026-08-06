@@ -40,7 +40,7 @@ import pandas as pd
 from src.eval.ablation import FAMILY_ORDER, paired_arm_gaps, test_arm_gaps, tidy
 from src.eval.ablation import fmt_p as _fmt_p
 from src.utils import load_config, setup_logging
-from src.viz.figures import save_figure, setup_style
+from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
 
 
@@ -220,11 +220,13 @@ def main() -> int:
     # ---- figure ------------------------------------------------------------
     palette = setup_style(cfg)
     families = [f for f in FAMILY_ORDER if f in set(levels_all["family"])]
-    fig, axes = plt.subplots(1, len(families), figsize=(3.4 * len(families), 3.9), sharey=True)
+    fig, axes = plt.subplots(1, len(families), figsize=(COL_DOUBLE, 2.35), sharey=True)
     axes = [axes] if len(families) == 1 else list(axes)
     colours = dict(zip(donors, palette, strict=False))
+    tags = "abcdefgh"
+    levels = sorted(levels_all["target_coverage"].unique() * 100.0)
 
-    for ax, family in zip(axes, families, strict=False):
+    for i, (ax, family) in enumerate(zip(axes, families, strict=False)):
         for donor in donors:
             sub = levels_all[
                 (levels_all["family"] == family) & (levels_all["donor"] == donor)
@@ -235,23 +237,25 @@ def main() -> int:
                 sub["target_coverage"] * 100.0,
                 sub["arm_gap"],
                 marker="o",
-                markersize=4.0,
-                linewidth=1.6,
+                markersize=2.8,
+                linewidth=1.15,
                 color=colours.get(donor, "#666666"),
                 label=donor,
             )
-        ax.axhline(0.0, color="#999999", linewidth=0.9, zorder=0)
-        ax.set_title(family)
+        ax.axhline(0.0, color="#999999", linewidth=0.8, zorder=0)
+        # The family names are data categories, not chart titles: they identify
+        # which model family the panel is about and the caption refers to them.
+        panel_label(ax, f"({tags[i]}) {family}")
         ax.set_xlabel("Injected coverage (%)")
+        # Tick the coverage levels that were actually injected. The default
+        # locator picks round numbers, and at four panels across a page that left
+        # two labelled ticks, neither of them a level in the grid.
+        ax.set_xticks(levels)
+        ax.set_xticklabels([f"{lv:g}" for lv in levels], fontsize=6.6)
         ax.invert_xaxis()
-    axes[0].set_ylabel("Fragmented − contiguous skill")
-    axes[-1].legend(frameon=False, fontsize=8)
-    fig.suptitle(
-        "Arm gap by donor record. Below zero: fragmentation costs more than the "
-        "same hours removed contiguously.",
-        fontsize=11,
-        y=1.03,
-    )
+    axes[0].set_ylabel("Fragmented $-$ contiguous skill")
+    axes[-1].legend(frameon=True, framealpha=0.92, facecolor="white", edgecolor="#CCCCCC")
+    fig.tight_layout(w_pad=0.9)
     written = save_figure(cfg, fig, "fig12_donor_replication")
     log.info("wrote %s", ", ".join(p.name for p in written))
     plt.close(fig)

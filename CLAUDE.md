@@ -217,6 +217,30 @@ Every run record carries a `tier`, and selection logic branches on it:
   time-series reviewer checks for first, and a linear model beating the recurrent
   one is a result, not a bug.
 
+### Figures are sized for the printed column and carry no titles
+
+`src/viz/figures.py::setup_style` is the only place figure typography is set, and
+every figure script calls it. Three conventions hold across all 13 figures:
+
+- **No `set_title` and no `suptitle`.** The title goes in the LaTeX caption. A title
+  drawn into the artefact is a second, unversioned copy that drifts from the caption.
+  Where a panel's identity is data-bearing rather than recoverable from its axes —
+  the tiers in fig05, the model families in fig12 — it rides on a `(a)`-style
+  `panel_label` or on the legend *title*, not on a chart title.
+- **Two widths only**, `COL_SINGLE` (3.5 in) and `COL_DOUBLE` (7.16 in), the narrower
+  of {Elsevier 90/190 mm, IEEE 3.5/7.16 in} so one artefact fits either template at
+  `width=\linewidth`. Never rescale in LaTeX: `font_size: 9` in `config.yaml` is
+  chosen against the printed column, and scaling the figure unpicks that.
+- **Units in mathtext**, via `UNIT_PM25`. The literal `µg/m³` needs glyphs the serif
+  stack does not always carry, and a missing glyph prints as a tofu box rather than
+  failing — the previous fig08 shipped with one in its axis label.
+
+**`Axes.add_artist` clips what it is given to the axes patch.** A second legend
+anchored outside the axes therefore renders invisible *and* is dropped from the tight
+bounding box, silently. fig08 needs three legends; they are `fig.legend(...)` with
+`bbox_transform=ax.transAxes`, which coexist in `fig.legends` and survive the tight
+bbox. Reach for `fig.legend`, not `ax.add_artist`, whenever a legend sits outside.
+
 ### Leakage rules are structural, not conventional
 
 The five rules in the README are enforced at these points:
@@ -312,10 +336,10 @@ state-space projection now lives in
 
 `results.json` stamps `git_commit` at the time the *results* were computed, not when
 the report was rendered — so `RESULTS.md` can legitimately show an older, `-dirty`
-hash than `HEAD`. That is intended. Both cities currently read `ec5336c…-dirty`,
-stamped when `19_selection_stability.py` last wrote them, **not** when their sweeps
-ran; the sweeps themselves predate that by days. Making the hashes clean requires
-re-running the sweeps, which was considered and declined.
+hash than `HEAD`. That is intended. Both cities currently read `1afdd57…-dirty`,
+stamped when `19_selection_stability.py` last wrote them during the figure restyle,
+**not** when their sweeps ran; the sweeps themselves predate that by days. Making the
+hashes clean requires re-running the sweeps, which was considered and declined.
 
 Note the asymmetry: `save_results` restamps `git_commit` on **every** write, so any
 downstream stage that touches a city's `results.json` moves that city's hash forward

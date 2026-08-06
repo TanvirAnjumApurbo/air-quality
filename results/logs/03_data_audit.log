@@ -46,3 +46,18 @@
 22:05:31 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
 22:05:33 | INFO    | 03_data_audit | figures written
 22:05:33 | INFO    | 03_data_audit | wrote F:\BUP\reports\donors\dongsi\DATA_AUDIT.md
+02:17:16 | INFO    | 03_data_audit | loaded PM2.5 (79216 rows) and meteorology (87672 rows)
+02:17:21 | INFO    | 03_data_audit | figures written
+02:17:22 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md
+02:18:06 | INFO    | 03_data_audit | loaded PM2.5 (79216 rows) and meteorology (87672 rows)
+02:18:09 | INFO    | 03_data_audit | figures written
+02:18:09 | INFO    | 03_data_audit | wrote F:\BUP\reports\DATA_AUDIT.md
+02:27:35 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
+02:27:37 | INFO    | 03_data_audit | figures written
+02:27:37 | INFO    | 03_data_audit | wrote F:\BUP\reports\beijing\DATA_AUDIT.md
+02:30:34 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
+02:30:36 | INFO    | 03_data_audit | figures written
+02:30:36 | INFO    | 03_data_audit | wrote F:\BUP\reports\donors\dingling\DATA_AUDIT.md
+02:30:40 | INFO    | 03_data_audit | loaded PM2.5 (35064 rows) and meteorology (35064 rows)
+02:30:42 | INFO    | 03_data_audit | figures written
+02:30:42 | INFO    | 03_data_audit | wrote F:\BUP\reports\donors\dongsi\DATA_AUDIT.md

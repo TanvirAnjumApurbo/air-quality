@@ -34,13 +34,21 @@ from src.models.sequence import (
 )
 from src.results import load_results
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
-from src.viz.figures import save_figure, setup_style
+from src.viz.figures import (
+    COL_DOUBLE,
+    COL_SINGLE,
+    UNIT_PM25,
+    panel_label,
+    save_figure,
+    setup_style,
+)
 
 TIER_LABELS = {
     "tier1": "Tier 1 — baselines",
     "tier2": "Tier 2 — classical ML",
     "tier3": "Tier 3 — sequence",
 }
+PANEL_TAGS = ("(a)", "(b)", "(c)", "(d)")
 
 
 def parse_args() -> argparse.Namespace:
@@ -60,7 +68,7 @@ def fig_rmse_vs_horizon(cfg, payload, palette, log) -> None:
     runs["rmse"] = runs["metrics"].map(lambda m: m["rmse"])
 
     tiers = [t for t in ("tier1", "tier2", "tier3") if t in set(runs["tier"])]
-    fig, axes = plt.subplots(1, len(tiers), figsize=(4.2 * len(tiers), 4.0), sharey=True)
+    fig, axes = plt.subplots(1, len(tiers), figsize=(COL_DOUBLE, 2.75), sharey=True)
     if len(tiers) == 1:
         axes = [axes]
 
@@ -91,17 +99,38 @@ def fig_rmse_vs_horizon(cfg, payload, palette, log) -> None:
                 mean.to_numpy(),
                 yerr=std.to_numpy(),
                 marker="o",
-                capsize=3,
+                markersize=3.0,
+                capsize=2.0,
+                elinewidth=0.8,
+                capthick=0.8,
                 color=palette[i],
-                label=model,
-                linewidth=1.6,
+                label=model.replace("_", " "),
+                linewidth=1.2,
             )
-        ax.set_title(TIER_LABELS.get(tier, tier))
-        ax.set_xlabel("forecast horizon (hours)")
+        ax.set_xlabel("Forecast horizon (h)")
         ax.set_xticks(sorted(runs["horizon_h"].unique()))
-        ax.legend(fontsize=7.5)
-    axes[0].set_ylabel("RMSE (µg/m³)")
-    fig.suptitle("Test-period RMSE against forecast horizon (error bars: ± 1 s.d. across seeds)")
+        # The tier name rides on the legend title rather than a panel title:
+        # it names the series in the box directly beneath it, and the caption
+        # keeps the sentence that used to be the suptitle.
+        ax.legend(
+            title=TIER_LABELS.get(tier, tier),
+            fontsize=6.8,
+            title_fontsize=7.2,
+            # "best" rather than a fixed corner: the panels share a y-axis set by
+            # tier 1, so the empty region is in a different corner in each one.
+            loc="best",
+            frameon=True,
+            framealpha=0.92,
+            facecolor="white",
+            edgecolor="#CCCCCC",
+            labelspacing=0.25,
+            handlelength=1.3,
+            borderpad=0.3,
+        )
+    for ax, tag in zip(axes, PANEL_TAGS, strict=False):
+        panel_label(ax, tag)
+    axes[0].set_ylabel(f"Test RMSE ({UNIT_PM25})")
+    fig.tight_layout(w_pad=1.0)
     save_figure(cfg, fig, "fig05_rmse_vs_horizon")
     log.info("wrote fig05_rmse_vs_horizon")
 
@@ -161,18 +190,18 @@ def fig_pred_vs_actual(cfg, frame, payload, palette, device, log) -> None:
     else:
         window = series
 
-    fig, ax = plt.subplots(figsize=tuple(cfg.get("output.figures.figsize_wide")))
+    fig, ax = plt.subplots(figsize=(COL_DOUBLE, 2.6))
     observed_colour = str(cfg.get("output.figures.observed_colour", "#222222"))
     reference_colour = str(cfg.get("output.figures.reference_colour", "#767676"))
 
     ax.plot(
-        window.index, window["observed"], color=observed_colour, linewidth=1.7, label="observed"
+        window.index, window["observed"], color=observed_colour, linewidth=1.15, label="observed"
     )
     ax.plot(
         window.index,
         window["persistence"],
         color=reference_colour,
-        linewidth=1.1,
+        linewidth=0.9,
         linestyle=":",
         label="persistence",
     )
@@ -180,26 +209,32 @@ def fig_pred_vs_actual(cfg, frame, payload, palette, device, log) -> None:
         window.index,
         window["predicted"],
         color=palette[0],
-        linewidth=1.5,
-        label=f"{spec.name} (w={spec.window})",
+        linewidth=1.15,
+        label=f"{spec.name.replace('_', ' ')} (w = {spec.window} h)",
     )
 
     threshold = float(cfg.get("evaluation.stratify.by_pollution_level.threshold_ugm3"))
-    ax.axhline(threshold, color=palette[1], linewidth=1.1, linestyle="--")
-    ax.annotate(
-        f"BD 24-h standard {threshold:g} µg/m³",
-        xy=(0.01, threshold),
-        xycoords=("axes fraction", "data"),
-        va="bottom",
-        fontsize=8,
+    ax.axhline(
+        threshold,
         color=palette[1],
+        linewidth=1.0,
+        linestyle="--",
+        label=f"BD 24-h standard ({threshold:g} {UNIT_PM25})",
     )
 
-    ax.set_ylabel("PM2.5 (µg/m³)")
-    ax.set_xlabel("date (UTC)")
-    ax.set_title(f"{headline}-hour-ahead forecast over a representative held-out window")
-    ax.legend(ncol=3, fontsize=8)
-    fig.autofmt_xdate()
+    ax.set_ylabel(f"PM2.5 ({UNIT_PM25})")
+    ax.set_xlabel("Date (UTC)")
+    ax.margins(x=0.005)
+    # Legend above the panel: four series over a spiky trace leave no interior
+    # region a box can occupy without covering an excursion.
+    ax.legend(
+        ncol=4,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.0),
+        columnspacing=1.4,
+        handlelength=1.8,
+    )
+    fig.autofmt_xdate(rotation=0, ha="center")
     save_figure(cfg, fig, "fig06_pred_vs_actual")
     log.info("wrote fig06_pred_vs_actual")
 
@@ -213,12 +248,15 @@ def fig_feature_importance(cfg, payload, palette, log) -> None:
     key = next(iter(importance))
     scores = pd.Series(importance[key]).sort_values(ascending=False).head(20)
 
-    fig, ax = plt.subplots(figsize=(7.2, 5.4))
-    ax.barh(range(len(scores)), scores.to_numpy()[::-1], color=palette[0])
-    ax.set_yticks(range(len(scores)), [s.replace("_", " ") for s in scores.index[::-1]], fontsize=8)
-    ax.set_xlabel("increase in RMSE when permuted (modelling scale)")
-    ax.set_title(f"Permutation importance — {key.replace('_', ' ')}")
+    # Single column: a ranked list of 20 names is tall and narrow by nature, and
+    # widening it to the page only stretches the bars away from their labels.
+    fig, ax = plt.subplots(figsize=(COL_SINGLE, 3.9))
+    ax.barh(range(len(scores)), scores.to_numpy()[::-1], color=palette[0], height=0.74)
+    ax.set_yticks(range(len(scores)), [s.replace("_", " ") for s in scores.index[::-1]], fontsize=7)
+    ax.set_ylim(-0.7, len(scores) - 0.3)
+    ax.set_xlabel("Increase in RMSE when permuted\n(modelling scale)", linespacing=1.4)
     ax.grid(axis="y", visible=False)
+    ax.tick_params(axis="y", length=0)
     save_figure(cfg, fig, "fig07_feature_importance")
     log.info("wrote fig07_feature_importance")
 
@@ -234,40 +272,101 @@ def fig_pareto(cfg, payload, palette, log) -> None:
         log.warning("no CO2e estimates available; Pareto figure would be empty")
         return
 
-    fig, ax = plt.subplots(figsize=(6.6, 4.6))
-    for i, (model, group) in enumerate(df.groupby("model")):
-        ax.scatter(
-            group["co2e_g_bd_mean"],
-            group["rmse_mean"],
-            s=np.clip(group["params"] / 300.0, 25, 400),
-            color=palette[i % len(palette)],
-            alpha=0.85,
-            edgecolor="white",
-            linewidth=0.8,
-            label=model,
-            zorder=3,
-        )
-        for _, row in group.iterrows():
-            ax.annotate(
-                f"w{int(row['window_h'])}",
-                xy=(row["co2e_g_bd_mean"], row["rmse_mean"]),
-                xytext=(4, 4),
-                textcoords="offset points",
-                fontsize=7,
-                color="#444444",
+    # Twelve model/window combinations exceed the six-colour categorical palette,
+    # and a per-point text label is what made the previous version unreadable.
+    # Colour therefore carries the architecture family and marker shape carries
+    # the input window, which is every dimension the labels held, in the marks.
+    family = df["model"].str.extract(r"^([a-z]+)", expand=False)
+    family_order = [f for f in ("dlinear", "nlinear", "gru", "lstm") if f in set(family)]
+    windows = sorted(df["window_h"].unique())
+    markers = ["o", "s", "^", "D", "v"]
+
+    fig, ax = plt.subplots(figsize=(COL_DOUBLE, 3.3))
+    for fam_i, fam in enumerate(family_order):
+        for win_i, win in enumerate(windows):
+            group = df[(family == fam) & (df["window_h"] == win)]
+            if group.empty:
+                continue
+            ax.scatter(
+                group["co2e_g_bd_mean"],
+                group["rmse_mean"],
+                s=np.clip(group["params"] / 260.0, 14, 210),
+                color=palette[fam_i],
+                marker=markers[win_i % len(markers)],
+                alpha=0.80,
+                edgecolor="white",
+                linewidth=0.6,
+                zorder=3,
             )
 
-    ax.set_xlabel("estimated training emissions (gCO₂e, Bangladesh grid)")
-    ax.set_ylabel(f"RMSE at {cfg.get('task.headline_horizon_h')} h (µg/m³)")
-    ax.set_title("Accuracy against estimated training emissions")
-    ax.legend(fontsize=8, title="marker area ∝ parameters", title_fontsize=7.5)
-    fig.text(
-        0.5,
-        -0.04,
+    family_handles = [
+        plt.Line2D(
+            [], [], marker="o", linestyle="none", markersize=5, color=palette[i], label=fam.upper()
+        )
+        for i, fam in enumerate(family_order)
+    ]
+    window_handles = [
+        plt.Line2D(
+            [],
+            [],
+            marker=markers[i % len(markers)],
+            linestyle="none",
+            markersize=5,
+            color="#555555",
+            label=f"{int(win)} h",
+        )
+        for i, win in enumerate(windows)
+    ]
+    # A size legend rather than a "marker area is proportional to parameters"
+    # caption: the reader can measure a marker against it instead of estimating
+    # what a proportionality claim means at this scale.
+    lo, hi = float(df["params"].min()), float(df["params"].max())
+    size_handles = [
+        ax.scatter(
+            [],
+            [],
+            s=float(np.clip(p / 260.0, 14, 210)),
+            color="#B0B0B0",
+            edgecolor="white",
+            linewidth=0.6,
+            label=f"{p / 1000.0:.1f}k" if p >= 1000 else f"{int(p)}",
+        )
+        for p in (lo, np.sqrt(lo * hi), hi)
+    ]
+
+    # Three legends, attached to the *figure* rather than the axes. Axes.add_artist
+    # clips what it is given to the axes patch, so a second legend anchored outside
+    # the axes silently disappears; figure-level legends coexist in fig.legends and
+    # are picked up by the tight bounding box.
+    for handles, title, y in (
+        (family_handles, "Architecture", 1.00),
+        (window_handles, "Input window", 0.60),
+        (size_handles, "Parameters", 0.26),
+    ):
+        fig.legend(
+            handles=handles,
+            title=title,
+            loc="upper left",
+            bbox_to_anchor=(1.02, y),
+            bbox_transform=ax.transAxes,
+            borderaxespad=0.0,
+            labelspacing=0.75 if title == "Parameters" else 0.35,
+        )
+
+    ax.set_xlabel("Estimated training emissions (g CO$_2$e, Bangladesh grid)")
+    ax.set_ylabel(f"RMSE at {cfg.get('task.headline_horizon_h')} h ({UNIT_PM25})")
+    # The caveat travels with the artefact rather than only in the caption: the
+    # x-axis is an estimate, and a figure separated from its caption should not
+    # read as a measurement.
+    ax.text(
+        0.0,
+        -0.235,
         "Energy is a CodeCarbon estimate, not a metered measurement.",
-        ha="center",
-        fontsize=7.5,
-        color="#555555",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=plt.rcParams["legend.fontsize"] - 0.5,
+        color="#666666",
     )
     save_figure(cfg, fig, "fig08_pareto_accuracy_emissions")
     log.info("wrote fig08_pareto_accuracy_emissions")
@@ -287,13 +386,21 @@ def fig_confusion(cfg, payload, log) -> None:
     labels_shown = [lab for lab, keep in zip(labels, present, strict=True) if keep]
     normalised = matrix_shown / np.clip(matrix_shown.sum(axis=1, keepdims=True), 1, None)
 
-    fig, ax = plt.subplots(figsize=(6.2, 5.2))
+    # A confusion matrix is square, so a full-width version would be half a page
+    # tall. Single column, with the AQI names wrapped rather than rotated: at
+    # this width a 35-degree rotation puts "Unhealthy for Sensitive Groups"
+    # further from its column than the neighbouring one.
+    wrapped = [lab.replace(" for Sensitive Groups", "\n(sensitive)") for lab in labels_shown]
+    wrapped = [lab.replace("Very Unhealthy", "Very\nunhealthy") for lab in wrapped]
+
+    fig, ax = plt.subplots(figsize=(COL_SINGLE, 3.35))
     im = ax.imshow(normalised, cmap="Blues", vmin=0, vmax=1)
-    ax.set_xticks(range(len(labels_shown)), labels_shown, rotation=35, ha="right", fontsize=8)
-    ax.set_yticks(range(len(labels_shown)), labels_shown, fontsize=8)
-    ax.set_xlabel("predicted category")
-    ax.set_ylabel("observed category")
+    ax.set_xticks(range(len(labels_shown)), wrapped, fontsize=6.0)
+    ax.set_yticks(range(len(labels_shown)), wrapped, fontsize=6.0)
+    ax.set_xlabel("Predicted category")
+    ax.set_ylabel("Observed category")
     ax.grid(False)
+    ax.tick_params(length=0)
     for i in range(len(labels_shown)):
         for j in range(len(labels_shown)):
             ax.text(
@@ -302,14 +409,14 @@ def fig_confusion(cfg, payload, log) -> None:
                 f"{normalised[i, j]:.2f}\n({int(matrix_shown[i, j])})",
                 ha="center",
                 va="center",
-                fontsize=7,
-                color="white" if normalised[i, j] > 0.55 else "#333333",
+                fontsize=5.6,
+                linespacing=1.15,
+                color="white" if normalised[i, j] > 0.55 else "#2B2B2B",
             )
-    fig.colorbar(im, ax=ax, label="share of observed class", fraction=0.04, pad=0.03)
-    ax.set_title(
-        f"AQI category confusion, {classification['horizon_h']}-hour advisory\n"
-        f"(summed over {len(classification['per_seed'])} seeds)"
-    )
+    cbar = fig.colorbar(im, ax=ax, fraction=0.045, pad=0.03)
+    cbar.set_label("Share of observed class", fontsize=plt.rcParams["axes.labelsize"])
+    cbar.ax.tick_params(labelsize=plt.rcParams["ytick.labelsize"], length=2)
+    cbar.outline.set_linewidth(0.6)
     save_figure(cfg, fig, "fig09_confusion_matrix")
     log.info("wrote fig09_confusion_matrix")
 
@@ -356,8 +463,8 @@ def fig_skill_by_stratum(cfg, payload, palette, log) -> None:
         log.warning("no non-zero skill series to plot; skipping stratum figure")
         return
 
-    fig, ax = plt.subplots(figsize=(9.0, 4.4))
-    width = 0.8 / max(len(models), 1)
+    fig, ax = plt.subplots(figsize=(COL_DOUBLE, 2.9))
+    width = 0.82 / max(len(models), 1)
     positions = np.arange(len(groups))
     for i, model in enumerate(models):
         sub = view[view["model"] == model].set_index("group").reindex(groups)
@@ -366,15 +473,33 @@ def fig_skill_by_stratum(cfg, payload, palette, log) -> None:
             sub["skill_vs_persistence"].to_numpy(),
             width=width,
             color=palette[i],
-            label=model,
+            label=model.replace("_", " "),
+            edgecolor="white",
+            linewidth=0.3,
         )
-    ax.axhline(0.0, color="#767676", linewidth=1.0)
+    ax.axhline(0.0, color="#767676", linewidth=0.8)
+    # The stratum labels are written by the evaluator in ASCII; typeset the unit
+    # here so the axis matches every other axis in the paper.
+    tick_labels = [
+        g.replace("ug/m3", UNIT_PM25).replace("<=", r"$\leq$").replace(">", r"$>$") for g in groups
+    ]
     ax.set_xticks(
-        positions + width * (len(models) - 1) / 2, groups, rotation=18, ha="right", fontsize=8
+        positions + width * (len(models) - 1) / 2,
+        tick_labels,
+        rotation=14,
+        ha="right",
+        fontsize=7.2,
     )
-    ax.set_ylabel("skill score vs persistence")
-    ax.set_title(f"Skill by stratum at {headline} hours (zero = no better than persistence)")
-    ax.legend(fontsize=8, ncol=min(len(models), 4))
+    ax.set_xlabel("Test-period stratum")
+    ax.set_ylabel("Skill score vs persistence")
+    ax.legend(
+        ncol=min(len(models), 6),
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.0),
+        columnspacing=1.0,
+        handlelength=1.2,
+        fontsize=7.5,
+    )
     save_figure(cfg, fig, "fig10_skill_by_stratum")
     log.info("wrote fig10_skill_by_stratum")
 

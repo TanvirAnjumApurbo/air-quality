@@ -806,9 +806,16 @@ output:
     reference_colour: "#767676"   # persistence / reference baseline, recessive
     grid_colour: "#D9D9D9"        # recessive grid, never competes with marks
     style: seaborn-v0_8-whitegrid
-    font_size: 11
-    figsize_single: [6.0, 4.0]
-    figsize_wide: [10.0, 4.0]
+    # Sized for the printed column, not the screen. Figures go into LaTeX at
+    # width=\linewidth with no rescaling, so 9 pt here is 9 pt on the page --
+    # one point under a 10 pt body, which is the convention. Scaling a figure in
+    # LaTeX is what makes legends unreadable at 100% zoom.
+    font_size: 9
+    # Column widths: 3.5 in single, 7.16 in double. These are the narrower of
+    # {Elsevier 90/190 mm, IEEE 3.5/7.16 in}, so one artefact fits either.
+    # src/viz/figures.py mirrors them as COL_SINGLE / COL_DOUBLE.
+    figsize_single: [3.5, 2.8]
+    figsize_wide: [7.16, 3.0]
   tables:
     formats: [csv, tex]
     tex_style: booktabs
