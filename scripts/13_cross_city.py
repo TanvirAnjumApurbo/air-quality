@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pandas as pd
-from src.results import load_results
+from src.results import load_results, main_runs
 from src.utils import check_disk_space, load_config, setup_logging
 from src.viz.tables import write_table
 
@@ -41,7 +41,7 @@ def _summary(cfg, label: str) -> pd.DataFrame:
     loss, never by test error.
     """
     payload = load_results(cfg)
-    runs = payload.get("runs", [])
+    runs = main_runs(payload)
     if not runs:
         return pd.DataFrame()
 

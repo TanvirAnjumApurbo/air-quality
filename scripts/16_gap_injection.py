@@ -58,6 +58,7 @@ from src.models.sequence import (
     evaluate_sampler,
     train_one,
 )
+from src.results import main_runs
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 
 
@@ -98,7 +99,7 @@ def _tuned_params(payload: dict, model: str, horizon: int) -> dict:
     Returns:
         The stored ``best_params``, or an empty mapping if the run is absent.
     """
-    for record in payload.get("runs", []):
+    for record in main_runs(payload):
         if record.get("model") == model and record.get("horizon_h") == horizon:
             return dict(record.get("best_params") or {})
     return {}

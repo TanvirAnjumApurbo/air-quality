@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd
 from src.eval.ablation import FAMILY_ORDER
 from src.models.data import load_meta
-from src.results import load_results
+from src.results import load_results, main_runs
 from src.utils import check_disk_space, load_config, setup_logging
 
 
@@ -54,7 +54,7 @@ def _fmt_p(p: float) -> str:
 
 def _runs_frame(payload: dict) -> pd.DataFrame:
     """Flatten the run records into a table."""
-    runs = payload.get("runs", [])
+    runs = main_runs(payload)
     if not runs:
         return pd.DataFrame()
     frame = pd.DataFrame(runs)

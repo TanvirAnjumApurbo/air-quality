@@ -15,6 +15,7 @@ Two choices differ from common practice and are deliberate:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from itertools import pairwise
 from typing import Any
 
 import numpy as np
@@ -500,6 +501,200 @@ def block_bootstrap_rmse(
 
     lower, upper = np.quantile(estimates, [alpha / 2.0, 1.0 - alpha / 2.0])
     return BootstrapCI(point, float(lower), float(upper), alpha, n_resamples, block_size)
+
+
+def block_bootstrap_proportion(
+    indicator: np.ndarray,
+    *,
+    n_resamples: int = 1000,
+    block_size: int = 24,
+    alpha: float = 0.05,
+    seed: int = 42,
+) -> BootstrapCI:
+    """Confidence interval for a proportion under serial correlation.
+
+    Forecast availability is far more autocorrelated than RMSE: an outage makes a
+    contiguous block of hours unservable all at once, so the effective sample
+    size is nearer the number of outages than the number of hours. A Wilson
+    interval over ten thousand "independent" hours would be roughly an order of
+    magnitude too narrow. Same moving-block scheme as
+    :func:`block_bootstrap_rmse`, same block length.
+
+    Args:
+        indicator: Boolean or 0/1 series in chronological order.
+        n_resamples: Number of bootstrap replicates.
+        block_size: Block length in hours.
+        alpha: Two-sided significance level.
+        seed: RNG seed.
+
+    Returns:
+        The interval.
+    """
+    x = np.asarray(indicator, dtype=float)
+    n = x.size
+    point = float(x.mean()) if n else float("nan")
+    if n < block_size * 2:
+        return BootstrapCI(point, float("nan"), float("nan"), alpha, n_resamples, block_size)
+
+    rng = np.random.default_rng(seed)
+    n_blocks = int(np.ceil(n / block_size))
+    starts_max = n - block_size
+
+    estimates = np.empty(n_resamples, dtype=float)
+    for i in range(n_resamples):
+        starts = rng.integers(0, starts_max + 1, size=n_blocks)
+        idx = (starts[:, None] + np.arange(block_size)[None, :]).ravel()[:n]
+        estimates[i] = x[idx].mean()
+
+    lower, upper = np.quantile(estimates, [alpha / 2.0, 1.0 - alpha / 2.0])
+    return BootstrapCI(point, float(lower), float(upper), alpha, n_resamples, block_size)
+
+
+# ---------------------------------------------------------------------------
+# All-hours scoring: accuracy and availability together
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class AllHoursResult:
+    """Skill over a fixed universe, with the unserved hours accounted for.
+
+    Attributes:
+        availability: Served rows divided by the size of the universe.
+        rmse_served: RMSE on the rows the model can serve. The status-quo
+            number, kept for continuity with the tables that predate this.
+        rmse_all_hours: RMSE over the whole universe after the fallback chain.
+        rmse_reference: Reference RMSE over the same universe.
+        skill_all_hours: ``1 - rmse_all_hours / rmse_reference``.
+        mse_all_hours: Mean squared error over the universe. Differences in MSE
+            are additive and differences in RMSE are not, so a decomposition
+            across arms must be done here and displayed as RMSE.
+        fallback_share: Fraction of the universe each chain member answered.
+        chain: The chain as applied, in order.
+        n_universe: Size of the universe.
+    """
+
+    availability: float
+    rmse_served: float
+    rmse_all_hours: float
+    rmse_reference: float
+    skill_all_hours: float
+    mse_all_hours: float
+    fallback_share: dict[str, float]
+    chain: list[str]
+    n_universe: int
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialisable view of the result."""
+        return {
+            "availability": self.availability,
+            "rmse_served": self.rmse_served,
+            "rmse_all_hours": self.rmse_all_hours,
+            "rmse_reference": self.rmse_reference,
+            "skill_all_hours": self.skill_all_hours,
+            "mse_all_hours": self.mse_all_hours,
+            "fallback_share": self.fallback_share,
+            "chain": self.chain,
+            "n_universe": self.n_universe,
+        }
+
+
+def all_hours_skill(
+    y_true: np.ndarray,
+    served: dict[str, np.ndarray],
+    *,
+    order: list[str],
+    history_requirement: dict[str, int],
+    reference: np.ndarray,
+) -> AllHoursResult:
+    """Score a fallback cascade over a fixed universe, not a per-model subset.
+
+    A model serving 76% of hours at RMSE 57 cannot be ranked against one serving
+    89% at RMSE 60 without saying what happens on the hours the first refuses.
+    So every member is scored over the same universe and the unserved rows are
+    answered by the next member down, rather than dropped.
+
+    ``order`` must be given explicitly and is checked to be non-increasing in the
+    member's declared history requirement. A fallback chain is a selection, and
+    ordering it by test error would be the study's rule 6 violated one level up:
+    rank candidates by test error, then report that error. Ordering by history
+    requirement is a property of the model, fixed before any test row is seen.
+
+    Args:
+        y_true: Observed values over the universe.
+        served: Chain member to its prediction vector over the universe, NaN
+            where that member cannot answer.
+        order: Chain members, most demanding first.
+        history_requirement: Hours of history each member needs, used only to
+            check the ordering.
+        reference: Reference prediction over the whole universe, for the skill
+            denominator. Must itself be complete.
+
+    Returns:
+        The result.
+
+    Raises:
+        ValueError: If ``order`` is not non-increasing in history requirement,
+            if a member is missing from ``served`` or ``history_requirement``,
+            if lengths disagree, if the reference is incomplete, or if the chain
+            leaves any row of the universe unanswered.
+    """
+    missing = [m for m in order if m not in served]
+    if missing:
+        raise ValueError(f"chain members absent from served: {missing}")
+    unranked = [m for m in order if m not in history_requirement]
+    if unranked:
+        raise ValueError(f"chain members absent from history_requirement: {unranked}")
+
+    needs = [history_requirement[m] for m in order]
+    if any(b > a for a, b in pairwise(needs)):
+        raise ValueError(
+            f"chain must be non-increasing in history requirement, got {dict(zip(order, needs, strict=True))}; "
+            f"a chain ordered by anything measured on the test set is a selection on test error"
+        )
+
+    truth = np.asarray(y_true, dtype=float)
+    n = truth.size
+    ref = np.asarray(reference, dtype=float)
+    if ref.size != n:
+        raise ValueError(f"reference has {ref.size} rows, universe has {n}")
+    if np.isnan(ref).any():
+        raise ValueError(
+            f"reference is undefined on {int(np.isnan(ref).sum())} rows; the skill "
+            f"denominator must cover the whole universe or it moves with the arm"
+        )
+
+    out = np.full(n, np.nan, dtype=float)
+    share: dict[str, float] = {}
+    for name in order:
+        candidate = np.asarray(served[name], dtype=float)
+        if candidate.size != n:
+            raise ValueError(f"{name} has {candidate.size} rows, universe has {n}")
+        take = np.isnan(out) & ~np.isnan(candidate)
+        out[take] = candidate[take]
+        share[name] = float(take.sum() / n) if n else 0.0
+
+    if np.isnan(out).any():
+        raise ValueError(
+            f"chain left {int(np.isnan(out).sum())} of {n} rows unanswered; the last "
+            f"member must cover the whole universe"
+        )
+
+    head = np.asarray(served[order[0]], dtype=float)
+    head_ok = ~np.isnan(head)
+    ref_rmse = rmse(truth, ref)
+    mse_all = float(np.mean((truth - out) ** 2))
+    return AllHoursResult(
+        availability=float(head_ok.mean()) if n else float("nan"),
+        rmse_served=rmse(truth[head_ok], head[head_ok]) if head_ok.any() else float("nan"),
+        rmse_all_hours=float(np.sqrt(mse_all)),
+        rmse_reference=ref_rmse,
+        skill_all_hours=float(1.0 - np.sqrt(mse_all) / ref_rmse) if ref_rmse > 0 else float("nan"),
+        mse_all_hours=mse_all,
+        fallback_share=share,
+        chain=list(order),
+        n_universe=int(n),
+    )
 
 
 # ---------------------------------------------------------------------------

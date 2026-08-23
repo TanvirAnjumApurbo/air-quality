@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
-from src.results import load_results, save_results
+from src.results import load_results, main_runs, save_results
 from src.utils import check_disk_space, load_config, setup_logging
 from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
@@ -81,7 +81,7 @@ def _candidate_frame(payload: dict, horizon: int) -> pd.DataFrame:
         One row per (candidate, seed) with its validation loss and test RMSE.
     """
     rows = []
-    for run in payload.get("runs", []):
+    for run in main_runs(payload):
         if run.get("tier") != "tier3" or int(run.get("horizon_h", -1)) != horizon:
             continue
         val = run.get("best_val_loss")

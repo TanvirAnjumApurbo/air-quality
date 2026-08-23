@@ -30,7 +30,7 @@ import pandas as pd
 from src.green.complexity import profile_model
 from src.models.data import build_sequence_index, load_features
 from src.models.sequence import ModelSpec, build_model
-from src.results import load_results, save_results
+from src.results import load_results, main_runs, save_results
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 from src.viz.tables import write_table
 
@@ -55,7 +55,7 @@ def main() -> int:
         cfg.raw["green"]["complexity"]["latency"]["n_runs"] = args.latency_runs
 
     payload = load_results(cfg)
-    runs = payload.get("runs", [])
+    runs = main_runs(payload)
     sequence_runs = [r for r in runs if r.get("tier") == "tier3" and r.get("completed")]
     if not sequence_runs:
         log.error("no completed Tier 3 runs found; run scripts/06_train_sequence.py first")

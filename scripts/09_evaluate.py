@@ -49,7 +49,7 @@ from src.models.sequence import (
     build_model,
     evaluate_sampler,
 )
-from src.results import load_results, save_results
+from src.results import load_results, main_runs, save_results
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 from src.viz.tables import write_table
 
@@ -76,7 +76,7 @@ def load_best_sequence_predictions(
     payload = load_results(cfg)
     runs = [
         r
-        for r in payload.get("runs", [])
+        for r in main_runs(payload)
         if r.get("tier") == "tier3" and r.get("completed") and r.get("horizon_h") == horizon
     ]
     if not runs:
@@ -212,7 +212,7 @@ def main() -> int:
             # ---- Diebold-Mariano vs the best classical baseline -----------
             classical_runs = [
                 r
-                for r in payload.get("runs", [])
+                for r in main_runs(payload)
                 if r.get("tier") in {"tier1", "tier2"} and r.get("horizon_h") == h
             ]
             if classical_runs:

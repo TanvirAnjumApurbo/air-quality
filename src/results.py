@@ -88,6 +88,54 @@ def save_results(cfg: Config, payload: dict[str, Any]) -> Path:
     return path
 
 
+#: Experiment label carried by every run belonging to the headline study.
+#:
+#: Records written before side experiments existed carry no ``experiment`` key
+#: at all, and they are the headline study, so absence means this value.
+MAIN_EXPERIMENT = "main"
+
+
+def main_runs(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """Runs belonging to the headline experiment, and only those.
+
+    The lookback frontier writes into the same ``results.json``, keyed by a
+    lookback-tagged variant so it cannot collide with an existing record. But
+    nothing else stops ``11_make_report.py::_best_per_horizon`` from *selecting*
+    a lookback-48 run as the headline model, which would silently change the
+    reported result -- the same class of failure as the 675 stale-width records,
+    moved to the reporting side.
+
+    Every consumer of ``runs`` goes through here rather than reading the list,
+    so a new side experiment cannot leak into the headline by being forgotten at
+    one of nine call sites. A test greps for survivors.
+
+    Args:
+        payload: The results mapping.
+
+    Returns:
+        Run records with no ``experiment`` key, or with it set to
+        :data:`MAIN_EXPERIMENT`.
+    """
+    return [
+        run
+        for run in payload.get("runs", [])
+        if run.get("experiment", MAIN_EXPERIMENT) == MAIN_EXPERIMENT
+    ]
+
+
+def experiment_runs(payload: dict[str, Any], experiment: str) -> list[dict[str, Any]]:
+    """Runs belonging to one named side experiment.
+
+    Args:
+        payload: The results mapping.
+        experiment: The ``experiment`` label to select.
+
+    Returns:
+        Matching run records.
+    """
+    return [run for run in payload.get("runs", []) if run.get("experiment") == experiment]
+
+
 def upsert_run(payload: dict[str, Any], record: dict[str, Any]) -> None:
     """Insert or replace a run record.
 

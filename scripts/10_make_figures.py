@@ -32,7 +32,7 @@ from src.models.sequence import (
     build_model,
     evaluate_sampler,
 )
-from src.results import load_results
+from src.results import load_results, main_runs
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 from src.viz.figures import (
     COL_DOUBLE,
@@ -61,7 +61,7 @@ def parse_args() -> argparse.Namespace:
 
 def fig_rmse_vs_horizon(cfg, payload, palette, log) -> None:
     """RMSE against forecast horizon, faceted by tier, with seed error bars."""
-    runs = pd.DataFrame(payload.get("runs", []))
+    runs = pd.DataFrame(main_runs(payload))
     if runs.empty:
         log.warning("no runs; skipping RMSE-vs-horizon figure")
         return
@@ -140,7 +140,7 @@ def fig_pred_vs_actual(cfg, frame, payload, palette, device, log) -> None:
     headline = int(cfg.get("task.headline_horizon_h"))
     runs = [
         r
-        for r in payload.get("runs", [])
+        for r in main_runs(payload)
         if r.get("tier") == "tier3" and r.get("completed") and r.get("horizon_h") == headline
     ]
     if not runs:
