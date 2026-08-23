@@ -40,3 +40,8 @@
 18:49:25 [8/8] T3 grid: wanliu_R48
 18:49:25   disk: C: 12G  F: 9G
 18:49:25   attempt 1: resume (keeps cells already computed)
+22:19:58   attempt 1: FAILED rc=127
+22:19:59   disk: C: 0G  F: 9G
+22:19:59   ABORT: under 6G free (C: 0G, F: 9G).
+22:19:59   The last crash was numpy failing to allocate 25 MB with a full system drive.
+22:19:59 pipeline: ABORT -- wanliu_R48 failed

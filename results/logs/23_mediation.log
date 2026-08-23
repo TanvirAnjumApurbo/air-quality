@@ -26,3 +26,13 @@
        72       50          -4414.74             -4321.5
 18:52:29 | INFO    | 23_mediation | dilution bound: with no arm difference on the 801 extra rows the gap would still shrink to 84.7% of its value; anything beyond that is mediated
 18:52:30 | INFO    | 23_mediation | wrote fig17_mediation.png, fig17_mediation.pdf
+22:25:50 | INFO    | 23_mediation | radii on disk: [192, 72, 48]
+22:25:50 | INFO    | 23_mediation | draw identity across 3 radii: OK
+22:25:50 | INFO    | 23_mediation | persistence invariant within every radius: True; across radii it moves by 2.3269, which is the evaluation set growing as the reach shortens
+22:25:50 | INFO    | 23_mediation | mediator (fragmented minus contiguous usable rows) by radius:
+ radius_h  n_draws  mean_row_deficit  median_row_deficit
+      192       50          -8056.16             -8527.5
+       72       50          -4414.74             -4321.5
+       48       50          -3219.92             -3198.5
+22:25:50 | INFO    | 23_mediation | dilution bound: with no arm difference on the 993 extra rows the gap would still shrink to 79.9% of its value; anything beyond that is mediated
+22:25:51 | INFO    | 23_mediation | wrote fig17_mediation.png, fig17_mediation.pdf

@@ -1244,6 +1244,115 @@ def main() -> int:
                         )
                         a("")
 
+    # ---- mediation: is the radius WHY fragmentation costs skill? -----------
+    # Sits at the end of the gap-injection section rather than in the
+    # availability one, because it is the gap-injection claim it completes: 8
+    # measures the penalty, the law explains what should cause it, and this
+    # manipulates that cause and watches the penalty follow.
+    med_paths = sorted(Path(str(cfg.get("paths.results"))).glob("mediation_*.json"))
+    if med_paths:
+        med = json.loads(med_paths[0].read_text(encoding="utf-8"))
+        tests = pd.DataFrame(med.get("tests", []))
+        mediator = pd.DataFrame(med.get("mediator", []))
+        radii = med.get("radii", [])
+        if not tests.empty and len(radii) >= 2:
+            deep, shallow = max(radii), min(radii)
+            a(f"### {next_section - 1}c. Is the backward reach *why* it costs skill?")
+            a("")
+            a("The section above measures a penalty and the law below explains what should")
+            a("cause it: a gap sterilises the hours behind it, so scattering removals")
+            a("destroys far more supervision than clustering them. That is a mediation")
+            a("claim, and it predicts something falsifiable — shorten the reach and the")
+            a("penalty should shrink.")
+            a("")
+            a("The reach is set by configuration rather than inferred from a regression, so")
+            a("this is a stronger design than a regression-based mediation and needs no")
+            a("sequential-ignorability assumption. `inject_gaps` is deterministic in")
+            a("(arm, coverage, seed) and runs before any feature is built, so the same")
+            a("degraded series appears at every reach and each draw is a repeated measure.")
+            a("")
+
+            if not mediator.empty:
+                a("**The mediator moves first.** Usable training rows the fragmented arm")
+                a("loses relative to the contiguous arm, at the same removed-hour count:")
+                a("")
+                a("| Sterilisation radius (h) | Row deficit |")
+                a("|---:|---:|")
+                for r in mediator.itertuples():
+                    a(f"| {int(r.radius_h)} | {r.mean_row_deficit:,.0f} |")
+                a("")
+                if not med.get("mediator_deficit_shrinks_with_radius"):
+                    a("> ⚠ The deficit does not shrink with the radius, so there is no mediator")
+                    a("> here and the test below should not be read as one.")
+                    a("")
+
+            a(f"**And the penalty follows it.** Arm gap at R = {deep} h against R = {shallow} h,")
+            a("differenced within the same injection draw:")
+            a("")
+            a(f"| Family | R = {deep} | R = {shallow} | Change | 95% CI | Mediated | p (Holm) |")
+            a("|---|---:|---:|---:|---|---:|---:|")
+            for r in tests.itertuples():
+                gap_deep = getattr(r, f"gap_R{deep}")
+                gap_shallow = getattr(r, f"gap_R{shallow}")
+                # A proportion of nearly nothing is not a proportion: with no
+                # penalty at the deepest reach the ratio is dominated by its own
+                # denominator and reads as 235% mediated, which means only that
+                # there was nothing there to mediate.
+                share = f"{100 * r.proportion_mediated:.0f}%" if abs(gap_deep) >= 0.005 else "—"
+                a(
+                    f"| {r.family} | {gap_deep:+.4f} | {gap_shallow:+.4f} | "
+                    f"{r.delta:+.4f} | [{r.ci_low:+.4f}, {r.ci_high:+.4f}] | "
+                    f"{share} | {_fmt_p(r.p_holm)} |"
+                )
+            a("")
+            a("One-sided and pre-declared: the mechanism predicts the gap becomes less")
+            a("negative, and spending power on the other direction would be spending it on")
+            a("something the account does not claim.")
+            a("")
+
+            dil = med.get("dilution_bound") or {}
+            if dil:
+                factor = float(dil["expected_gap_factor_under_pure_dilution"])
+                a(
+                    f"**The confound, bounded rather than argued.** A shorter reach scores "
+                    f"more test hours — {dil['n_rows_deep']:,} at R = {deep} against "
+                    f"{dil['n_rows_shallow']:,} at R = {shallow} — so the two gaps are not "
+                    f"measured on the same rows. If those extra hours carried no arm "
+                    f"difference whatever, the gap would still shrink to "
+                    f"{100 * factor:.0f}% of itself by arithmetic alone: the between-arm "
+                    f"error is averaged over more rows and the persistence denominator "
+                    f"moves. Anything beyond that is mediated."
+                )
+                a("")
+                seq = tests[tests["family"] == "sequence"]
+                if not seq.empty and "shrinkage_beyond_dilution" in seq:
+                    row = seq.iloc[0]
+                    beyond = float(row["shrinkage_beyond_dilution"])
+                    total = float(row["delta"])
+                    if total:
+                        a(
+                            f"For the sequence tier that leaves dilution explaining "
+                            f"{abs(total - beyond):.4f} of the {abs(total):.4f} change and "
+                            f"the reach explaining {abs(beyond):.4f} — "
+                            f"{100 * abs(beyond) / abs(total):.0f}% of the effect."
+                        )
+                        a("")
+
+            null_rows = tests[tests["p_wilcoxon_onesided"] > 0.10]["family"].tolist()
+            if null_rows:
+                a(
+                    f"**The falsification control holds.** {_join_and(null_rows)} had little "
+                    f"or no gap to mediate at the deepest reach, and shows no mediation. A "
+                    f"design in which every family moved regardless of whether it had a "
+                    f"penalty would be measuring something other than the mechanism."
+                )
+                a("")
+            a("**Scope.** One donor and one horizon. This establishes the mechanism on the")
+            a("record where the penalty was measured; it does not establish that the same")
+            a("mechanism carries the effect on the other donor stations, whose grids were")
+            a("run at the configured reach only.")
+            a("")
+
     # ---- forecast availability and the lookback frontier -------------------
     # Its own section rather than a subsection of the ablation, because it is a
     # property of the RECORD and the feature set, not of the gap-injection
