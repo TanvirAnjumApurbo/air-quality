@@ -1,0 +1,40 @@
+\begin{table}[htbp]
+\caption{Diebold-Mariano on the common subset, each capped arm against the status quo, Holm-corrected across the family. A negative statistic favours the capped arm. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:lookback_dm_tests}
+\begin{tabular}{lrrrrrrr}
+\toprule
+model & arm & vs & dm\_stat & better & p\_raw & p\_holm & significant \\
+\midrule
+climatology & A24 & C & 0.0934 & C & 0.9256 & 1.0000 & False \\
+climatology & A48 & C & -0.3240 & A48 & 0.7460 & 1.0000 & False \\
+dlinear\_w24 & A24 & C & -4.8287 & A24 & 0.0000 & 0.0000 & True \\
+dlinear\_w24 & A48 & C & -3.8745 & A48 & 0.0001 & 0.0030 & True \\
+dlinear\_w48 & A24 & C & -2.9954 & A24 & 0.0028 & 0.0717 & False \\
+dlinear\_w48 & A48 & C & -4.3864 & A48 & 0.0000 & 0.0003 & True \\
+gru\_h64\_l2\_w24 & A24 & C & 1.1890 & C & 0.2345 & 1.0000 & False \\
+gru\_h64\_l2\_w24 & A48 & C & 1.7867 & C & 0.0741 & 1.0000 & False \\
+gru\_h64\_l2\_w48 & A24 & C & 0.6037 & C & 0.5461 & 1.0000 & False \\
+gru\_h64\_l2\_w48 & A48 & C & 1.9538 & C & 0.0508 & 0.9686 & False \\
+lightgbm & A24 & C & -1.9742 & A24 & 0.0484 & 0.9686 & False \\
+lightgbm & A48 & C & -1.6445 & A48 & 0.1002 & 1.0000 & False \\
+lightgbm & B24 & C & -1.7243 & B24 & 0.0847 & 1.0000 & False \\
+lightgbm & B48 & C & -0.5918 & B48 & 0.5540 & 1.0000 & False \\
+lstm\_h64\_l1\_w24 & A24 & C & 0.1896 & C & 0.8496 & 1.0000 & False \\
+lstm\_h64\_l1\_w24 & A48 & C & 1.3112 & C & 0.1899 & 1.0000 & False \\
+lstm\_h64\_l1\_w48 & A24 & C & 0.4872 & C & 0.6261 & 1.0000 & False \\
+lstm\_h64\_l1\_w48 & A48 & C & -1.5289 & A48 & 0.1264 & 1.0000 & False \\
+random\_forest & A24 & C & -2.6044 & A24 & 0.0092 & 0.2217 & False \\
+random\_forest & A48 & C & -2.5780 & A48 & 0.0100 & 0.2294 & False \\
+random\_forest & B24 & C & -2.0123 & B24 & 0.0443 & 0.9293 & False \\
+random\_forest & B48 & C & -1.0349 & B48 & 0.3008 & 1.0000 & False \\
+ridge & A24 & C & -1.7266 & A24 & 0.0843 & 1.0000 & False \\
+ridge & A48 & C & -1.5578 & A48 & 0.1194 & 1.0000 & False \\
+ridge & B24 & C & -0.6563 & B24 & 0.5117 & 1.0000 & False \\
+ridge & B48 & C & -0.4984 & B48 & 0.6183 & 1.0000 & False \\
+xgboost & A24 & C & -2.9446 & A24 & 0.0033 & 0.0813 & False \\
+xgboost & A48 & C & -3.0367 & A48 & 0.0024 & 0.0650 & False \\
+xgboost & B24 & C & -1.4626 & B24 & 0.1437 & 1.0000 & False \\
+xgboost & B48 & C & -2.2324 & B48 & 0.0256 & 0.5642 & False \\
+\bottomrule
+\end{tabular}
+\end{table}

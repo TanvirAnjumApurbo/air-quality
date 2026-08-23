@@ -8,3 +8,8 @@
 01:08:06   22 config rc=0
 01:08:06 [3/4] 21 tier-3 frontier: config_beijing
 01:08:06   disk: C: 17G  F: 9G
+01:17:24   21 config_beijing rc=127
+01:17:24   NOTE: 16-style teardown exits non-zero after training; verifying by content
+01:17:24 [4/4] 22 score it honestly: config_beijing
+01:17:29   22 config_beijing rc=0
+01:17:29 frontier: DONE
