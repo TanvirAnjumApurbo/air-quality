@@ -1,0 +1,223 @@
+01:08:00 | INFO    | 22_availability_frontier | universe 10880 hours, persistence RMSE 71.2545
+01:08:00 | INFO    | 22_availability_frontier | common subset: 9083 of 10880 universe hours
+01:08:03 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
+01:08:05 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf
+01:08:05 | INFO    | 22_availability_frontier | reference RMSE on served 73.7644 vs unserved 56.8988 -- the hours the deepest arm cannot reach are EASIER, not harder
+
+==============================================================================
+COMMON SUBSET — every arm on the same 9083 hours
+==============================================================================
+          model arm  lookback_h  n_common  rmse_common  ci_low  ci_high
+    climatology A24     24.0000      9083      65.4037 60.3437  70.3250
+    climatology A48     48.0000      9083      65.3592 60.3531  70.2642
+    climatology B24     24.0000      9083      65.4315 60.5242  70.4543
+    climatology B48     48.0000      9083      65.4315 60.5242  70.4543
+    climatology   C         NaN      9083      65.4315 60.5242  70.4543
+    dlinear_w24 A24     24.0000      9083      68.0718 62.3394  73.6390
+    dlinear_w24 A48     48.0000      9083      66.0588 60.3850  71.5205
+    dlinear_w24 B24     24.0000      9083      65.9962 60.3285  71.4301
+    dlinear_w24 B48     48.0000      9083      65.9962 60.3285  71.4301
+    dlinear_w24   C         NaN      9083      65.9962 60.3285  71.4301
+    dlinear_w48 A24     24.0000      9083      65.8150 59.8980  71.6455
+    dlinear_w48 A48     48.0000      9083      65.8263 60.1330  71.4693
+    dlinear_w48 B24     24.0000      9083      66.4291 60.7295  71.8466
+    dlinear_w48 B48     48.0000      9083      66.4291 60.7295  71.8466
+    dlinear_w48   C         NaN      9083      66.4291 60.7295  71.8466
+ gru_h64_l2_w24 A24     24.0000      9083      58.0350 52.8802  63.1879
+ gru_h64_l2_w24 A48     48.0000      9083      58.2589 53.1764  63.4044
+ gru_h64_l2_w24 B24     24.0000      9083      57.6014 52.8439  62.5324
+ gru_h64_l2_w24 B48     48.0000      9083      57.6014 52.8439  62.5324
+ gru_h64_l2_w24   C         NaN      9083      57.6014 52.8439  62.5324
+ gru_h64_l2_w48 A24     24.0000      9083      58.9834 53.7678  64.2437
+ gru_h64_l2_w48 A48     48.0000      9083      58.0321 52.9143  63.0922
+ gru_h64_l2_w48 B24     24.0000      9083      58.0568 53.0056  63.0037
+ gru_h64_l2_w48 B48     48.0000      9083      58.0568 53.0056  63.0037
+ gru_h64_l2_w48   C         NaN      9083      58.0568 53.0056  63.0037
+       lightgbm A24     24.0000      9083      58.5441 53.5767  63.7193
+       lightgbm A48     48.0000      9083      58.6248 53.5121  63.8162
+       lightgbm B24     24.0000      9083      58.5693 53.6806  63.7790
+       lightgbm B48     48.0000      9083      58.4309 53.4733  63.5990
+       lightgbm   C         NaN      9083      59.0210 54.0286  64.1892
+lstm_h64_l1_w24 A24     24.0000      9083      56.6172 51.9778  61.1742
+lstm_h64_l1_w24 A48     48.0000      9083      56.6124 52.1509  61.0796
+lstm_h64_l1_w24 B24     24.0000      9083      57.2850 52.3531  62.2895
+lstm_h64_l1_w24 B48     48.0000      9083      57.2850 52.3531  62.2895
+lstm_h64_l1_w24   C         NaN      9083      57.2850 52.3531  62.2895
+lstm_h64_l1_w48 A24     24.0000      9083      57.3498 52.3301  62.2328
+lstm_h64_l1_w48 A48     48.0000      9083      56.7207 52.0931  61.3237
+lstm_h64_l1_w48 B24     24.0000      9083      56.8292 52.1160  61.5662
+lstm_h64_l1_w48 B48     48.0000      9083      56.8292 52.1160  61.5662
+lstm_h64_l1_w48   C         NaN      9083      56.8292 52.1160  61.5662
+    persistence A24     24.0000      9083      73.7644 67.7724  79.8617
+    persistence A48     48.0000      9083      73.7644 67.7724  79.8617
+    persistence B24     24.0000      9083      73.7644 67.7724  79.8617
+    persistence B48     48.0000      9083      73.7644 67.7724  79.8617
+    persistence   C         NaN      9083      73.7644 67.7724  79.8617
+  random_forest A24     24.0000      9083      58.2461 53.3046  63.3797
+  random_forest A48     48.0000      9083      58.4120 53.3673  63.4538
+  random_forest B24     24.0000      9083      58.3918 53.4446  63.3646
+  random_forest B48     48.0000      9083      58.3661 53.3640  63.4046
+  random_forest   C         NaN      9083      58.4997 53.4546  63.4894
+          ridge A24     24.0000      9083      59.6422 54.4281  64.7100
+          ridge A48     48.0000      9083      59.4959 54.1840  64.4819
+          ridge B24     24.0000      9083      59.6047 54.3883  64.6139
+          ridge B48     48.0000      9083      59.5439 54.3086  64.5930
+          ridge   C         NaN      9083      59.3651 54.2984  64.3421
+        xgboost A24     24.0000      9083      58.3632 53.2768  63.4827
+        xgboost A48     48.0000      9083      58.4784 53.2772  63.6250
+        xgboost B24     24.0000      9083      58.4514 53.5243  63.6384
+        xgboost B48     48.0000      9083      58.4651 53.4982  63.5679
+        xgboost   C         NaN      9083      58.6243 53.6406  63.7296
+
+Diebold-Mariano against the status quo (negative favours the cap)
+          model arm vs  dm_stat better  p_raw  p_holm  significant
+    climatology A24  C  -0.1343    A24 0.8932  1.0000        False
+    climatology A48  C  -0.3913    A48 0.6956  1.0000        False
+    dlinear_w24 A24  C   4.7799      C 0.0000  0.0001         True
+    dlinear_w24 A48  C   0.2382      C 0.8118  1.0000        False
+    dlinear_w48 A24  C  -0.7772    A24 0.4371  1.0000        False
+    dlinear_w48 A48  C  -1.0745    A48 0.2826  1.0000        False
+ gru_h64_l2_w24 A24  C   1.1992      C 0.2305  1.0000        False
+ gru_h64_l2_w24 A48  C   1.9131      C 0.0558  1.0000        False
+ gru_h64_l2_w48 A24  C   2.7553      C 0.0059  0.1704        False
+ gru_h64_l2_w48 A48  C  -0.1063    A48 0.9154  1.0000        False
+       lightgbm A24  C  -1.3621    A24 0.1732  1.0000        False
+       lightgbm A48  C  -1.1067    A48 0.2685  1.0000        False
+       lightgbm B24  C  -1.6824    B24 0.0925  1.0000        False
+       lightgbm B48  C  -2.2129    B48 0.0269  0.7541        False
+lstm_h64_l1_w24 A24  C  -1.9446    A24 0.0519  1.0000        False
+lstm_h64_l1_w24 A48  C  -1.7036    A48 0.0885  1.0000        False
+lstm_h64_l1_w48 A24  C   1.6655      C 0.0959  1.0000        False
+lstm_h64_l1_w48 A48  C  -0.4481    A48 0.6541  1.0000        False
+  random_forest A24  C  -1.2808    A24 0.2003  1.0000        False
+  random_forest A48  C  -0.4916    A48 0.6230  1.0000        False
+  random_forest B24  C  -0.5991    B24 0.5491  1.0000        False
+  random_forest B48  C  -0.8414    B48 0.4001  1.0000        False
+          ridge A24  C   1.4683      C 0.1421  1.0000        False
+          ridge A48  C   1.0246      C 0.3056  1.0000        False
+          ridge B24  C   1.4617      C 0.1439  1.0000        False
+          ridge B48  C   1.6594      C 0.0971  1.0000        False
+        xgboost A24  C  -0.9935    A24 0.3205  1.0000        False
+        xgboost A48  C  -0.5746    A48 0.5656  1.0000        False
+        xgboost B24  C  -0.8244    B24 0.4097  1.0000        False
+        xgboost B48  C  -0.9687    B48 0.3327  1.0000        False
+
+Decomposition (MSE)
+          model  lookback_h  rmse_C  rmse_B  rmse_A  total_mse_delta  volume_mse_delta  richness_mse_delta  residual
+    climatology          24 65.4315 65.4315 65.4037          -3.6400           -3.6400              0.0000    0.0000
+    climatology          48 65.4315 65.4315 65.3592          -9.4495           -9.4495              0.0000    0.0000
+    dlinear_w24          24 65.9962 65.9962 68.0718         278.2710          278.2710              0.0000    0.0000
+    dlinear_w24          48 65.9962 65.9962 66.0588           8.2668            8.2668              0.0000    0.0000
+    dlinear_w48          24 66.4291 66.4291 65.8150         -81.2013          -81.2013              0.0000    0.0000
+    dlinear_w48          48 66.4291 66.4291 65.8263         -79.7151          -79.7151              0.0000    0.0000
+ gru_h64_l2_w24          24 57.6014 57.6014 58.0350          50.1429           50.1429              0.0000    0.0000
+ gru_h64_l2_w24          48 57.6014 57.6014 58.2589          76.1857           76.1857              0.0000    0.0000
+ gru_h64_l2_w48          24 58.0568 58.0568 58.9834         108.4469          108.4469              0.0000    0.0000
+ gru_h64_l2_w48          48 58.0568 58.0568 58.0321          -2.8701           -2.8701              0.0000    0.0000
+       lightgbm          24 59.0210 58.5693 58.5441         -56.0611           -2.9470            -53.1140    0.0000
+       lightgbm          48 59.0210 58.4309 58.6248         -46.6097           22.6948            -69.3045    0.0000
+lstm_h64_l1_w24          24 57.2850 57.2850 56.6172         -76.0612          -76.0612              0.0000    0.0000
+lstm_h64_l1_w24          48 57.2850 57.2850 56.6124         -76.6086          -76.6086              0.0000    0.0000
+lstm_h64_l1_w48          24 56.8292 56.8292 57.3498          59.4478           59.4478              0.0000    0.0000
+lstm_h64_l1_w48          48 56.8292 56.8292 56.7207         -12.3174          -12.3174              0.0000    0.0000
+    persistence          24 73.7644 73.7644 73.7644           0.0000            0.0000              0.0000    0.0000
+    persistence          48 73.7644 73.7644 73.7644           0.0000            0.0000              0.0000    0.0000
+  random_forest          24 58.4997 58.3918 58.2461         -29.6076          -16.9970            -12.6106    0.0000
+  random_forest          48 58.4997 58.3661 58.4120         -10.2602            5.3537            -15.6139    0.0000
+          ridge          24 59.3651 59.6047 59.6422          32.9796            4.4749             28.5047    0.0000
+          ridge          48 59.3651 59.5439 59.4959          15.5449           -5.7180             21.2630    0.0000
+        xgboost          24 58.6243 58.4514 58.3632         -30.5425          -10.2949            -20.2476    0.0000
+        xgboost          48 58.6243 58.4651 58.4784         -17.0844            1.5590            -18.6435    0.0000
+
+==============================================================================
+VERDICT
+==============================================================================
+  On the common 9083 hours, at least one arm differs from the status quo under Holm.
+    lstm_h64_l1_w24 best arm A24  availability 0.9760 all-hours skill +0.2173 (+0.0204 vs status quo)
+    lightgbm       best arm A24  availability 0.9760 all-hours skill +0.1938 (+0.0173 vs status quo)
+    random_forest  best arm A24  availability 0.9760 all-hours skill +0.1983 (+0.0156 vs status quo)
+    xgboost        best arm A24  availability 0.9760 all-hours skill +0.1966 (+0.0154 vs status quo)
+    dlinear_w48    best arm A24  availability 0.9535 all-hours skill +0.1014 (+0.0130 vs status quo)
+    lstm_h64_l1_w48 best arm A48  availability 0.9525 all-hours skill +0.2132 (+0.0109 vs status quo)
+    gru_h64_l2_w48 best arm A48  availability 0.9525 all-hours skill +0.1966 (+0.0087 vs status quo)
+    ridge          best arm A48  availability 0.9525 all-hours skill +0.1791 (+0.0066 vs status quo)
+    gru_h64_l2_w24 best arm A24  availability 0.9760 all-hours skill +0.1993 (+0.0061 vs status quo)
+    dlinear_w24    best arm A48  availability 0.9525 all-hours skill +0.0974 (+0.0038 vs status quo)
+    climatology    best arm B24  availability 0.8348 all-hours skill +0.1004 (+0.0000 vs status quo)
+    persistence    best arm A24  availability 0.9760 all-hours skill +0.0000 (+0.0000 vs status quo)
+
+All hours
+          model     arm  policy  availability  rmse_served  rmse_all_hours  skill_all_hours
+    climatology     A24  single        0.9760      64.1822         64.4915           0.0949
+    climatology     A48  single        0.9525      64.2607         64.4701           0.0952
+    climatology     B24  single        0.8348      65.4315         64.1005           0.1004
+    climatology     B48  single        0.8348      65.4315         64.1005           0.1004
+    climatology       C  single        0.8348      65.4315         64.1005           0.1004
+    climatology cascade cascade        1.0000      65.4315         64.5638           0.0939
+    dlinear_w24     A24  single        0.9760      65.8636         66.1255           0.0720
+    dlinear_w24     A48  single        0.9525      64.0960         64.3138           0.0974
+    dlinear_w24     B24  single        0.8348      65.9962         64.5820           0.0936
+    dlinear_w24     B48  single        0.8348      65.9962         64.5820           0.0936
+    dlinear_w24       C  single        0.8348      65.9962         64.5820           0.0936
+    dlinear_w24 cascade cascade        1.0000      65.9962         64.2466           0.0984
+    dlinear_w48     A24  single        0.9535      63.7851         64.0272           0.1014
+    dlinear_w48     A48  single        0.9525      63.8008         64.0335           0.1013
+    dlinear_w48     B24  single        0.8348      66.4291         64.9515           0.0885
+    dlinear_w48     B48  single        0.8348      66.4291         64.9515           0.0885
+    dlinear_w48       C  single        0.8348      66.4291         64.9515           0.0885
+    dlinear_w48 cascade cascade        1.0000      66.4291         64.5399           0.0942
+ gru_h64_l2_w24     A24  single        0.9760      56.5068         57.0529           0.1993
+ gru_h64_l2_w24     A48  single        0.9525      56.8427         57.4520           0.1937
+ gru_h64_l2_w24     B24  single        0.8348      57.6014         57.4859           0.1932
+ gru_h64_l2_w24     B48  single        0.8348      57.6014         57.4859           0.1932
+ gru_h64_l2_w24       C  single        0.8348      57.6014         57.4859           0.1932
+ gru_h64_l2_w24 cascade cascade        1.0000      57.6014         56.7854           0.2031
+ gru_h64_l2_w48     A24  single        0.9535      57.4552         58.0322           0.1856
+ gru_h64_l2_w48     A48  single        0.9525      56.6234         57.2454           0.1966
+ gru_h64_l2_w48     B24  single        0.8348      58.0568         57.8671           0.1879
+ gru_h64_l2_w48     B48  single        0.8348      58.0568         57.8671           0.1879
+ gru_h64_l2_w48       C  single        0.8348      58.0568         57.8671           0.1879
+ gru_h64_l2_w48 cascade cascade        1.0000      58.0568         57.2525           0.1965
+       lightgbm     A24  single        0.9760      56.9114         57.4441           0.1938
+       lightgbm     A48  single        0.9525      57.0443         57.6420           0.1910
+       lightgbm     B24  single        0.8348      58.5693         58.2967           0.1819
+       lightgbm     B48  single        0.8348      58.4309         58.1806           0.1835
+       lightgbm       C  single        0.8348      59.0210         58.6758           0.1765
+       lightgbm cascade cascade        1.0000      59.0210         57.8470           0.1882
+lstm_h64_l1_w24     A24  single        0.9760      55.1800         55.7710           0.2173
+lstm_h64_l1_w24     A48  single        0.9525      55.2940         55.9939           0.2142
+lstm_h64_l1_w24     B24  single        0.8348      57.2850         57.2214           0.1969
+lstm_h64_l1_w24     B48  single        0.8348      57.2850         57.2214           0.1969
+lstm_h64_l1_w24       C  single        0.8348      57.2850         57.2214           0.1969
+lstm_h64_l1_w24 cascade cascade        1.0000      57.2850         56.3834           0.2087
+lstm_h64_l1_w48     A24  single        0.9535      55.9583         56.6203           0.2054
+lstm_h64_l1_w48     A48  single        0.9525      55.3682         56.0637           0.2132
+lstm_h64_l1_w48     B24  single        0.8348      56.8292         56.8407           0.2023
+lstm_h64_l1_w48     B48  single        0.8348      56.8292         56.8407           0.2023
+lstm_h64_l1_w48       C  single        0.8348      56.8292         56.8407           0.2023
+lstm_h64_l1_w48 cascade cascade        1.0000      56.8292         56.1400           0.2121
+    persistence     A24  single        0.9760      71.1335         71.2545           0.0000
+    persistence     A48  single        0.9525      71.3876         71.2545           0.0000
+    persistence     B24  single        0.8348      73.7644         71.2545           0.0000
+    persistence     B48  single        0.8348      73.7644         71.2545           0.0000
+    persistence       C  single        0.8348      73.7644         71.2545           0.0000
+    persistence cascade cascade        1.0000      73.7644         71.2545           0.0000
+  random_forest     A24  single        0.9760      56.5798         57.1236           0.1983
+  random_forest     A48  single        0.9525      56.8273         57.4375           0.1939
+  random_forest     B24  single        0.8348      58.3918         58.1479           0.1839
+  random_forest     B48  single        0.8348      58.3661         58.1263           0.1842
+  random_forest       C  single        0.8348      58.4997         58.2383           0.1827
+  random_forest cascade cascade        1.0000      58.4997         57.3522           0.1951
+          ridge     A24  single        0.9760      58.0187         58.5153           0.1788
+          ridge     A48  single        0.9525      57.9498         58.4960           0.1791
+          ridge     B24  single        0.8348      59.6047         59.1663           0.1696
+          ridge     B48  single        0.8348      59.5439         59.1152           0.1704
+          ridge       C  single        0.8348      59.3651         58.9649           0.1725
+          ridge cascade cascade        1.0000      59.3651         58.2575           0.1824
+        xgboost     A24  single        0.9760      56.7067         57.2462           0.1966
+        xgboost     A48  single        0.9525      56.9161         57.5212           0.1927
+        xgboost     B24  single        0.8348      58.4514         58.1978           0.1832
+        xgboost     B48  single        0.8348      58.4651         58.2093           0.1831
+        xgboost       C  single        0.8348      58.6243         58.3428           0.1812
+        xgboost cascade cascade        1.0000      58.6243         57.5067           0.1929
+

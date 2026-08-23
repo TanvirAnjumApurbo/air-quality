@@ -11,3 +11,13 @@
 16:33:34 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
 16:33:35 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf
 16:33:35 | INFO    | 22_availability_frontier | reference RMSE on served 73.7644 vs unserved 56.8988 -- the hours the deepest arm cannot reach are EASIER, not harder
+01:08:00 | INFO    | 22_availability_frontier | universe 10880 hours, persistence RMSE 71.2545
+01:08:00 | INFO    | 22_availability_frontier | common subset: 9083 of 10880 universe hours
+01:08:03 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
+01:08:05 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf
+01:08:05 | INFO    | 22_availability_frontier | reference RMSE on served 73.7644 vs unserved 56.8988 -- the hours the deepest arm cannot reach are EASIER, not harder
+01:09:22 | INFO    | 22_availability_frontier | universe 10880 hours, persistence RMSE 71.2545
+01:09:22 | INFO    | 22_availability_frontier | common subset: 9083 of 10880 universe hours
+01:09:24 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
+01:09:26 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf
+01:09:26 | INFO    | 22_availability_frontier | reference RMSE on served 73.7644 vs unserved 56.8988 -- the hours the deepest arm cannot reach are EASIER, not harder

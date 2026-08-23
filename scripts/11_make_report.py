@@ -1478,16 +1478,31 @@ def main() -> int:
         if not allh.empty:
             allh = allh[~allh["model"].isin(tier1)]
         if not dm.empty:
-            any_sig = bool(dm["significant"].any())
+            # Direction, not just significance. "Differs" would read as support
+            # for the caps here, and the only difference on this record runs the
+            # other way.
+            sig = dm[dm["significant"]]
+            for_cap = sig[sig["better"] != "C"]
+            for_status_quo = sig[sig["better"] == "C"]
             a(
-                f"**{'At least one capped arm differs' if any_sig else 'No capped arm differs'} "
-                f"from the status quo** on the common subset under Holm-corrected "
-                f"Diebold-Mariano across {int(dm['p_holm'].notna().sum())} tests."
+                f"Under Holm-corrected Diebold-Mariano across "
+                f"{int(dm['p_holm'].notna().sum())} tests, **{len(for_cap)} capped "
+                f"{'arm beats' if len(for_cap) == 1 else 'arms beat'} the status quo and "
+                f"{len(for_status_quo)} "
+                f"{'loses' if len(for_status_quo) == 1 else 'lose'} to it**."
             )
-            if not any_sig:
-                a("")
-                a("The shorter reach is not better at forecasting. It is better at answering.")
             a("")
+            if for_cap.empty:
+                a("The shorter reach is not better at forecasting. It is better at answering.")
+                a("")
+            for r in for_status_quo.itertuples():
+                a(
+                    f"`{r.model}` at {r.arm} is significantly *worse* "
+                    f"(p = {_fmt_p(r.p_holm)}). Below its own window a shorter reach stops "
+                    f"being free: a window-sized model loses the signal it is built on, and "
+                    f"that cost is real rather than a rounding of the availability gain."
+                )
+                a("")
         if not allh.empty:
             single = allh[allh["policy"] == "single"]
             sq = single[single["arm"] == "C"].set_index("model")["skill_all_hours"]

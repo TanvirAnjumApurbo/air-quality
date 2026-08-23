@@ -447,7 +447,12 @@ def main() -> int:
         print(decomp.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
     # ---- the verdict, stated rather than left to be inferred ---------------
     if not dm_table.empty and not all_hours.empty:
-        any_sig = bool(dm_table["significant"].any())
+        # Direction matters and "differs" hides it: the only significant result
+        # on this record favours the STATUS QUO, so reporting a bare count would
+        # read as support for the caps when it is the opposite.
+        sig = dm_table[dm_table["significant"]]
+        sig_for_cap = sig[sig["better"] != deepest_arm]
+        sig_for_status_quo = sig[sig["better"] == deepest_arm]
         single = all_hours[all_hours["policy"] == "single"]
         best = single.loc[single.groupby("model")["skill_all_hours"].idxmax()]
         status_quo = single[single["arm"] == deepest_arm].set_index("model")["skill_all_hours"]
@@ -460,12 +465,16 @@ def main() -> int:
         print("VERDICT")
         print("=" * 78)
         print(
-            f"  On the common {int(common.sum())} hours, "
-            f"{'at least one arm differs' if any_sig else 'NO arm differs'} from the status quo "
-            f"under Holm."
+            f"  On the common {int(common.sum())} hours, {len(sig_for_cap)} arm(s) beat the "
+            f"status quo under Holm and {len(sig_for_status_quo)} lose to it."
         )
-        if not any_sig:
+        if not len(sig_for_cap):
             print("  The shorter reach is not better at forecasting. It is better at answering.")
+        for r in sig_for_status_quo.itertuples():
+            print(
+                f"    {r.model} at {r.arm} is significantly WORSE than the status quo "
+                f"(p={r.p_holm:.4f}) -- a shorter reach costs this model real accuracy"
+            )
         for model, gain in sorted(gains.items(), key=lambda kv: -kv[1]):
             row = best[best["model"] == model].iloc[0]
             print(

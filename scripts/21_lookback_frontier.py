@@ -49,6 +49,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -223,7 +224,8 @@ def main() -> int:
     reference: np.ndarray | None = None
     rows: list[dict] = []
     predictions: dict[str, np.ndarray] = {}
-    radius_cache: dict[int, dict[str, np.ndarray]] = {}
+    # cache key -> {'pred': universe-length vector, 'fingerprint': window identity}
+    radius_cache: dict[str, dict[str, Any]] = {}
 
     from src.models.sequence import DeviceWindowSampler as Sampler
     from src.models.sequence import _make_loss
@@ -349,14 +351,42 @@ def main() -> int:
 
                 spec = _spec(int(model_seeds[0]))
                 cache_key = f"{spec.name}|w{window}|R{radius}"
-                if cache_key in radius_cache and not args.force:
-                    predictions[f"{spec.name}|{arm.label}"] = radius_cache[cache_key]["pred"]
-                    log.info("    %-14s reused from radius %d", spec.name, radius)
-                    continue
 
                 train_idx = build_sequence_index(frame, vcfg, horizon, window, "train")
                 val_idx = build_sequence_index(frame, vcfg, horizon, window, "val")
                 test_idx = build_sequence_index(frame, vcfg, horizon, window, "test")
+
+                # Two arms that share a radius train an identical sequence model:
+                # a lookback cap removes only derived-history columns, which the
+                # sequence channels never carried, so the cap moves the validity
+                # floor and nothing else. That is the argument for reusing a run
+                # across arms -- and an argument is not a check. The training and
+                # test window sets are compared elementwise before the reuse, and
+                # a disagreement retrains rather than quietly serving one arm's
+                # predictions as another's.
+                fingerprint = (
+                    hash(train_idx.end_positions.tobytes()),
+                    hash(test_idx.end_positions.tobytes()),
+                    int(test_idx.n_features),
+                )
+                cached = radius_cache.get(cache_key)
+                if cached is not None and not args.force:
+                    if cached["fingerprint"] == fingerprint:
+                        predictions[f"{spec.name}_w{window}|{arm.label}"] = cached["pred"]
+                        log.info(
+                            "    %-14s w%-4d reused: identical windows at radius %d",
+                            spec.name,
+                            window,
+                            radius,
+                        )
+                        continue
+                    log.warning(
+                        "    %s w%d: radius %d matches a cached run but its windows "
+                        "differ; retraining rather than reusing",
+                        spec.name,
+                        window,
+                        radius,
+                    )
                 if len(train_idx) < 100 or len(val_idx) < 50:
                     log.warning("    %s w%d: too few windows, skipped", spec.name, window)
                     continue
@@ -385,7 +415,7 @@ def main() -> int:
                     continue
                 mean_pred = np.mean(np.vstack(per_seed_pred), axis=0)
                 aligned = align_to_universe(universe_index, test_idx.index, mean_pred)
-                radius_cache[cache_key] = {"pred": aligned}
+                radius_cache[cache_key] = {"pred": aligned, "fingerprint": fingerprint}
                 predictions[f"{spec.name}_w{window}|{arm.label}"] = aligned
                 m = {
                     k: float(np.mean([x[k] for x in per_seed_metrics]))
