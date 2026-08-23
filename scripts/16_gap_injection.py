@@ -46,7 +46,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
 import pandas as pd
-from src.eval.ablation import resume_identity_problem
+from src.eval.ablation import cells_for_run, resume_identity_problem
 from src.eval.metrics import all_metrics, skill_score
 from src.features.build_features import max_backward_dependency
 from src.features.gap_injection import empirical_gap_profile, inject_gaps
@@ -168,7 +168,12 @@ def main() -> int:
         cfg.get("ablation.gap_injection.output_name", "ablation_gap_injection.json")
     )
     payload = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
-    cells = payload.get("cells", {})
+    filtered_run = bool(args.coverage or args.arm or args.seed)
+    cells, cells_message = cells_for_run(payload, force=bool(args.force), filtered=filtered_run)
+    if cells_message and filtered_run:
+        log.warning("%s", cells_message)
+    elif cells_message:
+        log.info("%s", cells_message)
 
     # Identity guards, both fatal. See ablation.resume_identity_problem.
     this_donor = str(cfg.get("data.openaq.site_label") or cfg.get("data.site.city"))

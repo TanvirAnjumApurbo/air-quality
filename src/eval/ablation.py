@@ -465,3 +465,46 @@ def resume_identity_problem(
             f"existing one to recompute."
         )
     return None
+
+
+def cells_for_run(
+    payload: dict[str, Any], *, force: bool, filtered: bool
+) -> tuple[dict[str, Any], str | None]:
+    """Which recorded cells a grid run should start from.
+
+    ``16_gap_injection.py`` overwrites one cell at a time and rewrites the whole
+    payload after each, so a ``--force`` run that dies partway leaves a mixture:
+    cells this invocation recomputed up to the failure, and cells from whatever
+    produced the file before it. A restart without ``--force`` then sees every key
+    present, skips all of them, and reports a complete grid that is partly stale.
+    It looks finished, which is the worst way for this to fail.
+
+    Clearing first makes the file honest at every instant: after a crash it holds
+    exactly the cells this run computed, so dropping ``--force`` is the correct
+    resume rather than a silent corruption.
+
+    A *filtered* force -- ``--coverage``, ``--arm`` or ``--seed`` -- expresses the
+    opposite intent, recompute these and keep the rest, so it keeps them and says
+    so.
+
+    Args:
+        payload: Contents of an existing grid file, or an empty mapping.
+        force: Whether ``--force`` was given.
+        filtered: Whether the run was restricted to a subset of the grid.
+
+    Returns:
+        ``(cells, message)`` where ``message`` is None when there is nothing to
+        report.
+    """
+    cells = dict(payload.get("cells", {}))
+    if not force or not cells:
+        return cells, None
+    if filtered:
+        return cells, (
+            f"--force with a cell filter keeps the {len(cells)} cells already on disk; "
+            f"the grid will mix this run's cells with earlier ones"
+        )
+    return {}, (
+        f"--force over the full grid: discarding {len(cells)} existing cells so a "
+        f"partial run leaves no stale mixture (restart without --force to resume)"
+    )

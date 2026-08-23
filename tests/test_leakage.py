@@ -1571,3 +1571,86 @@ def test_every_mediation_config_has_a_distinct_output_and_matching_radius():
         assert f"_R{radius}." in name, (
             f"{path.name} resolves to radius {radius} h but writes to {name}"
         )
+
+
+# ---------------------------------------------------------------------------
+# A --force run must stay resumable if it dies partway
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_force_over_the_whole_grid_starts_empty():
+    """Clearing first is what makes the file honest at every instant."""
+    from src.eval.ablation import cells_for_run
+
+    payload = {"cells": {f"c{i}": {} for i in range(101)}}
+    cells, message = cells_for_run(payload, force=True, filtered=False)
+    assert cells == {}
+    assert message is not None
+    assert "101" in message and "without --force" in message
+
+
+@pytest.mark.leakage
+def test_a_filtered_force_keeps_the_rest_of_the_grid():
+    """Recompute these and keep the rest is a different intent, and is honoured."""
+    from src.eval.ablation import cells_for_run
+
+    payload = {"cells": {"a": {}, "b": {}}}
+    cells, message = cells_for_run(payload, force=True, filtered=True)
+    assert set(cells) == {"a", "b"}
+    assert message is not None and "keeps" in message
+
+
+@pytest.mark.leakage
+def test_a_plain_resume_keeps_everything_and_says_nothing():
+    """The ordinary resume path must be untouched by any of this."""
+    from src.eval.ablation import cells_for_run
+
+    payload = {"cells": {"a": {}, "b": {}}}
+    cells, message = cells_for_run(payload, force=False, filtered=False)
+    assert set(cells) == {"a", "b"}
+    assert message is None
+    assert cells_for_run({}, force=True, filtered=False) == ({}, None)
+
+
+@pytest.mark.leakage
+def test_control_a_crashed_force_run_must_not_look_complete():
+    """Negative control: the failure this exists to prevent.
+
+    Simulate a --force run that dies after 40 of 101 cells, then a restart
+    without --force. Under the old behaviour the file kept the 61 cells the
+    previous code wrote, every key was present, the restart skipped all of them,
+    and the grid read as complete while being three-fifths stale.
+    """
+    from src.eval.ablation import cells_for_run
+
+    stale = {f"c{i}": {"origin": "old"} for i in range(101)}
+
+    # What the old behaviour did: start from the stale cells and overwrite.
+    old_cells = dict(stale)
+    for i in range(40):
+        old_cells[f"c{i}"] = {"origin": "new"}
+    assert len(old_cells) == 101, "every key present after the crash"
+    assert sum(1 for c in old_cells.values() if c["origin"] == "old") == 61
+    resumed_old = cells_for_run({"cells": old_cells}, force=False, filtered=False)[0]
+    assert len(resumed_old) == 101, "a restart would skip the whole grid"
+
+    # What it does now: clear first, so only this run's cells survive a crash.
+    new_cells = cells_for_run({"cells": stale}, force=True, filtered=False)[0]
+    for i in range(40):
+        new_cells[f"c{i}"] = {"origin": "new"}
+    assert len(new_cells) == 40
+    assert all(c["origin"] == "new" for c in new_cells.values())
+    resumed_new = cells_for_run({"cells": new_cells}, force=False, filtered=False)[0]
+    assert len(resumed_new) == 40, "a restart resumes at cell 41 rather than skipping"
+
+
+@pytest.mark.leakage
+def test_cells_for_run_does_not_mutate_the_payload():
+    """The caller still writes the payload out; aliasing it would be a trap."""
+    from src.eval.ablation import cells_for_run
+
+    payload = {"cells": {"a": {}}}
+    cells, _ = cells_for_run(payload, force=False, filtered=False)
+    cells["b"] = {}
+    assert set(payload["cells"]) == {"a"}
