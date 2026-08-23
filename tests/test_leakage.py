@@ -1045,3 +1045,425 @@ def test_control_selector_would_flip_if_it_ranked_on_test():
     )
     assert frame.groupby("candidate")["val_loss"].mean().idxmin() == "good"
     assert frame.groupby("candidate")["test_rmse"].mean().idxmin() == "bad"
+
+
+# ---------------------------------------------------------------------------
+# Lookback cap and the decoupled history floor
+# ---------------------------------------------------------------------------
+
+
+def _capped(cfg: Config, cap: int | None, floor: int | None = None) -> Config:
+    """A copy of the config with the lookback cap and history floor set."""
+    raw = copy.deepcopy(cfg.raw)
+    raw["features"]["lookback_h"] = cap
+    raw["features"]["history_floor_h"] = floor
+    return Config(raw=raw, path=cfg.path)
+
+
+@pytest.mark.leakage
+def test_lookback_cap_drops_the_columns_it_bounds(cfg, synthetic):
+    """A cap must remove the offending columns, not merely rename the bound.
+
+    Keeping ``pm25_lag_168`` while admitting rows that carry only 48 h of
+    history would hand the model a NaN, and ``get_split_arrays`` replaces NaN
+    with 0.0 *after* scaling -- with the training mean, silently.
+    """
+    pm, met = synthetic
+    variant = _capped(cfg, 48)
+    frame, _ = build_features(pm, met, variant, LOG)
+    predictors = set(feature_columns(frame, variant))
+    for name in ("pm25_lag_168", "pm25_roll168_mean", "pm25_roll168_std"):
+        assert name not in predictors
+        assert name not in frame.columns
+    assert "pm25_lag_48" in predictors
+
+
+@pytest.mark.leakage
+def test_capped_lookbacks_drive_every_reader(cfg, synthetic):
+    """The built columns and the generated names must agree at every cap.
+
+    ``derived_history_columns`` exists so the two cannot drift; the cap must be
+    applied in one place or that guarantee is lost.
+    """
+    pm, met = synthetic
+    for cap in (None, 48, 24, 12):
+        variant = _capped(cfg, cap)
+        frame, _ = build_features(pm, met, variant, LOG)
+        derived = derived_history_columns(variant, frame)
+        built = {c for c in frame.columns if "_lag_" in c or "_roll" in c or "_diff_" in c}
+        assert built <= derived, f"cap={cap}: built columns absent from the generated set"
+        deepest = max(int(c.rsplit("_", 1)[1]) for c in built if c.startswith("pm25_lag_"))
+        assert deepest <= max_backward_dependency(variant)
+
+
+@pytest.mark.leakage
+def test_history_floor_defaults_to_max_backward_dependency(cfg, synthetic):
+    """With both keys null the build must be exactly what it was before."""
+    from src.features.build_features import history_floor
+
+    assert history_floor(cfg) == max_backward_dependency(cfg)
+    pm, met = synthetic
+    base, _ = build_features(pm, met, cfg, LOG)
+    same, _ = build_features(pm, met, _capped(cfg, None, None), LOG)
+    for h in cfg.get("task.horizons_h"):
+        assert np.array_equal(base[f"valid_h{h}"].to_numpy(), same[f"valid_h{h}"].to_numpy())
+
+
+@pytest.mark.leakage
+def test_control_history_floor_below_max_lag_raises(cfg):
+    """Negative control: the forbidden combination must be refused."""
+    from src.features.build_features import history_floor
+
+    with pytest.raises(ConfigError, match="below the deepest configured feature"):
+        history_floor(_capped(cfg, None, 48))
+
+
+@pytest.mark.leakage
+def test_control_short_floor_feeds_the_train_mean_to_the_model(cfg, synthetic):
+    """Negative control: what the guard above actually prevents.
+
+    Build the forbidden combination by hand, bypassing ``history_floor``, and
+    show the deepest lag reaching a row that cannot support it. The value is
+    NaN, and every consumer replaces NaN with zero after scaling -- so the model
+    receives the training mean dressed as an observation.
+    """
+    pm, met = synthetic
+    frame, _ = build_features(pm, met, cfg, LOG)
+    deep = frame["pm25_lag_168"]
+    shallow_rows = frame["pos_in_run"].between(48, 167)
+    assert shallow_rows.any(), "fixture must contain rows between the two floors"
+    assert deep[shallow_rows].isna().all(), "the deepest lag is undefined on those rows"
+    assert float(np.nan_to_num(deep[shallow_rows].to_numpy(), nan=0.0).sum()) == 0.0
+
+
+@pytest.mark.leakage
+def test_arm_b_row_set_equals_arm_c_row_set(cfg, gapped):
+    """The volume control must reproduce the status quo rows exactly.
+
+    Arm B caps the feature set but holds the floor at the status quo, so it
+    differs from arm C in features alone. If the row sets were merely close, the
+    A-vs-B and B-vs-C differences would not decompose the A-vs-C difference.
+    """
+    pm, met = gapped
+    deepest = max_backward_dependency(cfg)
+    arm_c, _ = build_features(pm, met, cfg, LOG)
+    arm_b, _ = build_features(pm, met, _capped(cfg, 48, deepest), LOG)
+    arm_a, _ = build_features(pm, met, _capped(cfg, 48), LOG)
+    for h in cfg.get("task.horizons_h"):
+        assert np.array_equal(arm_c[f"valid_h{h}"].to_numpy(), arm_b[f"valid_h{h}"].to_numpy())
+    assert int(arm_a["valid_h24"].sum()) > int(arm_c["valid_h24"].sum())
+
+
+@pytest.mark.leakage
+def test_arm_b_sequence_channels_equal_arm_c(cfg, synthetic):
+    """A lookback cap must not change the sequence tier input at all.
+
+    ``sequence_channel_columns`` excludes every derived-history column, so the
+    cap can only move the validity floor for tier 3. This is what licenses
+    reusing arm C sequence runs for arm B instead of retraining them.
+    """
+    pm, met = synthetic
+    frame_c, _ = build_features(pm, met, cfg, LOG)
+    variant = _capped(cfg, 24)
+    frame_a, _ = build_features(pm, met, variant, LOG)
+    assert sequence_channel_columns(frame_c, cfg) == sequence_channel_columns(frame_a, variant)
+
+
+# ---------------------------------------------------------------------------
+# Evaluation universe and all-hours scoring
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_universe_contains_every_arms_served_rows(cfg_fractional):
+    """Every arm served set must be a subset of one fixed universe.
+
+    Needs its own record rather than the shared ``gapped`` fixture: the universe
+    is floored at 168 h, and a 1,200-hour fixture has a test split shorter than
+    that, so the boundary purge would empty it.
+    """
+    from src.eval.availability import evaluation_universe, served_mask
+    from src.features.build_features import scoreable_mask
+
+    index = pd.date_range("2020-01-01", periods=6000, freq="1h", tz="UTC")
+    n = len(index)
+    values = np.arange(n, dtype=float) + 10.0
+    for start in (900, 2400, 3800, 5200):
+        values[start : start + 40] = np.nan  # outages the ffill limit cannot bridge
+    pm = pd.DataFrame({"pm25": values}, index=index)
+    pm.index.name = "datetime_utc"
+    met = pd.DataFrame(
+        {
+            v: np.full(n, 1.0)
+            for v in (
+                "T2M",
+                "T2MDEW",
+                "RH2M",
+                "WS10M",
+                "WD10M",
+                "PS",
+                "PRECTOTCORR",
+                "ALLSKY_SFC_SW_DWN",
+            )
+        },
+        index=index,
+    )
+    met.index.name = "datetime_utc"
+
+    frame, _ = build_features(pm, met, cfg_fractional, LOG)
+    frame["split"] = assign_splits(frame.index, resolve_boundaries(frame.index, cfg_fractional))
+    universe = evaluation_universe(frame, "test", 24)
+    assert universe.sum() > 0
+    for floor in (168, 48, 24, 12):
+        served = served_mask(frame, "test", 24, floor)
+        assert int((served & ~universe).sum()) == 0, f"floor {floor} serves outside the universe"
+    assert int((universe & ~scoreable_mask(frame, 24)).sum()) == 0
+
+
+@pytest.mark.leakage
+def test_control_cascade_ordered_by_test_error_is_rejected():
+    """Negative control: rule 6 applied to a fallback chain.
+
+    A chain is a selection. Ordering it by anything measured on the test set --
+    which is what sorting by RMSE would be -- must be refused, exactly as
+    ranking candidates by test error is.
+    """
+    from src.eval.metrics import all_hours_skill
+
+    n = 200
+    rng = np.random.default_rng(0)
+    y = rng.normal(50, 10, n)
+    served = {"deep": y + 1.0, "shallow": y + 2.0, "clim": np.full(n, y.mean())}
+    need = {"deep": 168, "shallow": 48, "clim": 0}
+    ok = all_hours_skill(
+        y, served, order=["deep", "shallow", "clim"], history_requirement=need, reference=y + 5.0
+    )
+    assert ok.availability == 1.0
+    with pytest.raises(ValueError, match="non-increasing in history requirement"):
+        all_hours_skill(
+            y,
+            served,
+            order=["shallow", "deep", "clim"],
+            history_requirement=need,
+            reference=y + 5.0,
+        )
+
+
+@pytest.mark.leakage
+def test_control_all_hours_reference_must_cover_the_universe():
+    """Negative control: a denominator that moves with the arm is not one."""
+    from src.eval.metrics import all_hours_skill
+
+    n = 200
+    y = np.linspace(10, 90, n)
+    served = {"m": y + 1.0, "clim": np.full(n, y.mean())}
+    need = {"m": 168, "clim": 0}
+    reference = y + 5.0
+    reference[7] = np.nan
+    with pytest.raises(ValueError, match="denominator must cover the whole universe"):
+        all_hours_skill(
+            y, served, order=["m", "clim"], history_requirement=need, reference=reference
+        )
+
+
+@pytest.mark.leakage
+def test_control_incomplete_cascade_is_rejected():
+    """Negative control: silently dropping unanswered hours is the failure mode."""
+    from src.eval.metrics import all_hours_skill
+
+    n = 100
+    y = np.linspace(10, 90, n)
+    partial = y + 1.0
+    partial[:20] = np.nan
+    with pytest.raises(ValueError, match="unanswered"):
+        all_hours_skill(
+            y, {"m": partial}, order=["m"], history_requirement={"m": 168}, reference=y + 5.0
+        )
+
+
+# ---------------------------------------------------------------------------
+# The frontier must not leak into the headline experiment
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_every_runs_consumer_goes_through_main_runs():
+    """No script may read the runs list directly; nine sites is nine to forget."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    offenders = []
+    for path in sorted((root / "scripts").glob("*.py")) + sorted((root / "src").rglob("*.py")):
+        if path.name == "results.py":
+            continue
+        text = path.read_text(encoding="utf-8")
+        if '.get("runs"' in text or 'payload["runs"]' in text:
+            offenders.append(path.relative_to(root).as_posix())
+    assert not offenders, f"read the runs list directly instead of via main_runs: {offenders}"
+
+
+@pytest.mark.leakage
+def test_main_runs_is_a_no_op_without_side_experiments():
+    """Tagging must not disturb records written before tagging existed."""
+    from src.results import MAIN_EXPERIMENT, experiment_runs, main_runs
+
+    payload = {"runs": [{"model": "a"}, {"model": "b", "experiment": MAIN_EXPERIMENT}]}
+    assert main_runs(payload) == payload["runs"]
+    assert experiment_runs(payload, "lookback_frontier") == []
+
+
+@pytest.mark.leakage
+def test_control_lookback_run_cannot_win_the_headline():
+    """Negative control: a side-experiment record must not be selectable.
+
+    A lookback arm trains on more rows and can post a better validation loss
+    without being the headline model. If it reached ``_best_per_horizon`` it
+    would silently replace the reported result.
+    """
+    from src.results import main_runs
+
+    payload = {
+        "runs": [
+            {"model": "gru_h64_l1", "variant": "w24", "horizon_h": 24, "seed": 42, "metrics": {}},
+            {
+                "model": "gru_h64_l1",
+                "variant": "w24|R48|A",
+                "horizon_h": 24,
+                "seed": 42,
+                "experiment": "lookback_frontier",
+                "metrics": {},
+            },
+        ]
+    }
+    selected = main_runs(payload)
+    assert len(selected) == 1
+    assert selected[0]["variant"] == "w24"
+
+
+# ---------------------------------------------------------------------------
+# Ablation: the control, the timezone, and the two new tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_climatology_bins_in_the_configured_timezone():
+    """Hour bins must follow ``features.calendar_tz``, not a hardcoded city.
+
+    This was hardcoded to Asia/Dhaka, which put every Beijing record bins two
+    hours out -- including all 303 cells of the gap-injection grid, where
+    climatology represents a reported family.
+    """
+    from src.models.baselines import ClimatologyModel, predict_climatology
+
+    index = pd.date_range("2020-01-01", periods=240, freq="1h", tz="UTC")
+    arrays = type("A", (), {"index": index})()
+    table = {(h, m): float(h) for h in range(24) for m in range(1, 13)}
+    dhaka = ClimatologyModel(table=table, global_mean=0.0, tz="Asia/Dhaka")
+    shanghai = ClimatologyModel(table=table, global_mean=0.0, tz="Asia/Shanghai")
+    a = predict_climatology(dhaka, arrays, 24)
+    b = predict_climatology(shanghai, arrays, 24)
+    assert not np.array_equal(a, b), "two timezones must not give identical bins"
+    assert np.array_equal((a + 2.0) % 24.0, b % 24.0)
+
+
+@pytest.mark.leakage
+def test_control_climatology_cannot_predict_in_another_timezone():
+    """Negative control: a fit/predict timezone mismatch must be unrepresentable."""
+    import inspect
+
+    from src.models.baselines import fit_climatology, predict_climatology
+
+    assert "cfg" not in inspect.signature(predict_climatology).parameters, (
+        "predict_climatology must take no config; the timezone rides on the model "
+        "so it cannot disagree with the one the table was binned in"
+    )
+    assert "cfg" in inspect.signature(fit_climatology).parameters
+
+
+@pytest.mark.leakage
+def test_family_contrast_is_paired_within_units():
+    """The contrast must lose its signal when the pairing is destroyed."""
+    from src.eval.ablation import family_contrasts
+
+    rng = np.random.default_rng(0)
+    rows = []
+    for cov in (0.95, 0.90, 0.85, 0.82, 0.75):
+        for seed in range(10):
+            shared = rng.normal(0, 0.05)
+            rows.append(
+                {
+                    "family": "sequence",
+                    "target_coverage": cov,
+                    "injection_seed": seed,
+                    "arm_gap": shared - 0.03,
+                }
+            )
+            rows.append(
+                {
+                    "family": "trees",
+                    "target_coverage": cov,
+                    "injection_seed": seed,
+                    "arm_gap": shared,
+                }
+            )
+    paired = pd.DataFrame(rows)
+    kept = family_contrasts(paired)
+    kept_row = kept[kept["family"] == "trees"].iloc[0]
+    assert float(kept_row["p_wilcoxon"]) < 0.001
+
+    shuffled = paired.copy()
+    mask = shuffled["family"] == "trees"
+    shuffled.loc[mask, "arm_gap"] = rng.permutation(shuffled.loc[mask, "arm_gap"].to_numpy())
+    broken = family_contrasts(shuffled)
+    broken_row = broken[broken["family"] == "trees"].iloc[0]
+    kept_width = float(kept_row["ci_high"]) - float(kept_row["ci_low"])
+    broken_width = float(broken_row["ci_high"]) - float(broken_row["ci_low"])
+    assert broken_width > kept_width, "breaking the pairing must widen the interval"
+
+
+@pytest.mark.leakage
+def test_dose_response_recovers_a_planted_slope():
+    """A known slope in the dose must come back inside the interval."""
+    from src.eval.ablation import dose_response
+
+    slope = 0.4
+    rows = [
+        {
+            "family": "sequence",
+            "target_coverage": cov,
+            "injection_seed": seed,
+            "arm_gap": slope * (cov - 1.0) + 0.001 * seed,
+        }
+        for cov in (0.95, 0.90, 0.85, 0.82, 0.75)
+        for seed in range(10)
+    ]
+    out = dose_response(pd.DataFrame(rows))
+    row = out[out["family"] == "sequence"].iloc[0]
+    assert row["slope_per_unit_dose"] == pytest.approx(slope, rel=1e-6)
+    assert row["ci_low"] <= row["gap_change_per_10pp_lost"] <= row["ci_high"]
+    # Reported per 10 percentage points LOST, so a positive slope reads negative.
+    assert row["gap_change_per_10pp_lost"] == pytest.approx(-0.04, rel=1e-6)
+
+
+@pytest.mark.leakage
+def test_both_configs_declare_the_lookback_keys_as_null():
+    """Any key added to one config is inherited by the other with a wrong value.
+
+    That has caused four defects in this repository. Both new keys are
+    city-agnostic and null is correct everywhere, so the hazard is structurally
+    absent -- and stays absent only if something checks.
+    """
+    from pathlib import Path
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    paths = [root / "config.yaml", root / "config_beijing.yaml"]
+    paths += sorted((root / "config" / "donors").glob("*.yaml"))
+    assert len(paths) >= 3
+    for path in paths:
+        features = yaml.safe_load(path.read_text(encoding="utf-8"))["features"]
+        assert "lookback_h" in features, f"{path.name} is missing features.lookback_h"
+        assert "history_floor_h" in features, f"{path.name} is missing features.history_floor_h"
+        assert features["lookback_h"] is None, f"{path.name} pins a lookback cap"
+        assert features["history_floor_h"] is None, f"{path.name} pins a history floor"
