@@ -32,3 +32,11 @@
 16:53:37 [7/8] T3 grid: wanliu_R72
 16:53:37   disk: C: 11G  F: 9G
 16:53:37   attempt 1: resume (keeps cells already computed)
+18:49:16   attempt 1: FAILED rc=127
+18:49:17   disk: C: 12G  F: 9G
+18:49:17   attempt 2: resume (keeps cells already computed)
+18:49:21   attempt 2: ok
+18:49:25   17 rc=0
+18:49:25 [8/8] T3 grid: wanliu_R48
+18:49:25   disk: C: 12G  F: 9G
+18:49:25   attempt 1: resume (keeps cells already computed)

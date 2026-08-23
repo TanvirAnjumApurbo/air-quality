@@ -117,3 +117,19 @@ climatological     30            -0.0247 [-0.0470, -0.0048]       0.0310   0.062
       sequence     30            -0.0226 [-0.0356, -0.0107]       0.0040   0.0161
         linear     30            -0.0173 [-0.0272, -0.0072]       0.0062   0.0186
          trees     30            -0.0052 [-0.0151, +0.0054]       0.1642   0.1642
+18:49:44 | INFO    | 18_donor_replication | skipping ablation_gap_injection_wanliu_R72.json: sterilisation radius 72 h, not this comparison's 192 h
+18:49:44 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
+18:49:44 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
+18:49:44 | INFO    | 18_donor_replication | Dongsi: 101 cells, 50 matched pairs per family
+18:49:47 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+18:49:47 | INFO    | 18_donor_replication | pooled family contrasts:
+        Family  Triples  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+         trees      150        -0.0102 -0.0030 [-0.0189, -0.0016]       0.1488   0.1610
+climatological      150        -0.0096 -0.0082 [-0.0233, +0.0040]       0.0211   0.0632
+        linear      150        -0.0090 -0.0066 [-0.0174, -0.0007]       0.0805   0.1610
+18:49:47 | INFO    | 18_donor_replication | pooled dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+climatological     30            -0.0247 [-0.0470, -0.0048]       0.0310   0.0620
+      sequence     30            -0.0226 [-0.0356, -0.0107]       0.0040   0.0161
+        linear     30            -0.0173 [-0.0272, -0.0072]       0.0062   0.0186
+         trees     30            -0.0052 [-0.0151, +0.0054]       0.1642   0.1642

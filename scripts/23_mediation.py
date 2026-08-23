@@ -185,6 +185,28 @@ def main() -> int:
             len(grids),
         )
         return 1
+    # A grid still being written has some cells but not all of them, and every
+    # comparison here is within-draw -- so a partial radius would silently drop
+    # whichever draws it had not reached yet and rebalance the paired test. Only
+    # complete grids take part, and the rest are named rather than ignored.
+    complete = max(len(p["cells"]) for p in grids.values())
+    partial = {r: len(p["cells"]) for r, p in grids.items() if len(p["cells"]) < complete}
+    for radius, n in sorted(partial.items()):
+        log.warning(
+            "R=%d holds %d of %d cells and is still being written; excluded",
+            radius,
+            n,
+            complete,
+        )
+    grids = {r: p for r, p in grids.items() if len(p["cells"]) == complete}
+    if len(grids) < 2:
+        log.error(
+            "only %d complete radius grid(s) for %s; need at least 2",
+            len(grids),
+            args.slug,
+        )
+        return 1
+
     radii = sorted(grids, reverse=True)
     log.info("radii on disk: %s", radii)
 
@@ -198,19 +220,41 @@ def main() -> int:
         )
         return 1
 
-    # ---- control: persistence must be invariant everywhere ------------------
-    pers = []
-    for payload in grids.values():
+    # ---- control: persistence must be invariant WITHIN a radius -------------
+    # Across radii it legitimately differs, and that is the point of this whole
+    # contribution rather than a fault: a shorter reach makes more test hours
+    # scoreable, so the evaluation set grows. The design guarantee -- the test
+    # period is never degraded -- is a within-radius statement, and checking it
+    # across radii would flag the intended behaviour as a violation.
+    per_radius_persistence: dict[int, float] = {}
+    pers_ok = True
+    for radius, payload in grids.items():
         frame = tidy(payload)
-        pers.extend(frame[frame["model"] == "persistence"]["rmse"].tolist())
-    pers_spread = float(max(pers) - min(pers)) if pers else float("nan")
-    pers_ok = bool(pers and pers_spread < 1e-9)
-    if not pers_ok:
-        log.error(
-            "persistence RMSE varies by %.3e across radii; the test period was "
-            "supposed to be protected, so this is a design violation",
-            pers_spread,
-        )
+        vals = frame[frame["model"] == "persistence"]["rmse"].tolist()
+        if not vals:
+            continue
+        spread = float(max(vals) - min(vals))
+        per_radius_persistence[radius] = float(vals[0])
+        if spread >= 1e-9:
+            pers_ok = False
+            log.error(
+                "R=%d: persistence RMSE varies by %.3e across its own cells; the "
+                "test period was supposed to be protected, so this IS a design "
+                "violation",
+                radius,
+                spread,
+            )
+    pers_spread = (
+        float(max(per_radius_persistence.values()) - min(per_radius_persistence.values()))
+        if len(per_radius_persistence) > 1
+        else 0.0
+    )
+    log.info(
+        "persistence invariant within every radius: %s; across radii it moves by "
+        "%.4f, which is the evaluation set growing as the reach shortens",
+        pers_ok,
+        pers_spread,
+    )
 
     # ---- the mediator must be shown to move ---------------------------------
     mediator_rows = []
@@ -265,6 +309,43 @@ def main() -> int:
     ).dropna()
     deepest, shallowest = max(radii), min(radii)
 
+    # ---- how much of the shrinkage could the changing test set explain? -----
+    # A shorter reach scores more test hours, so the arm gaps at two radii are not
+    # measured on the same rows. If the extra hours carried NO arm difference at
+    # all, the gap would still shrink purely by dilution: the between-arm MSE
+    # difference is averaged over more rows, and the persistence denominator moves
+    # too. That bound is computable from the recorded row counts alone, and any
+    # shrinkage beyond it is what the radius actually mediates.
+    rows_by_radius: dict[int, int] = {}
+    for radius, payload in grids.items():
+        counts = {int(c["test_rows"]) for c in payload["cells"].values()}
+        if len(counts) == 1:
+            rows_by_radius[radius] = counts.pop()
+    dilution = {}
+    if {deepest, shallowest} <= set(rows_by_radius) and {deepest, shallowest} <= set(
+        per_radius_persistence
+    ):
+        n_deep, n_shallow = rows_by_radius[deepest], rows_by_radius[shallowest]
+        ref_deep = per_radius_persistence[deepest]
+        ref_shallow = per_radius_persistence[shallowest]
+        # MSE difference scales by the share of rows both radii score; the skill
+        # gap divides by persistence, which also moves.
+        factor = (n_deep / n_shallow) * (ref_deep / ref_shallow)
+        dilution = {
+            "n_rows_deep": n_deep,
+            "n_rows_shallow": n_shallow,
+            "reference_rmse_deep": ref_deep,
+            "reference_rmse_shallow": ref_shallow,
+            "expected_gap_factor_under_pure_dilution": float(factor),
+        }
+        log.info(
+            "dilution bound: with no arm difference on the %d extra rows the gap "
+            "would still shrink to %.1f%% of its value; anything beyond that is "
+            "mediated",
+            n_shallow - n_deep,
+            100 * factor,
+        )
+
     test_rows = []
     for family in FAMILY_ORDER:
         if family not in wide.index.get_level_values("family"):
@@ -306,6 +387,21 @@ def main() -> int:
                 "slope_per_halving": float(slope_arr.mean()) if slope_arr.size else float("nan"),
                 "proportion_mediated": (
                     float(1.0 - mean_shallow / mean_deep) if mean_deep != 0 else float("nan")
+                ),
+                # What the gap would be if the extra rows carried no arm
+                # difference. The observed value beyond this is the mediated part.
+                "gap_expected_under_pure_dilution": (
+                    float(mean_deep * dilution["expected_gap_factor_under_pure_dilution"])
+                    if dilution
+                    else float("nan")
+                ),
+                "shrinkage_beyond_dilution": (
+                    float(
+                        mean_shallow
+                        - mean_deep * dilution["expected_gap_factor_under_pure_dilution"]
+                    )
+                    if dilution
+                    else float("nan")
                 ),
                 "p_wilcoxon_onesided": p,
             }
@@ -411,8 +507,10 @@ def main() -> int:
                 "donor": args.slug,
                 "radii": radii,
                 "draws_identical_across_radii": True,
-                "persistence_rmse_invariant": pers_ok,
-                "persistence_rmse_spread": pers_spread,
+                "persistence_rmse_invariant_within_radius": pers_ok,
+                "persistence_rmse_by_radius": per_radius_persistence,
+                "persistence_rmse_spread_across_radii": pers_spread,
+                "dilution_bound": dilution,
                 "mediator_deficit_shrinks_with_radius": mediator_moves,
                 "mediator": mediator.to_dict(orient="records"),
                 "tests": tests.to_dict(orient="records"),
@@ -436,7 +534,13 @@ def main() -> int:
     print(NL + "mediator: usable-row deficit (fragmented minus contiguous)")
     print(mediator.to_string(index=False, float_format=lambda v: f"{v:.1f}"))
     print(f"{NL}  deficit shrinks as the radius shortens: {'YES' if mediator_moves else 'NO'}")
-    print(f"  persistence invariant across all cells   : {'YES' if pers_ok else 'NO'}")
+    print(f"  persistence invariant within each radius : {'YES' if pers_ok else 'NO'}")
+    if dilution:
+        pct = 100 * dilution["expected_gap_factor_under_pure_dilution"]
+        print(
+            f"  test rows {dilution['n_rows_deep']} -> {dilution['n_rows_shallow']}, so a gap "
+            f"would shrink to {pct:.0f}% by dilution alone"
+        )
     if not mediator_moves:
         print(
             f"{NL}  The mediator does not move, so there is nothing for the radius to "

@@ -1,0 +1,103 @@
+{
+  "donor": "wanliu",
+  "radii": [
+    192,
+    72
+  ],
+  "draws_identical_across_radii": true,
+  "persistence_rmse_invariant_within_radius": true,
+  "persistence_rmse_by_radius": {
+    "192": 97.29176691674544,
+    "72": 94.96488982297471
+  },
+  "persistence_rmse_spread_across_radii": 2.326877093770733,
+  "dilution_bound": {
+    "n_rows_deep": 3813,
+    "n_rows_shallow": 4614,
+    "reference_rmse_deep": 97.29176691674544,
+    "reference_rmse_shallow": 94.96488982297471,
+    "expected_gap_factor_under_pure_dilution": 0.8466467333587482
+  },
+  "mediator_deficit_shrinks_with_radius": true,
+  "mediator": [
+    {
+      "radius_h": 192,
+      "n_draws": 50,
+      "mean_row_deficit": -8056.16,
+      "median_row_deficit": -8527.5
+    },
+    {
+      "radius_h": 72,
+      "n_draws": 50,
+      "mean_row_deficit": -4414.74,
+      "median_row_deficit": -4321.5
+    }
+  ],
+  "tests": [
+    {
+      "family": "sequence",
+      "n_draws": 50,
+      "gap_R192": -0.03942791812469932,
+      "gap_R72": 0.0011048347066814834,
+      "delta": 0.0405327528313808,
+      "ci_low": 0.02387814723514349,
+      "ci_high": 0.05733156000875804,
+      "slope_per_halving": -0.028644295894658497,
+      "proportion_mediated": 1.028021634395892,
+      "gap_expected_under_pure_dilution": -0.03338151808341286,
+      "shrinkage_beyond_dilution": 0.03448635279009434,
+      "p_wilcoxon_onesided": 2.8402318514864078e-06,
+      "p_holm": 1.1360927405945631e-05,
+      "significant_holm": true
+    },
+    {
+      "family": "trees",
+      "n_draws": 50,
+      "gap_R192": -0.02630838776620914,
+      "gap_R72": -0.009173960834288819,
+      "delta": 0.01713442693192032,
+      "ci_low": 0.0045555717724174655,
+      "ci_high": 0.02962767919550222,
+      "slope_per_halving": -0.012108814742120031,
+      "proportion_mediated": 0.6512914088155572,
+      "gap_expected_under_pure_dilution": -0.02227391056219622,
+      "shrinkage_beyond_dilution": 0.013099949727907402,
+      "p_wilcoxon_onesided": 0.0015496299801922575,
+      "p_holm": 0.0046488899405767725,
+      "significant_holm": true
+    },
+    {
+      "family": "linear",
+      "n_draws": 50,
+      "gap_R192": -0.0015553228353569915,
+      "gap_R72": -0.002243743439691071,
+      "delta": -0.0006884206043340789,
+      "ci_low": -0.013859089355510359,
+      "ci_high": 0.012870951878549832,
+      "slope_per_halving": 0.0004865034351986579,
+      "proportion_mediated": -0.44262232167128657,
+      "gap_expected_under_pure_dilution": -0.001316808997873263,
+      "shrinkage_beyond_dilution": -0.0009269344418178082,
+      "p_wilcoxon_onesided": 0.627552051960997,
+      "p_holm": 0.627552051960997,
+      "significant_holm": false
+    },
+    {
+      "family": "climatological",
+      "n_draws": 50,
+      "gap_R192": -0.035651281915971146,
+      "gap_R72": -0.0037857751155318062,
+      "delta": 0.03186550680043934,
+      "ci_low": 0.010695823939668043,
+      "ci_high": 0.05602447314308154,
+      "slope_per_halving": -0.022519196004826172,
+      "proportion_mediated": 0.8938109680191936,
+      "gap_expected_under_pure_dilution": -0.030184041374208784,
+      "shrinkage_beyond_dilution": 0.02639826625867698,
+      "p_wilcoxon_onesided": 0.04471905123889375,
+      "p_holm": 0.0894381024777875,
+      "significant_holm": false
+    }
+  ],
+  "design_note": "The mediator is manipulated directly by configuration, not inferred from a regression, so this is not a Baron-Kenny mediation and needs no sequential-ignorability assumption. The same injected series appears at every radius, verified from the recorded injection statistics, so each draw is a repeated measure."
+}
