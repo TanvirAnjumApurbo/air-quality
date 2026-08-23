@@ -298,6 +298,26 @@ is undefined anywhere in the universe: persistence is the denominator precisely
 because it needs no history and is therefore defined everywhere, and a denominator
 that moved with the arm would not be a denominator.
 
+### Both cities share `paths.results`, so every new artefact needs a city suffix
+
+`paths.results` is `results` for **both** configs — only `paths.results_json`
+differs. Any artefact written to `path_for("results")` under a bare name is
+therefore written twice, and the city that runs second destroys the first one's
+silently. This has now happened five times in this repository; the fifth was the
+lookback frontier, where the comparison city overwrote the primary city's
+`lookback_frontier.json` and its prediction bundle, and the primary city's report
+then presented the comparison city's numbers as its own for about ten minutes.
+
+`src/results.py::city_suffix` derives the suffix from the results-file stem, so it
+cannot drift from the city the run belongs to: `results.json` gives `""` and
+`results_beijing.json` gives `"_beijing"`. Use it for anything new under
+`paths.results`. `ablation.gap_injection.output_name` is the older solution to the
+same problem and is why the donor grids never collided.
+
+Two tests guard it: one asserts the bare name genuinely collides (so the control
+cannot rot into a tautology) and one greps the frontier scripts for bare
+artefact names.
+
 ### Side experiments write into `results.json` and must not reach the headline
 
 The frontier writes runs into the city's own `results.json`, tagged

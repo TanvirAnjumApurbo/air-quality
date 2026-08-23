@@ -1,0 +1,1097 @@
+
+==============================================================================
+LOOKBACK FRONTIER — 5 arms at h=24, deepest feature 168 h
+==============================================================================
+  C     cap=None  floor=None  status quo: full features, floor 168
+  B48   cap=48    floor=168   capped features, floor held at 168
+  A48   cap=48    floor=None  capped features, floor at 48
+  B24   cap=24    floor=168   capped features, floor held at 168
+  A24   cap=24    floor=None  capped features, floor at 24
+01:38:19 | INFO    | 21_lookback_frontier | === arm C: cap 168, floor 168 ===
+01:38:19 | INFO    | 21_lookback_frontier | contiguity: 296 runs after 3h ffill, longest 4283 h
+01:38:19 | INFO    | 21_lookback_frontier | h=  1:  42732 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 89, target-imputed 1037)
+01:38:19 | INFO    | 21_lookback_frontier | h=  3:  42568 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 265, target-imputed 1025)
+01:38:19 | INFO    | 21_lookback_frontier | h=  6:  42317 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 528, target-imputed 1013)
+01:38:19 | INFO    | 21_lookback_frontier | h= 12:  41829 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 1042, target-imputed 987)
+01:38:19 | INFO    | 21_lookback_frontier | h= 24:  40877 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 2030, target-imputed 951)
+01:38:19 | INFO    | 21_lookback_frontier | built 102 predictor columns (max backward dependency 168 h)
+01:38:19 | INFO    | 21_lookback_frontier | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+01:38:19 | INFO    | 21_lookback_frontier | h=  1: boundary purge removed 52 rows (42732 -> 42680)
+01:38:19 | INFO    | 21_lookback_frontier | h=  3: boundary purge removed 52 rows (42568 -> 42516)
+01:38:19 | INFO    | 21_lookback_frontier | h=  6: boundary purge removed 52 rows (42317 -> 42265)
+01:38:19 | INFO    | 21_lookback_frontier | h= 12: boundary purge removed 52 rows (41829 -> 41777)
+01:38:19 | INFO    | 21_lookback_frontier | h= 24: boundary purge removed 52 rows (40877 -> 40825)
+01:38:20 | INFO    | 21_lookback_frontier | scaler fitted on 55451 training rows over 102 predictors
+01:38:20 | INFO    | 21_lookback_frontier | wrote F:\BUP\data\interim\lookback\C\processed\features.parquet (79216 rows, 169 cols)
+01:38:20 | INFO    | 21_lookback_frontier | universe: 10880 test hours, persistence RMSE 71.2545
+01:38:21 | INFO    | 21_lookback_frontier |   served 9083 of 10880 universe hours (0.8348)
+01:38:21 | INFO    | 21_lookback_frontier |     ridge          RMSE   59.37  (served rows)
+01:38:30 | INFO    | 21_lookback_frontier |     random_forest  RMSE   58.50  (served rows)
+01:38:32 | INFO    | 21_lookback_frontier |     xgboost        RMSE   58.62  (served rows)
+01:38:35 | INFO    | 21_lookback_frontier |     lightgbm       RMSE   59.02  (served rows)
+01:38:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: resumed from epoch 22 (best val 0.11301)
+01:38:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:38:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  23/60  train 0.08183  val 0.15474  lr 2.25e-03  1.3s
+01:38:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  24/60  train 0.08083  val 0.16026  lr 2.18e-03  0.8s
+01:38:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  25/60  train 0.07862  val 0.14513  lr 2.11e-03  0.7s
+01:38:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  26/60  train 0.07748  val 0.14617  lr 2.03e-03  0.8s
+01:38:42 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  27/60  train 0.07463  val 0.15820  lr 1.95e-03  0.9s
+01:38:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  28/60  train 0.07365  val 0.15645  lr 1.87e-03  0.6s
+01:38:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  29/60  train 0.07164  val 0.15397  lr 1.79e-03  0.6s
+01:38:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  30/60  train 0.07033  val 0.14762  lr 1.71e-03  0.6s
+01:38:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  31/60  train 0.06883  val 0.15128  lr 1.63e-03  0.7s
+01:38:45 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  32/60  train 0.06827  val 0.15791  lr 1.55e-03  0.8s
+01:38:46 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  33/60  train 0.06724  val 0.15674  lr 1.46e-03  0.7s
+01:38:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  34/60  train 0.06515  val 0.15521  lr 1.38e-03  0.8s
+01:38:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  35/60  train 0.06498  val 0.15184  lr 1.30e-03  0.7s
+01:38:48 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  36/60  train 0.06344  val 0.15644  lr 1.22e-03  0.7s
+01:38:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  37/60  train 0.06317  val 0.15701  lr 1.14e-03  0.7s
+01:38:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: resumed from epoch 20 (best val 0.10943)
+01:38:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:38:50 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  21/60  train 0.08368  val 0.14780  lr 2.39e-03  0.7s
+01:38:50 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  22/60  train 0.08348  val 0.15810  lr 2.32e-03  0.6s
+01:38:51 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  23/60  train 0.08008  val 0.14415  lr 2.25e-03  0.7s
+01:38:52 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  24/60  train 0.07947  val 0.16073  lr 2.18e-03  0.6s
+01:38:52 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  25/60  train 0.07682  val 0.16606  lr 2.11e-03  0.6s
+01:38:53 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  26/60  train 0.07611  val 0.15008  lr 2.03e-03  0.6s
+01:38:54 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  27/60  train 0.07352  val 0.17851  lr 1.95e-03  0.6s
+01:38:55 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  28/60  train 0.07168  val 0.16113  lr 1.87e-03  0.6s
+01:38:55 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  29/60  train 0.06960  val 0.15950  lr 1.79e-03  0.7s
+01:38:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  30/60  train 0.06907  val 0.15219  lr 1.71e-03  0.6s
+01:38:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  31/60  train 0.06852  val 0.16077  lr 1.63e-03  0.7s
+01:38:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  32/60  train 0.06683  val 0.15640  lr 1.55e-03  0.8s
+01:38:58 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  33/60  train 0.06590  val 0.15691  lr 1.46e-03  0.7s
+01:38:59 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  34/60  train 0.06403  val 0.15791  lr 1.38e-03  0.8s
+01:39:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  35/60  train 0.06249  val 0.15965  lr 1.30e-03  0.8s
+01:39:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: resumed from epoch 20 (best val 0.10221)
+01:39:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:01 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  21/60  train 0.08658  val 0.14178  lr 2.39e-03  0.9s
+01:39:02 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  22/60  train 0.08561  val 0.14059  lr 2.32e-03  0.9s
+01:39:03 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  23/60  train 0.08166  val 0.14263  lr 2.25e-03  0.8s
+01:39:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  24/60  train 0.08131  val 0.13501  lr 2.18e-03  0.7s
+01:39:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  25/60  train 0.07810  val 0.14617  lr 2.11e-03  0.7s
+01:39:05 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  26/60  train 0.07679  val 0.16651  lr 2.03e-03  0.7s
+01:39:06 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  27/60  train 0.07537  val 0.14567  lr 1.95e-03  0.7s
+01:39:06 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  28/60  train 0.07374  val 0.15756  lr 1.87e-03  0.7s
+01:39:07 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  29/60  train 0.07180  val 0.14193  lr 1.79e-03  0.7s
+01:39:08 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  30/60  train 0.07051  val 0.15635  lr 1.71e-03  0.7s
+01:39:08 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  31/60  train 0.06829  val 0.15505  lr 1.63e-03  0.6s
+01:39:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  32/60  train 0.06774  val 0.15079  lr 1.55e-03  0.6s
+01:39:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  33/60  train 0.06595  val 0.14441  lr 1.46e-03  0.6s
+01:39:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  34/60  train 0.06596  val 0.14810  lr 1.38e-03  0.6s
+01:39:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  35/60  train 0.06447  val 0.15107  lr 1.30e-03  0.7s
+01:39:11 | INFO    | 21_lookback_frontier |     gru_h64_l2     w48   R=192  RMSE   58.72  avail 0.8348
+01:39:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: resumed from epoch 22 (best val 0.11529)
+01:39:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  23/60  train 0.08487  val 0.15922  lr 2.25e-03  0.8s
+01:39:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  24/60  train 0.08281  val 0.15237  lr 2.18e-03  0.7s
+01:39:14 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  25/60  train 0.08051  val 0.13952  lr 2.11e-03  0.7s
+01:39:14 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  26/60  train 0.07874  val 0.15745  lr 2.03e-03  0.6s
+01:39:15 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  27/60  train 0.07581  val 0.15508  lr 1.95e-03  0.6s
+01:39:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  28/60  train 0.07508  val 0.15157  lr 1.87e-03  0.6s
+01:39:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  29/60  train 0.07211  val 0.16144  lr 1.79e-03  0.7s
+01:39:17 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  30/60  train 0.07106  val 0.15580  lr 1.71e-03  0.7s
+01:39:17 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  31/60  train 0.06958  val 0.14751  lr 1.63e-03  0.6s
+01:39:18 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  32/60  train 0.06842  val 0.15630  lr 1.55e-03  0.7s
+01:39:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  33/60  train 0.06691  val 0.15132  lr 1.46e-03  0.6s
+01:39:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  34/60  train 0.06508  val 0.15218  lr 1.38e-03  0.6s
+01:39:20 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  35/60  train 0.06497  val 0.15172  lr 1.30e-03  0.6s
+01:39:21 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  36/60  train 0.06303  val 0.15508  lr 1.22e-03  0.6s
+01:39:21 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  37/60  train 0.06259  val 0.15942  lr 1.14e-03  0.6s
+01:39:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: resumed from epoch 26 (best val 0.10830)
+01:39:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  27/60  train 0.07362  val 0.15223  lr 1.95e-03  0.6s
+01:39:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  28/60  train 0.07381  val 0.17070  lr 1.87e-03  0.7s
+01:39:24 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  29/60  train 0.06951  val 0.14774  lr 1.79e-03  0.7s
+01:39:25 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  30/60  train 0.06903  val 0.15881  lr 1.71e-03  0.7s
+01:39:25 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  31/60  train 0.06825  val 0.16655  lr 1.63e-03  0.7s
+01:39:26 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  32/60  train 0.06625  val 0.14516  lr 1.55e-03  0.6s
+01:39:27 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  33/60  train 0.06482  val 0.16734  lr 1.46e-03  0.6s
+01:39:27 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  34/60  train 0.06367  val 0.15797  lr 1.38e-03  0.7s
+01:39:28 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  35/60  train 0.06173  val 0.16323  lr 1.30e-03  0.7s
+01:39:29 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  36/60  train 0.06142  val 0.15222  lr 1.22e-03  0.7s
+01:39:29 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  37/60  train 0.06141  val 0.16559  lr 1.14e-03  0.7s
+01:39:30 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  38/60  train 0.05995  val 0.15818  lr 1.06e-03  0.8s
+01:39:31 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  39/60  train 0.05892  val 0.15438  lr 9.81e-04  0.7s
+01:39:32 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  40/60  train 0.05716  val 0.16044  lr 9.04e-04  0.7s
+01:39:32 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  41/60  train 0.05656  val 0.16436  lr 8.30e-04  0.7s
+01:39:33 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: resumed from epoch 20 (best val 0.10270)
+01:39:33 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: 41153 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:34 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  21/60  train 0.08976  val 0.12702  lr 2.39e-03  0.7s
+01:39:34 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  22/60  train 0.08974  val 0.12723  lr 2.32e-03  0.7s
+01:39:35 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  23/60  train 0.08467  val 0.13324  lr 2.25e-03  0.7s
+01:39:36 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  24/60  train 0.08367  val 0.13051  lr 2.18e-03  0.6s
+01:39:36 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  25/60  train 0.08026  val 0.13831  lr 2.11e-03  0.7s
+01:39:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  26/60  train 0.07951  val 0.14708  lr 2.03e-03  0.7s
+01:39:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  27/60  train 0.07756  val 0.13708  lr 1.95e-03  0.7s
+01:39:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  28/60  train 0.07495  val 0.15079  lr 1.87e-03  0.7s
+01:39:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  29/60  train 0.07402  val 0.13311  lr 1.79e-03  0.7s
+01:39:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  30/60  train 0.07170  val 0.14210  lr 1.71e-03  0.6s
+01:39:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  31/60  train 0.07013  val 0.14238  lr 1.63e-03  0.7s
+01:39:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  32/60  train 0.06909  val 0.14622  lr 1.55e-03  0.7s
+01:39:42 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  33/60  train 0.06713  val 0.13676  lr 1.46e-03  0.7s
+01:39:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  34/60  train 0.06744  val 0.13522  lr 1.38e-03  0.6s
+01:39:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  35/60  train 0.06578  val 0.13918  lr 1.30e-03  0.5s
+01:39:43 | INFO    | 21_lookback_frontier |     gru_h64_l2     w24   R=192  RMSE   58.69  avail 0.8348
+01:39:43 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: resumed from epoch 29 (best val 0.10442)
+01:39:43 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:44 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  30/60  train 0.10890  val 0.11951  lr 1.71e-03  0.5s
+01:39:44 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  31/60  train 0.10739  val 0.12967  lr 1.63e-03  0.5s
+01:39:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  32/60  train 0.10645  val 0.11310  lr 1.55e-03  0.4s
+01:39:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  33/60  train 0.10515  val 0.13764  lr 1.46e-03  0.4s
+01:39:46 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  34/60  train 0.10333  val 0.13200  lr 1.38e-03  0.5s
+01:39:46 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  35/60  train 0.10238  val 0.12423  lr 1.30e-03  0.6s
+01:39:47 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  36/60  train 0.10103  val 0.13278  lr 1.22e-03  0.6s
+01:39:48 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  37/60  train 0.09981  val 0.12069  lr 1.14e-03  0.6s
+01:39:48 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  38/60  train 0.09918  val 0.11646  lr 1.06e-03  0.6s
+01:39:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  39/60  train 0.09838  val 0.12079  lr 9.81e-04  0.6s
+01:39:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  40/60  train 0.09659  val 0.12506  lr 9.04e-04  0.6s
+01:39:50 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  41/60  train 0.09540  val 0.11733  lr 8.30e-04  0.6s
+01:39:51 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  42/60  train 0.09480  val 0.12245  lr 7.58e-04  0.6s
+01:39:51 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  43/60  train 0.09388  val 0.12510  lr 6.87e-04  0.6s
+01:39:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  44/60  train 0.09330  val 0.12585  lr 6.20e-04  0.6s
+01:39:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: resumed from epoch 26 (best val 0.11030)
+01:39:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:39:53 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  27/60  train 0.11157  val 0.12488  lr 1.95e-03  0.5s
+01:39:53 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  28/60  train 0.11200  val 0.14228  lr 1.87e-03  0.6s
+01:39:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  29/60  train 0.10969  val 0.13009  lr 1.79e-03  0.5s
+01:39:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  30/60  train 0.10830  val 0.14360  lr 1.71e-03  0.6s
+01:39:55 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  31/60  train 0.10730  val 0.15052  lr 1.63e-03  0.6s
+01:39:55 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  32/60  train 0.10646  val 0.12714  lr 1.55e-03  0.6s
+01:39:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  33/60  train 0.10607  val 0.15583  lr 1.46e-03  0.6s
+01:39:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  34/60  train 0.10316  val 0.13885  lr 1.38e-03  0.6s
+01:39:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  35/60  train 0.10096  val 0.14542  lr 1.30e-03  0.6s
+01:39:58 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  36/60  train 0.09961  val 0.13686  lr 1.22e-03  0.6s
+01:39:58 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  37/60  train 0.09829  val 0.14476  lr 1.14e-03  0.6s
+01:39:59 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  38/60  train 0.09918  val 0.14071  lr 1.06e-03  0.6s
+01:40:00 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  39/60  train 0.09639  val 0.14414  lr 9.81e-04  0.6s
+01:40:00 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  40/60  train 0.09498  val 0.14684  lr 9.04e-04  0.6s
+01:40:01 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  41/60  train 0.09329  val 0.14690  lr 8.30e-04  0.6s
+01:40:01 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: resumed from epoch 24 (best val 0.10611)
+01:40:01 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:02 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  25/60  train 0.11581  val 0.12355  lr 2.11e-03  0.6s
+01:40:02 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  26/60  train 0.11587  val 0.12625  lr 2.03e-03  0.6s
+01:40:03 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  27/60  train 0.11165  val 0.13677  lr 1.95e-03  0.6s
+01:40:04 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  28/60  train 0.10917  val 0.13499  lr 1.87e-03  0.6s
+01:40:04 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  29/60  train 0.10991  val 0.14552  lr 1.79e-03  0.6s
+01:40:05 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  30/60  train 0.10927  val 0.15711  lr 1.71e-03  0.6s
+01:40:05 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  31/60  train 0.10608  val 0.14266  lr 1.63e-03  0.6s
+01:40:06 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  32/60  train 0.10434  val 0.14582  lr 1.55e-03  0.5s
+01:40:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  33/60  train 0.10273  val 0.13699  lr 1.46e-03  0.5s
+01:40:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  34/60  train 0.10152  val 0.14908  lr 1.38e-03  0.6s
+01:40:08 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  35/60  train 0.09949  val 0.14088  lr 1.30e-03  0.6s
+01:40:08 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  36/60  train 0.09882  val 0.14511  lr 1.22e-03  0.6s
+01:40:09 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  37/60  train 0.09719  val 0.14294  lr 1.14e-03  0.5s
+01:40:09 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  38/60  train 0.09719  val 0.13342  lr 1.06e-03  0.6s
+01:40:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  39/60  train 0.09505  val 0.13164  lr 9.81e-04  0.6s
+01:40:10 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w48   R=192  RMSE   57.38  avail 0.8348
+01:40:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: resumed from epoch 29 (best val 0.10703)
+01:40:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:11 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  30/60  train 0.10632  val 0.12820  lr 1.71e-03  0.6s
+01:40:12 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  31/60  train 0.10446  val 0.12872  lr 1.63e-03  0.6s
+01:40:12 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  32/60  train 0.10184  val 0.12733  lr 1.55e-03  0.6s
+01:40:13 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  33/60  train 0.10183  val 0.14543  lr 1.46e-03  0.5s
+01:40:13 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  34/60  train 0.10024  val 0.14096  lr 1.38e-03  0.6s
+01:40:14 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  35/60  train 0.09967  val 0.14246  lr 1.30e-03  0.6s
+01:40:14 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  36/60  train 0.09664  val 0.14439  lr 1.22e-03  0.6s
+01:40:15 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  37/60  train 0.09446  val 0.13792  lr 1.14e-03  0.6s
+01:40:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  38/60  train 0.09402  val 0.13501  lr 1.06e-03  0.8s
+01:40:17 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  39/60  train 0.09304  val 0.13291  lr 9.81e-04  0.8s
+01:40:17 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  40/60  train 0.09149  val 0.13644  lr 9.04e-04  0.7s
+01:40:18 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  41/60  train 0.08989  val 0.12999  lr 8.30e-04  0.6s
+01:40:19 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  42/60  train 0.08947  val 0.13591  lr 7.58e-04  0.6s
+01:40:19 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  43/60  train 0.08828  val 0.13494  lr 6.87e-04  0.7s
+01:40:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  44/60  train 0.08720  val 0.14002  lr 6.20e-04  0.6s
+01:40:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: resumed from epoch 26 (best val 0.11151)
+01:40:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:21 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  27/60  train 0.10755  val 0.12814  lr 1.95e-03  0.5s
+01:40:21 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  28/60  train 0.10796  val 0.14925  lr 1.87e-03  0.5s
+01:40:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  29/60  train 0.10486  val 0.13945  lr 1.79e-03  0.6s
+01:40:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  30/60  train 0.10292  val 0.14887  lr 1.71e-03  0.6s
+01:40:23 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  31/60  train 0.10177  val 0.14804  lr 1.63e-03  0.6s
+01:40:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  32/60  train 0.10053  val 0.12885  lr 1.55e-03  0.6s
+01:40:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  33/60  train 0.10007  val 0.16036  lr 1.46e-03  0.6s
+01:40:25 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  34/60  train 0.09717  val 0.14498  lr 1.38e-03  0.5s
+01:40:25 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  35/60  train 0.09405  val 0.14475  lr 1.30e-03  0.6s
+01:40:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  36/60  train 0.09296  val 0.14389  lr 1.22e-03  0.6s
+01:40:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  37/60  train 0.09138  val 0.14816  lr 1.14e-03  0.6s
+01:40:27 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  38/60  train 0.09096  val 0.14249  lr 1.06e-03  0.6s
+01:40:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  39/60  train 0.08941  val 0.16157  lr 9.81e-04  0.5s
+01:40:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  40/60  train 0.08781  val 0.14939  lr 9.04e-04  0.6s
+01:40:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  41/60  train 0.08576  val 0.15824  lr 8.30e-04  0.6s
+01:40:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: resumed from epoch 28 (best val 0.10803)
+01:40:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: 21569 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  29/60  train 0.10995  val 0.12957  lr 1.79e-03  0.6s
+01:40:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  30/60  train 0.10851  val 0.13060  lr 1.71e-03  0.6s
+01:40:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  31/60  train 0.10461  val 0.14802  lr 1.63e-03  0.6s
+01:40:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  32/60  train 0.10330  val 0.14215  lr 1.55e-03  0.6s
+01:40:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  33/60  train 0.10192  val 0.15059  lr 1.46e-03  0.6s
+01:40:33 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  34/60  train 0.10224  val 0.15007  lr 1.38e-03  0.6s
+01:40:33 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  35/60  train 0.09883  val 0.15257  lr 1.30e-03  0.6s
+01:40:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  36/60  train 0.09748  val 0.14669  lr 1.22e-03  0.5s
+01:40:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  37/60  train 0.09589  val 0.14395  lr 1.14e-03  0.5s
+01:40:35 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  38/60  train 0.09493  val 0.15011  lr 1.06e-03  0.6s
+01:40:35 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  39/60  train 0.09281  val 0.14843  lr 9.81e-04  0.5s
+01:40:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  40/60  train 0.09230  val 0.14937  lr 9.04e-04  0.5s
+01:40:37 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  41/60  train 0.09105  val 0.14444  lr 8.30e-04  0.6s
+01:40:37 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  42/60  train 0.09033  val 0.13671  lr 7.58e-04  0.5s
+01:40:38 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  43/60  train 0.08946  val 0.13137  lr 6.87e-04  0.5s
+01:40:38 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w24   R=192  RMSE   57.70  avail 0.8348
+01:40:38 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: resumed from epoch 27 (best val 0.13351)
+01:40:38 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: 1730 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:38 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  28/60  train 0.13957  val 0.13874  lr 1.87e-03  0.4s
+01:40:39 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  29/60  train 0.14275  val 0.17094  lr 1.79e-03  0.4s
+01:40:39 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  30/60  train 0.13731  val 0.14209  lr 1.71e-03  0.4s
+01:40:40 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  31/60  train 0.13805  val 0.13797  lr 1.63e-03  0.4s
+01:40:40 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  32/60  train 0.13740  val 0.14014  lr 1.55e-03  0.4s
+01:40:41 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  33/60  train 0.13643  val 0.15081  lr 1.46e-03  0.4s
+01:40:41 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  34/60  train 0.13600  val 0.14369  lr 1.38e-03  0.4s
+01:40:41 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  35/60  train 0.13563  val 0.14510  lr 1.30e-03  0.4s
+01:40:42 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  36/60  train 0.13518  val 0.14973  lr 1.22e-03  0.4s
+01:40:42 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  37/60  train 0.13345  val 0.14952  lr 1.14e-03  0.4s
+01:40:43 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  38/60  train 0.13378  val 0.15179  lr 1.06e-03  0.4s
+01:40:43 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  39/60  train 0.13249  val 0.13703  lr 9.81e-04  0.4s
+01:40:44 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  40/60  train 0.13160  val 0.14846  lr 9.04e-04  0.4s
+01:40:44 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  41/60  train 0.13201  val 0.14063  lr 8.30e-04  0.4s
+01:40:44 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  42/60  train 0.13179  val 0.13678  lr 7.58e-04  0.4s
+01:40:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: resumed from epoch 60 (best val 0.13266)
+01:40:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: 1730 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: resumed from epoch 51 (best val 0.13202)
+01:40:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: 1730 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  52/60  train 0.12706  val 0.13912  lr 1.90e-04  0.4s
+01:40:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  53/60  train 0.12687  val 0.14110  lr 1.53e-04  0.4s
+01:40:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  54/60  train 0.12703  val 0.13729  lr 1.20e-04  0.4s
+01:40:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  55/60  train 0.12672  val 0.13775  lr 9.10e-05  0.4s
+01:40:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  56/60  train 0.12624  val 0.13794  lr 6.64e-05  0.4s
+01:40:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  57/60  train 0.12622  val 0.13755  lr 4.62e-05  0.4s
+01:40:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  58/60  train 0.12610  val 0.13843  lr 3.04e-05  0.4s
+01:40:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  59/60  train 0.12613  val 0.13865  lr 1.91e-05  0.4s
+01:40:49 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  60/60  train 0.12589  val 0.13882  lr 1.23e-05  0.4s
+01:40:49 | INFO    | 21_lookback_frontier |     dlinear        w48   R=192  RMSE   67.06  avail 0.8348
+01:40:49 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: resumed from epoch 34 (best val 0.13185)
+01:40:49 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: 866 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:49 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  35/60  train 0.13373  val 0.13595  lr 1.30e-03  0.4s
+01:40:50 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  36/60  train 0.13295  val 0.13502  lr 1.22e-03  0.4s
+01:40:50 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  37/60  train 0.13200  val 0.13799  lr 1.14e-03  0.5s
+01:40:51 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  38/60  train 0.13187  val 0.14151  lr 1.06e-03  0.5s
+01:40:51 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  39/60  train 0.13174  val 0.13925  lr 9.81e-04  0.5s
+01:40:52 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  40/60  train 0.13226  val 0.14386  lr 9.04e-04  0.5s
+01:40:52 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  41/60  train 0.13143  val 0.15524  lr 8.30e-04  0.4s
+01:40:53 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  42/60  train 0.13177  val 0.14224  lr 7.58e-04  0.4s
+01:40:53 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  43/60  train 0.13093  val 0.13758  lr 6.87e-04  0.4s
+01:40:54 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  44/60  train 0.13074  val 0.13495  lr 6.20e-04  0.4s
+01:40:54 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  45/60  train 0.12992  val 0.13447  lr 5.55e-04  0.4s
+01:40:54 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  46/60  train 0.13047  val 0.13514  lr 4.92e-04  0.4s
+01:40:55 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  47/60  train 0.13042  val 0.14193  lr 4.33e-04  0.3s
+01:40:55 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  48/60  train 0.12982  val 0.13601  lr 3.78e-04  0.4s
+01:40:56 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  49/60  train 0.12976  val 0.13780  lr 3.25e-04  0.4s
+01:40:56 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: resumed from epoch 27 (best val 0.13328)
+01:40:56 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: 866 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:40:56 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  28/60  train 0.13553  val 0.14102  lr 1.87e-03  0.4s
+01:40:56 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  29/60  train 0.13527  val 0.14546  lr 1.79e-03  0.4s
+01:40:57 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  30/60  train 0.13458  val 0.14825  lr 1.71e-03  0.3s
+01:40:57 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  31/60  train 0.13407  val 0.14162  lr 1.63e-03  0.4s
+01:40:58 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  32/60  train 0.13367  val 0.14133  lr 1.55e-03  0.4s
+01:40:58 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  33/60  train 0.13333  val 0.14053  lr 1.46e-03  0.4s
+01:40:58 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  34/60  train 0.13456  val 0.14668  lr 1.38e-03  0.4s
+01:40:59 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  35/60  train 0.13421  val 0.14987  lr 1.30e-03  0.4s
+01:40:59 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  36/60  train 0.13366  val 0.13258  lr 1.22e-03  0.5s  *
+01:41:00 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  37/60  train 0.13258  val 0.14023  lr 1.14e-03  0.4s
+01:41:00 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  38/60  train 0.13159  val 0.14029  lr 1.06e-03  0.4s
+01:41:00 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  39/60  train 0.13167  val 0.14540  lr 9.81e-04  0.3s
+01:41:01 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  40/60  train 0.13199  val 0.14312  lr 9.04e-04  0.3s
+01:41:01 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  41/60  train 0.13213  val 0.14462  lr 8.30e-04  0.3s
+01:41:01 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  42/60  train 0.13059  val 0.14492  lr 7.58e-04  0.3s
+01:41:02 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  43/60  train 0.13073  val 0.14928  lr 6.87e-04  0.3s
+01:41:02 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  44/60  train 0.13087  val 0.13577  lr 6.20e-04  0.3s
+01:41:03 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  45/60  train 0.13072  val 0.14277  lr 5.55e-04  0.3s
+01:41:03 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  46/60  train 0.12998  val 0.13957  lr 4.92e-04  0.3s
+01:41:03 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  47/60  train 0.13042  val 0.14397  lr 4.33e-04  0.3s
+01:41:04 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  48/60  train 0.12990  val 0.13930  lr 3.78e-04  0.3s
+01:41:04 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  49/60  train 0.12968  val 0.13979  lr 3.25e-04  0.3s
+01:41:04 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  50/60  train 0.12915  val 0.13781  lr 2.76e-04  0.3s
+01:41:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  51/60  train 0.12890  val 0.13976  lr 2.31e-04  0.3s
+01:41:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: resumed from epoch 57 (best val 0.13260)
+01:41:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: 866 params | train 25787 windows, val 5955 | 101 steps/epoch | matrix 5.4 MB on device
+01:41:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  58/60  train 0.12825  val 0.13928  lr 3.04e-05  0.4s
+01:41:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  59/60  train 0.12872  val 0.13928  lr 1.91e-05  0.3s
+01:41:06 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  60/60  train 0.12814  val 0.13871  lr 1.23e-05  0.3s
+01:41:06 | INFO    | 21_lookback_frontier |     dlinear        w24   R=192  RMSE   66.16  avail 0.8348
+01:41:06 | INFO    | 21_lookback_frontier | === arm B48: cap 48, floor 168 ===
+01:41:06 | INFO    | 21_lookback_frontier | contiguity: 296 runs after 3h ffill, longest 4283 h
+01:41:06 | INFO    | 21_lookback_frontier | h=  1:  42732 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 89, target-imputed 1037)
+01:41:06 | INFO    | 21_lookback_frontier | h=  3:  42568 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 265, target-imputed 1025)
+01:41:06 | INFO    | 21_lookback_frontier | h=  6:  42317 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 528, target-imputed 1013)
+01:41:06 | INFO    | 21_lookback_frontier | h= 12:  41829 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 1042, target-imputed 987)
+01:41:06 | INFO    | 21_lookback_frontier | h= 24:  40877 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 2030, target-imputed 951)
+01:41:06 | INFO    | 21_lookback_frontier | built 97 predictor columns (max backward dependency 48 h)
+01:41:06 | INFO    | 21_lookback_frontier | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+01:41:06 | INFO    | 21_lookback_frontier | h=  1: boundary purge removed 52 rows (42732 -> 42680)
+01:41:06 | INFO    | 21_lookback_frontier | h=  3: boundary purge removed 52 rows (42568 -> 42516)
+01:41:06 | INFO    | 21_lookback_frontier | h=  6: boundary purge removed 52 rows (42317 -> 42265)
+01:41:06 | INFO    | 21_lookback_frontier | h= 12: boundary purge removed 52 rows (41829 -> 41777)
+01:41:06 | INFO    | 21_lookback_frontier | h= 24: boundary purge removed 52 rows (40877 -> 40825)
+01:41:06 | INFO    | 21_lookback_frontier | scaler fitted on 55451 training rows over 97 predictors
+01:41:07 | INFO    | 21_lookback_frontier | wrote F:\BUP\data\interim\lookback\B48\processed\features.parquet (79216 rows, 164 cols)
+01:41:07 | INFO    | 21_lookback_frontier |   served 9083 of 10880 universe hours (0.8348)
+01:41:08 | INFO    | 21_lookback_frontier |     ridge          RMSE   59.54  (served rows)
+01:41:15 | INFO    | 21_lookback_frontier |     random_forest  RMSE   58.37  (served rows)
+01:41:17 | INFO    | 21_lookback_frontier |     xgboost        RMSE   58.47  (served rows)
+01:41:19 | INFO    | 21_lookback_frontier |     lightgbm       RMSE   58.43  (served rows)
+01:41:19 | INFO    | 21_lookback_frontier |     gru_h64_l2     w48   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier |     gru_h64_l2     w24   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w48   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w24   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier |     dlinear        w48   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier |     dlinear        w24   reused: identical windows at radius 192
+01:41:19 | INFO    | 21_lookback_frontier | === arm A48: cap 48, floor 48 ===
+01:41:19 | INFO    | 21_lookback_frontier | contiguity: 296 runs after 3h ffill, longest 4283 h
+01:41:20 | INFO    | 21_lookback_frontier | h=  1:  56203 valid rows  (rejected: no-run 10766, short-history 10220, target-past-run-end 165, target-imputed 1862)
+01:41:20 | INFO    | 21_lookback_frontier | h=  3:  55917 valid rows  (rejected: no-run 10766, short-history 10220, target-past-run-end 489, target-imputed 1824)
+01:41:20 | INFO    | 21_lookback_frontier | h=  6:  55490 valid rows  (rejected: no-run 10766, short-history 10220, target-past-run-end 960, target-imputed 1780)
+01:41:20 | INFO    | 21_lookback_frontier | h= 12:  54634 valid rows  (rejected: no-run 10766, short-history 10220, target-past-run-end 1882, target-imputed 1714)
+01:41:20 | INFO    | 21_lookback_frontier | h= 24:  53006 valid rows  (rejected: no-run 10766, short-history 10220, target-past-run-end 3632, target-imputed 1592)
+01:41:20 | INFO    | 21_lookback_frontier | built 97 predictor columns (max backward dependency 48 h)
+01:41:20 | INFO    | 21_lookback_frontier | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+01:41:20 | INFO    | 21_lookback_frontier | h=  1: boundary purge removed 48 rows (56203 -> 56155)
+01:41:20 | INFO    | 21_lookback_frontier | h=  3: boundary purge removed 50 rows (55917 -> 55867)
+01:41:20 | INFO    | 21_lookback_frontier | h=  6: boundary purge removed 51 rows (55490 -> 55439)
+01:41:20 | INFO    | 21_lookback_frontier | h= 12: boundary purge removed 51 rows (54634 -> 54583)
+01:41:20 | INFO    | 21_lookback_frontier | h= 24: boundary purge removed 52 rows (53006 -> 52954)
+01:41:20 | INFO    | 21_lookback_frontier | scaler fitted on 55451 training rows over 97 predictors
+01:41:21 | INFO    | 21_lookback_frontier | wrote F:\BUP\data\interim\lookback\A48\processed\features.parquet (79216 rows, 164 cols)
+01:41:21 | INFO    | 21_lookback_frontier |   served 10363 of 10880 universe hours (0.9525)
+01:41:21 | INFO    | 21_lookback_frontier |     ridge          RMSE   58.01  (served rows)
+01:41:32 | INFO    | 21_lookback_frontier |     random_forest  RMSE   56.81  (served rows)
+01:41:35 | INFO    | 21_lookback_frontier |     xgboost        RMSE   56.93  (served rows)
+01:41:37 | INFO    | 21_lookback_frontier |     lightgbm       RMSE   57.03  (served rows)
+01:41:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: resumed from epoch 20 (best val 0.10643)
+01:41:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:41:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  21/60  train 0.07952  val 0.14089  lr 2.39e-03  0.8s
+01:41:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  22/60  train 0.07780  val 0.13141  lr 2.32e-03  0.7s
+01:41:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  23/60  train 0.07582  val 0.14531  lr 2.25e-03  0.8s
+01:41:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  24/60  train 0.07360  val 0.14185  lr 2.18e-03  0.8s
+01:41:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  25/60  train 0.07202  val 0.14494  lr 2.11e-03  0.8s
+01:41:42 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  26/60  train 0.06909  val 0.14549  lr 2.03e-03  0.7s
+01:41:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  27/60  train 0.06830  val 0.14613  lr 1.95e-03  0.8s
+01:41:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  28/60  train 0.06654  val 0.14981  lr 1.87e-03  0.7s
+01:41:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  29/60  train 0.06449  val 0.16697  lr 1.79e-03  0.8s
+01:41:45 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  30/60  train 0.06425  val 0.14211  lr 1.71e-03  0.7s
+01:41:46 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  31/60  train 0.06212  val 0.14520  lr 1.63e-03  0.7s
+01:41:46 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  32/60  train 0.06100  val 0.14199  lr 1.55e-03  0.8s
+01:41:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  33/60  train 0.05976  val 0.15340  lr 1.46e-03  0.8s
+01:41:48 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  34/60  train 0.05876  val 0.14960  lr 1.38e-03  0.7s
+01:41:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  35/60  train 0.05731  val 0.14925  lr 1.30e-03  0.8s
+01:41:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: resumed from epoch 20 (best val 0.09913)
+01:41:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:41:50 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  21/60  train 0.07859  val 0.15488  lr 2.39e-03  0.7s
+01:41:50 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  22/60  train 0.07620  val 0.13000  lr 2.32e-03  0.8s
+01:41:51 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  23/60  train 0.07400  val 0.13956  lr 2.25e-03  0.8s
+01:41:52 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  24/60  train 0.07124  val 0.14336  lr 2.18e-03  0.7s
+01:41:53 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  25/60  train 0.07102  val 0.14503  lr 2.11e-03  0.7s
+01:41:53 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  26/60  train 0.06875  val 0.14735  lr 2.03e-03  0.7s
+01:41:54 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  27/60  train 0.06676  val 0.13791  lr 1.95e-03  0.8s
+01:41:55 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  28/60  train 0.06631  val 0.13338  lr 1.87e-03  0.7s
+01:41:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  29/60  train 0.06396  val 0.13778  lr 1.79e-03  0.8s
+01:41:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  30/60  train 0.06245  val 0.14944  lr 1.71e-03  0.7s
+01:41:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  31/60  train 0.06136  val 0.14032  lr 1.63e-03  0.8s
+01:41:58 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  32/60  train 0.06024  val 0.14689  lr 1.55e-03  0.8s
+01:41:59 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  33/60  train 0.05960  val 0.14461  lr 1.46e-03  0.8s
+01:42:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  34/60  train 0.05746  val 0.15481  lr 1.38e-03  0.8s
+01:42:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  35/60  train 0.05690  val 0.14874  lr 1.30e-03  0.8s
+01:42:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: resumed from epoch 24 (best val 0.10041)
+01:42:01 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:01 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  25/60  train 0.07145  val 0.13199  lr 2.11e-03  0.8s
+01:42:02 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  26/60  train 0.07006  val 0.14226  lr 2.03e-03  0.7s
+01:42:03 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  27/60  train 0.06840  val 0.13877  lr 1.95e-03  0.7s
+01:42:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  28/60  train 0.06735  val 0.14184  lr 1.87e-03  0.8s
+01:42:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  29/60  train 0.06594  val 0.14510  lr 1.79e-03  0.7s
+01:42:05 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  30/60  train 0.06421  val 0.15851  lr 1.71e-03  0.7s
+01:42:06 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  31/60  train 0.06252  val 0.13898  lr 1.63e-03  0.7s
+01:42:07 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  32/60  train 0.06158  val 0.14549  lr 1.55e-03  0.8s
+01:42:07 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  33/60  train 0.06048  val 0.13962  lr 1.46e-03  0.7s
+01:42:08 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  34/60  train 0.05897  val 0.14597  lr 1.38e-03  0.7s
+01:42:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  35/60  train 0.05808  val 0.14738  lr 1.30e-03  0.7s
+01:42:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  36/60  train 0.05680  val 0.14776  lr 1.22e-03  0.7s
+01:42:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  37/60  train 0.05560  val 0.15037  lr 1.14e-03  0.8s
+01:42:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  38/60  train 0.05514  val 0.15122  lr 1.06e-03  0.7s
+01:42:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  39/60  train 0.05397  val 0.14768  lr 9.81e-04  0.7s
+01:42:12 | INFO    | 21_lookback_frontier |     gru_h64_l2     w48   R=72   RMSE   57.59  avail 0.9525
+01:42:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: resumed from epoch 21 (best val 0.10554)
+01:42:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  22/60  train 0.08265  val 0.13881  lr 2.32e-03  0.7s
+01:42:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  23/60  train 0.07921  val 0.13798  lr 2.25e-03  0.7s
+01:42:14 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  24/60  train 0.07780  val 0.14392  lr 2.18e-03  0.7s
+01:42:15 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  25/60  train 0.07498  val 0.14778  lr 2.11e-03  0.7s
+01:42:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  26/60  train 0.07283  val 0.14817  lr 2.03e-03  0.7s
+01:42:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  27/60  train 0.07036  val 0.15036  lr 1.95e-03  0.7s
+01:42:17 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  28/60  train 0.06938  val 0.14383  lr 1.87e-03  0.8s
+01:42:18 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  29/60  train 0.06757  val 0.15235  lr 1.79e-03  0.8s
+01:42:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  30/60  train 0.06579  val 0.17169  lr 1.71e-03  0.8s
+01:42:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  31/60  train 0.06545  val 0.14663  lr 1.63e-03  0.8s
+01:42:20 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  32/60  train 0.06282  val 0.15294  lr 1.55e-03  0.8s
+01:42:21 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  33/60  train 0.06158  val 0.15220  lr 1.46e-03  0.7s
+01:42:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  34/60  train 0.06047  val 0.15834  lr 1.38e-03  0.7s
+01:42:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  35/60  train 0.05984  val 0.15018  lr 1.30e-03  0.8s
+01:42:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  36/60  train 0.05784  val 0.14974  lr 1.22e-03  0.8s
+01:42:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: resumed from epoch 20 (best val 0.09878)
+01:42:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:24 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  21/60  train 0.08179  val 0.15398  lr 2.39e-03  0.8s
+01:42:25 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  22/60  train 0.07884  val 0.14129  lr 2.32e-03  0.7s
+01:42:26 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  23/60  train 0.07632  val 0.15093  lr 2.25e-03  0.7s
+01:42:26 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  24/60  train 0.07377  val 0.15105  lr 2.18e-03  0.7s
+01:42:27 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  25/60  train 0.07275  val 0.14761  lr 2.11e-03  0.7s
+01:42:28 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  26/60  train 0.07099  val 0.16165  lr 2.03e-03  0.8s
+01:42:29 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  27/60  train 0.06836  val 0.14765  lr 1.95e-03  0.8s
+01:42:30 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  28/60  train 0.06750  val 0.14780  lr 1.87e-03  0.9s
+01:42:30 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  29/60  train 0.06581  val 0.15289  lr 1.79e-03  0.8s
+01:42:31 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  30/60  train 0.06327  val 0.16893  lr 1.71e-03  0.8s
+01:42:32 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  31/60  train 0.06246  val 0.15048  lr 1.63e-03  0.7s
+01:42:33 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  32/60  train 0.06052  val 0.15446  lr 1.55e-03  0.7s
+01:42:33 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  33/60  train 0.05946  val 0.16336  lr 1.46e-03  0.7s
+01:42:34 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  34/60  train 0.05781  val 0.15906  lr 1.38e-03  0.8s
+01:42:35 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  35/60  train 0.05729  val 0.15095  lr 1.30e-03  0.8s
+01:42:35 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: resumed from epoch 24 (best val 0.10104)
+01:42:35 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: 41153 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:36 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  25/60  train 0.07222  val 0.14405  lr 2.11e-03  0.8s
+01:42:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  26/60  train 0.07100  val 0.14088  lr 2.03e-03  0.8s
+01:42:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  27/60  train 0.06950  val 0.14537  lr 1.95e-03  0.7s
+01:42:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  28/60  train 0.06807  val 0.14893  lr 1.87e-03  0.7s
+01:42:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  29/60  train 0.06651  val 0.15472  lr 1.79e-03  0.7s
+01:42:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  30/60  train 0.06530  val 0.16281  lr 1.71e-03  0.8s
+01:42:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  31/60  train 0.06248  val 0.14540  lr 1.63e-03  0.8s
+01:42:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  32/60  train 0.06151  val 0.15161  lr 1.55e-03  0.7s
+01:42:42 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  33/60  train 0.05986  val 0.15319  lr 1.46e-03  0.7s
+01:42:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  34/60  train 0.05870  val 0.15541  lr 1.38e-03  0.7s
+01:42:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  35/60  train 0.05835  val 0.16173  lr 1.30e-03  0.8s
+01:42:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  36/60  train 0.05720  val 0.15135  lr 1.22e-03  0.8s
+01:42:45 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  37/60  train 0.05594  val 0.15880  lr 1.14e-03  0.7s
+01:42:46 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  38/60  train 0.05450  val 0.16149  lr 1.06e-03  0.7s
+01:42:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  39/60  train 0.05388  val 0.15716  lr 9.81e-04  0.8s
+01:42:47 | INFO    | 21_lookback_frontier |     gru_h64_l2     w24   R=72   RMSE   58.18  avail 0.9525
+01:42:47 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: resumed from epoch 27 (best val 0.10612)
+01:42:47 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:47 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  28/60  train 0.10240  val 0.12707  lr 1.87e-03  0.7s
+01:42:48 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  29/60  train 0.10044  val 0.12948  lr 1.79e-03  0.6s
+01:42:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  30/60  train 0.09893  val 0.13425  lr 1.71e-03  0.6s
+01:42:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  31/60  train 0.09700  val 0.14582  lr 1.63e-03  0.6s
+01:42:50 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  32/60  train 0.09722  val 0.14336  lr 1.55e-03  0.6s
+01:42:51 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  33/60  train 0.09483  val 0.13346  lr 1.46e-03  0.6s
+01:42:51 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  34/60  train 0.09266  val 0.14795  lr 1.38e-03  0.6s
+01:42:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  35/60  train 0.09217  val 0.14161  lr 1.30e-03  0.6s
+01:42:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  36/60  train 0.09090  val 0.14920  lr 1.22e-03  0.6s
+01:42:53 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  37/60  train 0.08951  val 0.13600  lr 1.14e-03  0.6s
+01:42:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  38/60  train 0.08882  val 0.14174  lr 1.06e-03  0.6s
+01:42:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  39/60  train 0.08794  val 0.14049  lr 9.81e-04  0.6s
+01:42:55 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  40/60  train 0.08596  val 0.14460  lr 9.04e-04  0.6s
+01:42:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  41/60  train 0.08581  val 0.13846  lr 8.30e-04  0.6s
+01:42:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  42/60  train 0.08389  val 0.13639  lr 7.58e-04  0.6s
+01:42:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: resumed from epoch 29 (best val 0.10649)
+01:42:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:42:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  30/60  train 0.10346  val 0.12928  lr 1.71e-03  0.6s
+01:42:58 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  31/60  train 0.10222  val 0.12743  lr 1.63e-03  0.6s
+01:42:58 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  32/60  train 0.10134  val 0.12130  lr 1.55e-03  0.6s
+01:42:59 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  33/60  train 0.09878  val 0.13081  lr 1.46e-03  0.6s
+01:43:00 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  34/60  train 0.09807  val 0.13028  lr 1.38e-03  0.7s
+01:43:00 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  35/60  train 0.09649  val 0.14235  lr 1.30e-03  0.7s
+01:43:01 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  36/60  train 0.09512  val 0.12924  lr 1.22e-03  0.7s
+01:43:02 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  37/60  train 0.09465  val 0.13344  lr 1.14e-03  0.6s
+01:43:02 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  38/60  train 0.09384  val 0.12867  lr 1.06e-03  0.6s
+01:43:03 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  39/60  train 0.09212  val 0.13683  lr 9.81e-04  0.6s
+01:43:03 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  40/60  train 0.09020  val 0.13646  lr 9.04e-04  0.6s
+01:43:04 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  41/60  train 0.09022  val 0.13985  lr 8.30e-04  0.6s
+01:43:05 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  42/60  train 0.08882  val 0.14241  lr 7.58e-04  0.6s
+01:43:05 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  43/60  train 0.08791  val 0.14185  lr 6.87e-04  0.6s
+01:43:06 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  44/60  train 0.08735  val 0.14314  lr 6.20e-04  0.6s
+01:43:06 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: resumed from epoch 23 (best val 0.10124)
+01:43:06 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  24/60  train 0.11074  val 0.12281  lr 2.18e-03  0.6s
+01:43:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  25/60  train 0.10945  val 0.11114  lr 2.11e-03  0.6s
+01:43:08 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  26/60  train 0.10798  val 0.12300  lr 2.03e-03  0.6s
+01:43:09 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  27/60  train 0.10583  val 0.12554  lr 1.95e-03  0.6s
+01:43:09 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  28/60  train 0.10491  val 0.13088  lr 1.87e-03  0.6s
+01:43:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  29/60  train 0.10215  val 0.13271  lr 1.79e-03  0.6s
+01:43:11 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  30/60  train 0.10128  val 0.12412  lr 1.71e-03  0.7s
+01:43:11 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  31/60  train 0.09980  val 0.12419  lr 1.63e-03  0.6s
+01:43:12 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  32/60  train 0.09923  val 0.12790  lr 1.55e-03  0.6s
+01:43:12 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  33/60  train 0.09751  val 0.13723  lr 1.46e-03  0.6s
+01:43:13 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  34/60  train 0.09576  val 0.13080  lr 1.38e-03  0.6s
+01:43:14 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  35/60  train 0.09525  val 0.12662  lr 1.30e-03  0.6s
+01:43:14 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  36/60  train 0.09306  val 0.13821  lr 1.22e-03  0.6s
+01:43:15 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  37/60  train 0.09185  val 0.14278  lr 1.14e-03  0.7s
+01:43:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  38/60  train 0.09076  val 0.13292  lr 1.06e-03  0.6s
+01:43:16 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w48   R=72   RMSE   56.77  avail 0.9525
+01:43:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: resumed from epoch 27 (best val 0.10449)
+01:43:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  28/60  train 0.10167  val 0.12343  lr 1.87e-03  0.7s
+01:43:17 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  29/60  train 0.09913  val 0.12381  lr 1.79e-03  0.6s
+01:43:18 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  30/60  train 0.09855  val 0.12936  lr 1.71e-03  0.6s
+01:43:18 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  31/60  train 0.09621  val 0.13628  lr 1.63e-03  0.6s
+01:43:19 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  32/60  train 0.09608  val 0.13875  lr 1.55e-03  0.6s
+01:43:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  33/60  train 0.09439  val 0.13145  lr 1.46e-03  0.6s
+01:43:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  34/60  train 0.09197  val 0.13266  lr 1.38e-03  0.7s
+01:43:21 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  35/60  train 0.09159  val 0.13706  lr 1.30e-03  0.6s
+01:43:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  36/60  train 0.09008  val 0.14125  lr 1.22e-03  0.7s
+01:43:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  37/60  train 0.08970  val 0.13473  lr 1.14e-03  0.7s
+01:43:23 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  38/60  train 0.08800  val 0.14124  lr 1.06e-03  0.6s
+01:43:23 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  39/60  train 0.08701  val 0.13993  lr 9.81e-04  0.6s
+01:43:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  40/60  train 0.08521  val 0.14363  lr 9.04e-04  0.7s
+01:43:25 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  41/60  train 0.08484  val 0.14269  lr 8.30e-04  0.7s
+01:43:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  42/60  train 0.08412  val 0.13477  lr 7.58e-04  0.7s
+01:43:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: resumed from epoch 30 (best val 0.10656)
+01:43:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  31/60  train 0.09991  val 0.13470  lr 1.63e-03  0.7s
+01:43:27 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  32/60  train 0.09801  val 0.13125  lr 1.55e-03  0.6s
+01:43:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  33/60  train 0.09690  val 0.12333  lr 1.46e-03  0.6s
+01:43:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  34/60  train 0.09484  val 0.12880  lr 1.38e-03  0.7s
+01:43:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  35/60  train 0.09436  val 0.12408  lr 1.30e-03  0.6s
+01:43:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  36/60  train 0.09372  val 0.13087  lr 1.22e-03  0.8s
+01:43:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  37/60  train 0.09126  val 0.12881  lr 1.14e-03  0.8s
+01:43:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  38/60  train 0.09086  val 0.13156  lr 1.06e-03  0.7s
+01:43:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  39/60  train 0.08928  val 0.13260  lr 9.81e-04  0.6s
+01:43:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  40/60  train 0.08803  val 0.13155  lr 9.04e-04  0.6s
+01:43:33 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  41/60  train 0.08618  val 0.14223  lr 8.30e-04  0.6s
+01:43:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  42/60  train 0.08530  val 0.13679  lr 7.58e-04  0.6s
+01:43:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  43/60  train 0.08435  val 0.14381  lr 6.87e-04  0.6s
+01:43:35 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  44/60  train 0.08330  val 0.13149  lr 6.20e-04  0.6s
+01:43:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  45/60  train 0.08353  val 0.13520  lr 5.55e-04  0.6s
+01:43:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: resumed from epoch 23 (best val 0.10365)
+01:43:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: 21569 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  24/60  train 0.10841  val 0.12291  lr 2.18e-03  0.7s
+01:43:37 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  25/60  train 0.10740  val 0.12346  lr 2.11e-03  0.6s
+01:43:38 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  26/60  train 0.10531  val 0.12927  lr 2.03e-03  0.6s
+01:43:38 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  27/60  train 0.10318  val 0.12333  lr 1.95e-03  0.7s
+01:43:39 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  28/60  train 0.10165  val 0.13300  lr 1.87e-03  0.6s
+01:43:39 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  29/60  train 0.09943  val 0.14285  lr 1.79e-03  0.7s
+01:43:40 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  30/60  train 0.09808  val 0.12898  lr 1.71e-03  0.6s
+01:43:41 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  31/60  train 0.09535  val 0.12901  lr 1.63e-03  0.6s
+01:43:41 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  32/60  train 0.09430  val 0.13938  lr 1.55e-03  0.6s
+01:43:42 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  33/60  train 0.09287  val 0.13157  lr 1.46e-03  0.6s
+01:43:43 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  34/60  train 0.09131  val 0.14304  lr 1.38e-03  0.6s
+01:43:43 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  35/60  train 0.08983  val 0.12897  lr 1.30e-03  0.7s
+01:43:44 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  36/60  train 0.08831  val 0.14483  lr 1.22e-03  0.6s
+01:43:44 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  37/60  train 0.08669  val 0.14176  lr 1.14e-03  0.6s
+01:43:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  38/60  train 0.08540  val 0.13522  lr 1.06e-03  0.6s
+01:43:45 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w24   R=72   RMSE   56.15  avail 0.9525
+01:43:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: resumed from epoch 40 (best val 0.12889)
+01:43:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: 1730 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  41/60  train 0.13039  val 0.15137  lr 8.30e-04  0.4s
+01:43:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  42/60  train 0.13033  val 0.13766  lr 7.58e-04  0.4s
+01:43:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  43/60  train 0.12868  val 0.13509  lr 6.87e-04  0.5s
+01:43:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  44/60  train 0.12921  val 0.13525  lr 6.20e-04  0.5s
+01:43:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  45/60  train 0.12877  val 0.13143  lr 5.55e-04  0.4s
+01:43:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  46/60  train 0.12781  val 0.13535  lr 4.92e-04  0.4s
+01:43:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  47/60  train 0.12797  val 0.12931  lr 4.33e-04  0.4s
+01:43:49 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  48/60  train 0.12761  val 0.13635  lr 3.78e-04  0.4s
+01:43:49 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  49/60  train 0.12703  val 0.13380  lr 3.25e-04  0.4s
+01:43:50 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  50/60  train 0.12630  val 0.13344  lr 2.76e-04  0.4s
+01:43:50 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  51/60  train 0.12638  val 0.13505  lr 2.31e-04  0.4s
+01:43:51 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  52/60  train 0.12567  val 0.13148  lr 1.90e-04  0.4s
+01:43:51 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  53/60  train 0.12550  val 0.13673  lr 1.53e-04  0.4s
+01:43:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  54/60  train 0.12556  val 0.13440  lr 1.20e-04  0.4s
+01:43:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  55/60  train 0.12484  val 0.13525  lr 9.10e-05  0.4s
+01:43:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: resumed from epoch 38 (best val 0.13038)
+01:43:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: 1730 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:43:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  39/60  train 0.13123  val 0.13930  lr 9.81e-04  0.4s
+01:43:53 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  40/60  train 0.13080  val 0.13113  lr 9.04e-04  0.4s
+01:43:53 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  41/60  train 0.12990  val 0.14261  lr 8.30e-04  0.5s
+01:43:54 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  42/60  train 0.12987  val 0.13472  lr 7.58e-04  0.4s
+01:43:54 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  43/60  train 0.12967  val 0.13508  lr 6.87e-04  0.4s
+01:43:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  44/60  train 0.12852  val 0.13154  lr 6.20e-04  0.4s
+01:43:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  45/60  train 0.12846  val 0.13894  lr 5.55e-04  0.4s
+01:43:56 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  46/60  train 0.12816  val 0.12510  lr 4.92e-04  0.4s  *
+01:43:56 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  47/60  train 0.12778  val 0.13444  lr 4.33e-04  0.4s
+01:43:56 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  48/60  train 0.12742  val 0.12936  lr 3.78e-04  0.4s
+01:43:57 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  49/60  train 0.12707  val 0.13236  lr 3.25e-04  0.4s
+01:43:57 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  50/60  train 0.12643  val 0.13063  lr 2.76e-04  0.4s
+01:43:58 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  51/60  train 0.12617  val 0.13587  lr 2.31e-04  0.4s
+01:43:58 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  52/60  train 0.12587  val 0.12871  lr 1.90e-04  0.4s
+01:43:59 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  53/60  train 0.12556  val 0.13123  lr 1.53e-04  0.4s
+01:43:59 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  54/60  train 0.12523  val 0.13219  lr 1.20e-04  0.5s
+01:44:00 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  55/60  train 0.12515  val 0.13717  lr 9.10e-05  0.5s
+01:44:00 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  56/60  train 0.12504  val 0.13231  lr 6.64e-05  0.5s
+01:44:01 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  57/60  train 0.12458  val 0.13134  lr 4.62e-05  0.4s
+01:44:01 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  58/60  train 0.12443  val 0.13300  lr 3.04e-05  0.5s
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  59/60  train 0.12432  val 0.13144  lr 1.91e-05  0.4s
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  60/60  train 0.12446  val 0.13220  lr 1.23e-05  0.4s
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: resumed from epoch 60 (best val 0.12670)
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: 1730 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:44:02 | INFO    | 21_lookback_frontier |     dlinear        w48   R=72   RMSE   63.74  avail 0.9525
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: resumed from epoch 30 (best val 0.13027)
+01:44:02 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: 866 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:44:03 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  31/60  train 0.13192  val 0.15568  lr 1.63e-03  0.4s
+01:44:03 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  32/60  train 0.13210  val 0.13685  lr 1.55e-03  0.5s
+01:44:04 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  33/60  train 0.13133  val 0.13628  lr 1.46e-03  0.4s
+01:44:04 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  34/60  train 0.13127  val 0.13311  lr 1.38e-03  0.4s
+01:44:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  35/60  train 0.13145  val 0.13520  lr 1.30e-03  0.4s
+01:44:05 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  36/60  train 0.13074  val 0.13804  lr 1.22e-03  0.4s
+01:44:06 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  37/60  train 0.13058  val 0.13138  lr 1.14e-03  0.4s
+01:44:06 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  38/60  train 0.13097  val 0.13566  lr 1.06e-03  0.4s
+01:44:06 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  39/60  train 0.12996  val 0.13692  lr 9.81e-04  0.4s
+01:44:07 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  40/60  train 0.12981  val 0.13821  lr 9.04e-04  0.4s
+01:44:07 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  41/60  train 0.12956  val 0.13302  lr 8.30e-04  0.4s
+01:44:08 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  42/60  train 0.13007  val 0.13227  lr 7.58e-04  0.4s
+01:44:08 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  43/60  train 0.12932  val 0.13635  lr 6.87e-04  0.4s
+01:44:09 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  44/60  train 0.12859  val 0.13617  lr 6.20e-04  0.4s
+01:44:09 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  45/60  train 0.12830  val 0.13808  lr 5.55e-04  0.4s
+01:44:09 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: resumed from epoch 38 (best val 0.12775)
+01:44:09 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: 866 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:44:10 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  39/60  train 0.13009  val 0.13425  lr 9.81e-04  0.4s
+01:44:10 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  40/60  train 0.12971  val 0.13026  lr 9.04e-04  0.4s
+01:44:10 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  41/60  train 0.12985  val 0.13499  lr 8.30e-04  0.4s
+01:44:11 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  42/60  train 0.12920  val 0.13289  lr 7.58e-04  0.4s
+01:44:11 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  43/60  train 0.12929  val 0.13088  lr 6.87e-04  0.5s
+01:44:12 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  44/60  train 0.12880  val 0.13573  lr 6.20e-04  0.4s
+01:44:12 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  45/60  train 0.12885  val 0.13404  lr 5.55e-04  0.4s
+01:44:13 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  46/60  train 0.12830  val 0.13216  lr 4.92e-04  0.4s
+01:44:13 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  47/60  train 0.12877  val 0.13074  lr 4.33e-04  0.4s
+01:44:14 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  48/60  train 0.12832  val 0.12940  lr 3.78e-04  0.4s
+01:44:14 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  49/60  train 0.12812  val 0.13240  lr 3.25e-04  0.4s
+01:44:15 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  50/60  train 0.12815  val 0.13469  lr 2.76e-04  0.5s
+01:44:15 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  51/60  train 0.12741  val 0.13225  lr 2.31e-04  0.5s
+01:44:16 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  52/60  train 0.12748  val 0.13129  lr 1.90e-04  0.5s
+01:44:16 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  53/60  train 0.12745  val 0.13145  lr 1.53e-04  0.5s
+01:44:16 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: resumed from epoch 32 (best val 0.12718)
+01:44:16 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: 866 params | train 35399 windows, val 7072 | 139 steps/epoch | matrix 5.4 MB on device
+01:44:17 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  33/60  train 0.13211  val 0.14288  lr 1.46e-03  0.5s
+01:44:17 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  34/60  train 0.13152  val 0.13154  lr 1.38e-03  0.4s
+01:44:17 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  35/60  train 0.13087  val 0.13495  lr 1.30e-03  0.4s
+01:44:18 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  36/60  train 0.13038  val 0.12898  lr 1.22e-03  0.6s
+01:44:19 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  37/60  train 0.13156  val 0.12897  lr 1.14e-03  0.4s
+01:44:19 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  38/60  train 0.13172  val 0.13962  lr 1.06e-03  0.5s
+01:44:20 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  39/60  train 0.12995  val 0.13539  lr 9.81e-04  0.4s
+01:44:20 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  40/60  train 0.13001  val 0.13785  lr 9.04e-04  0.4s
+01:44:20 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  41/60  train 0.13009  val 0.13760  lr 8.30e-04  0.5s
+01:44:21 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  42/60  train 0.12972  val 0.13698  lr 7.58e-04  0.4s
+01:44:21 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  43/60  train 0.12957  val 0.13296  lr 6.87e-04  0.4s
+01:44:22 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  44/60  train 0.12894  val 0.13304  lr 6.20e-04  0.4s
+01:44:22 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  45/60  train 0.12842  val 0.13887  lr 5.55e-04  0.4s
+01:44:23 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  46/60  train 0.12882  val 0.13472  lr 4.92e-04  0.4s
+01:44:23 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  47/60  train 0.12797  val 0.13215  lr 4.33e-04  0.4s
+01:44:23 | INFO    | 21_lookback_frontier |     dlinear        w24   R=72   RMSE   65.24  avail 0.9525
+01:44:23 | INFO    | 21_lookback_frontier | === arm B24: cap 24, floor 168 ===
+01:44:23 | INFO    | 21_lookback_frontier | contiguity: 296 runs after 3h ffill, longest 4283 h
+01:44:23 | INFO    | 21_lookback_frontier | h=  1:  42732 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 89, target-imputed 1037)
+01:44:23 | INFO    | 21_lookback_frontier | h=  3:  42568 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 265, target-imputed 1025)
+01:44:23 | INFO    | 21_lookback_frontier | h=  6:  42317 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 528, target-imputed 1013)
+01:44:23 | INFO    | 21_lookback_frontier | h= 12:  41829 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 1042, target-imputed 987)
+01:44:23 | INFO    | 21_lookback_frontier | h= 24:  40877 valid rows  (rejected: no-run 10766, short-history 24592, target-past-run-end 2030, target-imputed 951)
+01:44:23 | INFO    | 21_lookback_frontier | built 96 predictor columns (max backward dependency 24 h)
+01:44:24 | INFO    | 21_lookback_frontier | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+01:44:24 | INFO    | 21_lookback_frontier | h=  1: boundary purge removed 52 rows (42732 -> 42680)
+01:44:24 | INFO    | 21_lookback_frontier | h=  3: boundary purge removed 52 rows (42568 -> 42516)
+01:44:24 | INFO    | 21_lookback_frontier | h=  6: boundary purge removed 52 rows (42317 -> 42265)
+01:44:24 | INFO    | 21_lookback_frontier | h= 12: boundary purge removed 52 rows (41829 -> 41777)
+01:44:24 | INFO    | 21_lookback_frontier | h= 24: boundary purge removed 52 rows (40877 -> 40825)
+01:44:24 | INFO    | 21_lookback_frontier | scaler fitted on 55451 training rows over 96 predictors
+01:44:24 | INFO    | 21_lookback_frontier | wrote F:\BUP\data\interim\lookback\B24\processed\features.parquet (79216 rows, 163 cols)
+01:44:25 | INFO    | 21_lookback_frontier |   served 9083 of 10880 universe hours (0.8348)
+01:44:25 | INFO    | 21_lookback_frontier |     ridge          RMSE   59.60  (served rows)
+01:44:32 | INFO    | 21_lookback_frontier |     random_forest  RMSE   58.39  (served rows)
+01:44:34 | INFO    | 21_lookback_frontier |     xgboost        RMSE   58.45  (served rows)
+01:44:36 | INFO    | 21_lookback_frontier |     lightgbm       RMSE   58.57  (served rows)
+01:44:36 | INFO    | 21_lookback_frontier |     gru_h64_l2     w48   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier |     gru_h64_l2     w24   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w48   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w24   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier |     dlinear        w48   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier |     dlinear        w24   reused: identical windows at radius 192
+01:44:36 | INFO    | 21_lookback_frontier | === arm A24: cap 24, floor 24 ===
+01:44:36 | INFO    | 21_lookback_frontier | contiguity: 296 runs after 3h ffill, longest 4283 h
+01:44:36 | INFO    | 21_lookback_frontier | h=  1:  60085 valid rows  (rejected: no-run 10766, short-history 5837, target-past-run-end 206, target-imputed 2322)
+01:44:36 | INFO    | 21_lookback_frontier | h=  3:  59762 valid rows  (rejected: no-run 10766, short-history 5837, target-past-run-end 609, target-imputed 2242)
+01:44:36 | INFO    | 21_lookback_frontier | h=  6:  59258 valid rows  (rejected: no-run 10766, short-history 5837, target-past-run-end 1176, target-imputed 2179)
+01:44:36 | INFO    | 21_lookback_frontier | h= 12:  58259 valid rows  (rejected: no-run 10766, short-history 5837, target-past-run-end 2276, target-imputed 2078)
+01:44:36 | INFO    | 21_lookback_frontier | h= 24:  56346 valid rows  (rejected: no-run 10766, short-history 5837, target-past-run-end 4383, target-imputed 1884)
+01:44:36 | INFO    | 21_lookback_frontier | built 96 predictor columns (max backward dependency 24 h)
+01:44:36 | INFO    | 21_lookback_frontier | split: train 2016-03-10 to 2022-07-08, val to 2023-11-15, test to 2025-03-24 (chronological, no shuffling)
+01:44:36 | INFO    | 21_lookback_frontier | h=  1: boundary purge removed 24 rows (60085 -> 60061)
+01:44:36 | INFO    | 21_lookback_frontier | h=  3: boundary purge removed 26 rows (59762 -> 59736)
+01:44:36 | INFO    | 21_lookback_frontier | h=  6: boundary purge removed 29 rows (59258 -> 59229)
+01:44:36 | INFO    | 21_lookback_frontier | h= 12: boundary purge removed 35 rows (58259 -> 58224)
+01:44:36 | INFO    | 21_lookback_frontier | h= 24: boundary purge removed 47 rows (56346 -> 56299)
+01:44:36 | INFO    | 21_lookback_frontier | scaler fitted on 55451 training rows over 96 predictors
+01:44:37 | INFO    | 21_lookback_frontier | wrote F:\BUP\data\interim\lookback\A24\processed\features.parquet (79216 rows, 163 cols)
+01:44:37 | INFO    | 21_lookback_frontier |   served 10619 of 10880 universe hours (0.9760)
+01:44:38 | INFO    | 21_lookback_frontier |     ridge          RMSE   58.01  (served rows)
+01:44:50 | INFO    | 21_lookback_frontier |     random_forest  RMSE   56.50  (served rows)
+01:44:53 | INFO    | 21_lookback_frontier |     xgboost        RMSE   56.64  (served rows)
+01:44:56 | INFO    | 21_lookback_frontier |     lightgbm       RMSE   56.84  (served rows)
+01:44:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: resumed from epoch 20 (best val 0.10736)
+01:44:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42: 41153 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:44:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  21/60  train 0.08044  val 0.15357  lr 2.39e-03  1.4s
+01:44:58 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  22/60  train 0.07823  val 0.14400  lr 2.32e-03  1.2s
+01:44:59 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  23/60  train 0.07694  val 0.14263  lr 2.25e-03  1.1s
+01:45:01 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  24/60  train 0.07380  val 0.14178  lr 2.18e-03  1.1s
+01:45:02 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  25/60  train 0.07296  val 0.15155  lr 2.11e-03  1.0s
+01:45:03 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  26/60  train 0.07053  val 0.15061  lr 2.03e-03  1.2s
+01:45:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  27/60  train 0.06903  val 0.14209  lr 1.95e-03  1.1s
+01:45:05 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  28/60  train 0.06820  val 0.14596  lr 1.87e-03  1.1s
+01:45:06 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  29/60  train 0.06580  val 0.15214  lr 1.79e-03  1.0s
+01:45:07 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  30/60  train 0.06461  val 0.14829  lr 1.71e-03  1.0s
+01:45:08 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  31/60  train 0.06360  val 0.14170  lr 1.63e-03  1.0s
+01:45:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  32/60  train 0.06224  val 0.14354  lr 1.55e-03  1.2s
+01:45:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  33/60  train 0.06082  val 0.15336  lr 1.46e-03  1.1s
+01:45:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  34/60  train 0.05937  val 0.14501  lr 1.38e-03  1.0s
+01:45:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s42 epoch  35/60  train 0.05896  val 0.14620  lr 1.30e-03  1.1s
+01:45:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: resumed from epoch 21 (best val 0.10328)
+01:45:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337: 41153 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:45:14 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  22/60  train 0.07689  val 0.15151  lr 2.32e-03  1.1s
+01:45:15 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  23/60  train 0.07443  val 0.14247  lr 2.25e-03  1.1s
+01:45:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  24/60  train 0.07284  val 0.15256  lr 2.18e-03  1.0s
+01:45:17 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  25/60  train 0.07081  val 0.16186  lr 2.11e-03  1.0s
+01:45:18 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  26/60  train 0.06936  val 0.14878  lr 2.03e-03  1.0s
+01:45:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  27/60  train 0.06808  val 0.15963  lr 1.95e-03  1.0s
+01:45:20 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  28/60  train 0.06665  val 0.14899  lr 1.87e-03  1.0s
+01:45:21 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  29/60  train 0.06512  val 0.16204  lr 1.79e-03  1.0s
+01:45:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  30/60  train 0.06332  val 0.16370  lr 1.71e-03  1.0s
+01:45:23 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  31/60  train 0.06256  val 0.16668  lr 1.63e-03  1.0s
+01:45:24 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  32/60  train 0.06073  val 0.16859  lr 1.55e-03  1.0s
+01:45:25 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  33/60  train 0.05915  val 0.15744  lr 1.46e-03  1.0s
+01:45:26 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  34/60  train 0.05844  val 0.16200  lr 1.38e-03  1.1s
+01:45:27 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  35/60  train 0.05737  val 0.16504  lr 1.30e-03  1.1s
+01:45:28 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s1337 epoch  36/60  train 0.05687  val 0.16208  lr 1.22e-03  1.1s
+01:45:28 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: resumed from epoch 23 (best val 0.10579)
+01:45:28 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024: 41153 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:45:29 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  24/60  train 0.07447  val 0.14089  lr 2.18e-03  1.1s
+01:45:31 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  25/60  train 0.07222  val 0.13710  lr 2.11e-03  1.1s
+01:45:32 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  26/60  train 0.07007  val 0.14581  lr 2.03e-03  1.1s
+01:45:33 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  27/60  train 0.06866  val 0.15600  lr 1.95e-03  1.2s
+01:45:34 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  28/60  train 0.06678  val 0.14825  lr 1.87e-03  1.1s
+01:45:35 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  29/60  train 0.06482  val 0.14005  lr 1.79e-03  1.0s
+01:45:36 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  30/60  train 0.06393  val 0.14267  lr 1.71e-03  1.0s
+01:45:37 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  31/60  train 0.06285  val 0.14102  lr 1.63e-03  1.0s
+01:45:38 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  32/60  train 0.06173  val 0.14413  lr 1.55e-03  1.0s
+01:45:39 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  33/60  train 0.06103  val 0.14629  lr 1.46e-03  0.9s
+01:45:40 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  34/60  train 0.05858  val 0.14533  lr 1.38e-03  0.8s
+01:45:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  35/60  train 0.05796  val 0.14439  lr 1.30e-03  0.8s
+01:45:41 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  36/60  train 0.05717  val 0.14740  lr 1.22e-03  0.8s
+01:45:42 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  37/60  train 0.05598  val 0.15136  lr 1.14e-03  0.8s
+01:45:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w48_H24_s2024 epoch  38/60  train 0.05509  val 0.15334  lr 1.06e-03  0.8s
+01:45:43 | INFO    | 21_lookback_frontier |     gru_h64_l2     w48   R=71   RMSE   58.07  avail 0.9535
+01:45:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: resumed from epoch 20 (best val 0.09773)
+01:45:43 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42: 41153 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:45:44 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  21/60  train 0.08351  val 0.13361  lr 2.39e-03  0.8s
+01:45:45 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  22/60  train 0.08199  val 0.13022  lr 2.32e-03  0.9s
+01:45:46 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  23/60  train 0.08004  val 0.13380  lr 2.25e-03  0.8s
+01:45:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  24/60  train 0.07671  val 0.14458  lr 2.18e-03  0.8s
+01:45:47 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  25/60  train 0.07472  val 0.13615  lr 2.11e-03  0.9s
+01:45:48 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  26/60  train 0.07225  val 0.13504  lr 2.03e-03  0.9s
+01:45:49 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  27/60  train 0.07056  val 0.13642  lr 1.95e-03  0.8s
+01:45:50 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  28/60  train 0.07014  val 0.14014  lr 1.87e-03  0.8s
+01:45:51 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  29/60  train 0.06789  val 0.15051  lr 1.79e-03  0.8s
+01:45:52 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  30/60  train 0.06572  val 0.14695  lr 1.71e-03  0.9s
+01:45:52 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  31/60  train 0.06435  val 0.16009  lr 1.63e-03  0.8s
+01:45:53 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  32/60  train 0.06292  val 0.13580  lr 1.55e-03  0.8s
+01:45:54 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  33/60  train 0.06176  val 0.14494  lr 1.46e-03  0.9s
+01:45:55 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  34/60  train 0.06005  val 0.15200  lr 1.38e-03  0.8s
+01:45:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s42 epoch  35/60  train 0.05911  val 0.14777  lr 1.30e-03  0.8s
+01:45:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: resumed from epoch 21 (best val 0.10088)
+01:45:56 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337: 41153 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:45:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  22/60  train 0.08114  val 0.14038  lr 2.32e-03  0.8s
+01:45:57 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  23/60  train 0.07844  val 0.14950  lr 2.25e-03  0.8s
+01:45:58 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  24/60  train 0.07590  val 0.13882  lr 2.18e-03  0.8s
+01:45:59 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  25/60  train 0.07415  val 0.15143  lr 2.11e-03  0.8s
+01:46:00 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  26/60  train 0.07124  val 0.16177  lr 2.03e-03  0.9s
+01:46:01 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  27/60  train 0.06996  val 0.16623  lr 1.95e-03  0.9s
+01:46:02 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  28/60  train 0.06769  val 0.14300  lr 1.87e-03  0.8s
+01:46:03 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  29/60  train 0.06606  val 0.17434  lr 1.79e-03  1.0s
+01:46:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  30/60  train 0.06571  val 0.14816  lr 1.71e-03  0.9s
+01:46:04 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  31/60  train 0.06212  val 0.15572  lr 1.63e-03  0.8s
+01:46:05 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  32/60  train 0.06192  val 0.15329  lr 1.55e-03  0.8s
+01:46:06 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  33/60  train 0.06060  val 0.15461  lr 1.46e-03  0.8s
+01:46:07 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  34/60  train 0.05896  val 0.15686  lr 1.38e-03  0.8s
+01:46:08 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  35/60  train 0.05759  val 0.16316  lr 1.30e-03  0.8s
+01:46:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s1337 epoch  36/60  train 0.05718  val 0.15498  lr 1.22e-03  0.8s
+01:46:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: resumed from epoch 21 (best val 0.10148)
+01:46:09 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024: 41153 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:46:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  22/60  train 0.08152  val 0.15232  lr 2.32e-03  0.8s
+01:46:10 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  23/60  train 0.07855  val 0.13222  lr 2.25e-03  0.9s
+01:46:11 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  24/60  train 0.07720  val 0.14802  lr 2.18e-03  0.8s
+01:46:12 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  25/60  train 0.07372  val 0.13946  lr 2.11e-03  0.8s
+01:46:13 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  26/60  train 0.07266  val 0.14827  lr 2.03e-03  0.8s
+01:46:14 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  27/60  train 0.06985  val 0.13435  lr 1.95e-03  0.9s
+01:46:15 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  28/60  train 0.06954  val 0.15662  lr 1.87e-03  0.8s
+01:46:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  29/60  train 0.06855  val 0.14275  lr 1.79e-03  0.9s
+01:46:16 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  30/60  train 0.06576  val 0.16677  lr 1.71e-03  0.9s
+01:46:17 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  31/60  train 0.06518  val 0.15462  lr 1.63e-03  0.9s
+01:46:18 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  32/60  train 0.06290  val 0.14723  lr 1.55e-03  0.8s
+01:46:19 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  33/60  train 0.06130  val 0.14866  lr 1.46e-03  0.8s
+01:46:20 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  34/60  train 0.06025  val 0.14516  lr 1.38e-03  0.8s
+01:46:21 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  35/60  train 0.05981  val 0.15858  lr 1.30e-03  0.9s
+01:46:22 | INFO    | 21_lookback_frontier | gru_h64_l2_w24_H24_s2024 epoch  36/60  train 0.05807  val 0.14953  lr 1.22e-03  0.9s
+01:46:22 | INFO    | 21_lookback_frontier |     gru_h64_l2     w24   R=48   RMSE   56.66  avail 0.9760
+01:46:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: resumed from epoch 30 (best val 0.10858)
+01:46:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42: 21569 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:46:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  31/60  train 0.10275  val 0.13127  lr 1.63e-03  0.7s
+01:46:23 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  32/60  train 0.10002  val 0.12768  lr 1.55e-03  0.8s
+01:46:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  33/60  train 0.09991  val 0.13286  lr 1.46e-03  0.6s
+01:46:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  34/60  train 0.09776  val 0.11178  lr 1.38e-03  0.6s
+01:46:25 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  35/60  train 0.09743  val 0.12209  lr 1.30e-03  0.6s
+01:46:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  36/60  train 0.09552  val 0.13322  lr 1.22e-03  0.6s
+01:46:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  37/60  train 0.09407  val 0.12944  lr 1.14e-03  0.6s
+01:46:27 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  38/60  train 0.09282  val 0.13769  lr 1.06e-03  0.6s
+01:46:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  39/60  train 0.09115  val 0.12858  lr 9.81e-04  0.7s
+01:46:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  40/60  train 0.09042  val 0.13029  lr 9.04e-04  0.7s
+01:46:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  41/60  train 0.08957  val 0.12847  lr 8.30e-04  0.6s
+01:46:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  42/60  train 0.08826  val 0.14009  lr 7.58e-04  0.7s
+01:46:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  43/60  train 0.08711  val 0.14087  lr 6.87e-04  0.9s
+01:46:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  44/60  train 0.08582  val 0.13068  lr 6.20e-04  0.7s
+01:46:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s42 epoch  45/60  train 0.08539  val 0.13805  lr 5.55e-04  0.6s
+01:46:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: resumed from epoch 32 (best val 0.10669)
+01:46:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337: 21569 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:46:33 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  33/60  train 0.09579  val 0.13792  lr 1.46e-03  0.9s
+01:46:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  34/60  train 0.09322  val 0.12837  lr 1.38e-03  0.8s
+01:46:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  35/60  train 0.09213  val 0.13483  lr 1.30e-03  0.7s
+01:46:35 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  36/60  train 0.09143  val 0.13535  lr 1.22e-03  0.7s
+01:46:36 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  37/60  train 0.08982  val 0.13562  lr 1.14e-03  0.6s
+01:46:37 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  38/60  train 0.08808  val 0.13577  lr 1.06e-03  0.7s
+01:46:37 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  39/60  train 0.08724  val 0.13299  lr 9.81e-04  0.7s
+01:46:38 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  40/60  train 0.08577  val 0.14674  lr 9.04e-04  0.9s
+01:46:39 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  41/60  train 0.08429  val 0.13970  lr 8.30e-04  1.0s
+01:46:40 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  42/60  train 0.08363  val 0.14104  lr 7.58e-04  1.1s
+01:46:41 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  43/60  train 0.08312  val 0.15219  lr 6.87e-04  1.0s
+01:46:42 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  44/60  train 0.08162  val 0.14115  lr 6.20e-04  1.0s
+01:46:43 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  45/60  train 0.08113  val 0.14821  lr 5.55e-04  0.8s
+01:46:44 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  46/60  train 0.08089  val 0.15031  lr 4.92e-04  0.7s
+01:46:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s1337 epoch  47/60  train 0.07974  val 0.15055  lr 4.33e-04  0.9s
+01:46:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: resumed from epoch 27 (best val 0.10233)
+01:46:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024: 21569 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:46:45 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  28/60  train 0.10648  val 0.12091  lr 1.87e-03  0.9s
+01:46:46 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  29/60  train 0.10563  val 0.11746  lr 1.79e-03  0.8s
+01:46:47 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  30/60  train 0.10267  val 0.13115  lr 1.71e-03  0.8s
+01:46:48 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  31/60  train 0.10091  val 0.12833  lr 1.63e-03  0.8s
+01:46:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  32/60  train 0.10007  val 0.13737  lr 1.55e-03  0.8s
+01:46:49 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  33/60  train 0.09829  val 0.12594  lr 1.46e-03  0.8s
+01:46:50 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  34/60  train 0.09705  val 0.13915  lr 1.38e-03  0.9s
+01:46:51 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  35/60  train 0.09516  val 0.12161  lr 1.30e-03  0.8s
+01:46:52 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  36/60  train 0.09449  val 0.13465  lr 1.22e-03  0.8s
+01:46:53 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  37/60  train 0.09327  val 0.12637  lr 1.14e-03  1.0s
+01:46:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  38/60  train 0.09176  val 0.13763  lr 1.06e-03  0.9s
+01:46:54 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  39/60  train 0.09089  val 0.12007  lr 9.81e-04  0.7s
+01:46:55 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  40/60  train 0.08922  val 0.12739  lr 9.04e-04  0.9s
+01:46:56 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  41/60  train 0.08841  val 0.13895  lr 8.30e-04  0.9s
+01:46:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w48_H24_s2024 epoch  42/60  train 0.08772  val 0.13815  lr 7.58e-04  0.9s
+01:46:57 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w48   R=71   RMSE   56.59  avail 0.9535
+01:46:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: resumed from epoch 22 (best val 0.10019)
+01:46:57 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42: 21569 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:46:58 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  23/60  train 0.11079  val 0.11793  lr 2.25e-03  0.9s
+01:46:59 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  24/60  train 0.10981  val 0.11424  lr 2.18e-03  1.1s
+01:47:00 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  25/60  train 0.10841  val 0.11871  lr 2.11e-03  0.9s
+01:47:01 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  26/60  train 0.10593  val 0.12236  lr 2.03e-03  0.8s
+01:47:02 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  27/60  train 0.10439  val 0.11521  lr 1.95e-03  0.7s
+01:47:03 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  28/60  train 0.10237  val 0.12125  lr 1.87e-03  1.0s
+01:47:04 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  29/60  train 0.10084  val 0.12445  lr 1.79e-03  0.8s
+01:47:04 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  30/60  train 0.09982  val 0.13169  lr 1.71e-03  0.8s
+01:47:05 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  31/60  train 0.09850  val 0.13667  lr 1.63e-03  0.7s
+01:47:06 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  32/60  train 0.09623  val 0.12615  lr 1.55e-03  0.8s
+01:47:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  33/60  train 0.09460  val 0.14776  lr 1.46e-03  0.8s
+01:47:07 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  34/60  train 0.09454  val 0.12404  lr 1.38e-03  0.7s
+01:47:08 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  35/60  train 0.09300  val 0.13317  lr 1.30e-03  0.7s
+01:47:09 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  36/60  train 0.09072  val 0.14287  lr 1.22e-03  0.7s
+01:47:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s42 epoch  37/60  train 0.09007  val 0.13600  lr 1.14e-03  0.7s
+01:47:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: resumed from epoch 27 (best val 0.10352)
+01:47:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337: 21569 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:47:10 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  28/60  train 0.10432  val 0.12914  lr 1.87e-03  0.8s
+01:47:11 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  29/60  train 0.10312  val 0.12863  lr 1.79e-03  0.7s
+01:47:12 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  30/60  train 0.10061  val 0.11622  lr 1.71e-03  0.7s
+01:47:13 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  31/60  train 0.09872  val 0.13432  lr 1.63e-03  0.7s
+01:47:13 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  32/60  train 0.09649  val 0.14645  lr 1.55e-03  0.8s
+01:47:14 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  33/60  train 0.09533  val 0.15048  lr 1.46e-03  0.7s
+01:47:15 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  34/60  train 0.09370  val 0.12367  lr 1.38e-03  0.8s
+01:47:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  35/60  train 0.09134  val 0.14749  lr 1.30e-03  0.8s
+01:47:16 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  36/60  train 0.09087  val 0.13728  lr 1.22e-03  0.8s
+01:47:17 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  37/60  train 0.08933  val 0.14091  lr 1.14e-03  0.8s
+01:47:18 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  38/60  train 0.08772  val 0.13302  lr 1.06e-03  0.8s
+01:47:19 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  39/60  train 0.08722  val 0.13369  lr 9.81e-04  0.8s
+01:47:20 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  40/60  train 0.08637  val 0.14484  lr 9.04e-04  0.9s
+01:47:21 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  41/60  train 0.08463  val 0.14476  lr 8.30e-04  1.0s
+01:47:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s1337 epoch  42/60  train 0.08372  val 0.13659  lr 7.58e-04  0.8s
+01:47:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: resumed from epoch 20 (best val 0.10106)
+01:47:22 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024: 21569 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:47:23 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  21/60  train 0.11622  val 0.13835  lr 2.39e-03  0.9s
+01:47:24 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  22/60  train 0.11278  val 0.11156  lr 2.32e-03  0.8s
+01:47:25 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  23/60  train 0.11212  val 0.13663  lr 2.25e-03  0.7s
+01:47:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  24/60  train 0.10991  val 0.12601  lr 2.18e-03  0.9s
+01:47:26 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  25/60  train 0.10737  val 0.11690  lr 2.11e-03  0.8s
+01:47:27 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  26/60  train 0.10463  val 0.12722  lr 2.03e-03  0.8s
+01:47:28 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  27/60  train 0.10262  val 0.14417  lr 1.95e-03  0.7s
+01:47:29 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  28/60  train 0.10223  val 0.12980  lr 1.87e-03  0.9s
+01:47:30 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  29/60  train 0.10088  val 0.15098  lr 1.79e-03  0.9s
+01:47:31 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  30/60  train 0.09836  val 0.14910  lr 1.71e-03  1.0s
+01:47:32 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  31/60  train 0.09710  val 0.13252  lr 1.63e-03  0.9s
+01:47:33 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  32/60  train 0.09389  val 0.13093  lr 1.55e-03  1.0s
+01:47:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  33/60  train 0.09384  val 0.12765  lr 1.46e-03  1.0s
+01:47:34 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  34/60  train 0.09314  val 0.14403  lr 1.38e-03  0.9s
+01:47:35 | INFO    | 21_lookback_frontier | lstm_h64_l1_w24_H24_s2024 epoch  35/60  train 0.09157  val 0.13854  lr 1.30e-03  1.0s
+01:47:36 | INFO    | 21_lookback_frontier |     lstm_h64_l1    w24   R=48   RMSE   55.79  avail 0.9760
+01:47:36 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: resumed from epoch 45 (best val 0.12785)
+01:47:36 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42: 1730 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:47:36 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  46/60  train 0.12826  val 0.13322  lr 4.92e-04  0.6s
+01:47:37 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  47/60  train 0.12814  val 0.14701  lr 4.33e-04  0.6s
+01:47:38 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  48/60  train 0.12714  val 0.13007  lr 3.78e-04  0.6s
+01:47:38 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  49/60  train 0.12692  val 0.13551  lr 3.25e-04  0.5s
+01:47:39 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  50/60  train 0.12660  val 0.14013  lr 2.76e-04  0.6s
+01:47:40 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  51/60  train 0.12618  val 0.13748  lr 2.31e-04  0.6s
+01:47:40 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  52/60  train 0.12639  val 0.13400  lr 1.90e-04  0.6s
+01:47:41 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  53/60  train 0.12561  val 0.13331  lr 1.53e-04  0.5s
+01:47:41 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  54/60  train 0.12547  val 0.13217  lr 1.20e-04  0.5s
+01:47:42 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  55/60  train 0.12502  val 0.13345  lr 9.10e-05  0.5s
+01:47:43 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  56/60  train 0.12504  val 0.13272  lr 6.64e-05  0.6s
+01:47:43 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  57/60  train 0.12479  val 0.13198  lr 4.62e-05  0.5s
+01:47:44 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  58/60  train 0.12457  val 0.13321  lr 3.04e-05  0.6s
+01:47:44 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  59/60  train 0.12459  val 0.13181  lr 1.91e-05  0.6s
+01:47:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s42 epoch  60/60  train 0.12440  val 0.13265  lr 1.23e-05  0.6s
+01:47:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: resumed from epoch 32 (best val 0.12738)
+01:47:45 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337: 1730 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:47:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  33/60  train 0.13498  val 0.13438  lr 1.46e-03  0.6s
+01:47:46 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  34/60  train 0.13417  val 0.14012  lr 1.38e-03  0.7s
+01:47:47 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  35/60  train 0.13395  val 0.13472  lr 1.30e-03  0.6s
+01:47:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  36/60  train 0.13303  val 0.13696  lr 1.22e-03  0.5s
+01:47:48 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  37/60  train 0.13286  val 0.14382  lr 1.14e-03  0.5s
+01:47:49 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  38/60  train 0.13317  val 0.13832  lr 1.06e-03  0.6s
+01:47:49 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  39/60  train 0.13157  val 0.13353  lr 9.81e-04  0.5s
+01:47:50 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  40/60  train 0.13180  val 0.13624  lr 9.04e-04  0.6s
+01:47:51 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  41/60  train 0.13058  val 0.13654  lr 8.30e-04  0.5s
+01:47:51 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  42/60  train 0.13045  val 0.13448  lr 7.58e-04  0.6s
+01:47:52 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  43/60  train 0.12941  val 0.13178  lr 6.87e-04  0.6s
+01:47:53 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  44/60  train 0.12891  val 0.13007  lr 6.20e-04  0.6s
+01:47:53 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  45/60  train 0.12809  val 0.13713  lr 5.55e-04  0.6s
+01:47:54 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  46/60  train 0.12846  val 0.13205  lr 4.92e-04  0.5s
+01:47:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s1337 epoch  47/60  train 0.12796  val 0.13196  lr 4.33e-04  0.5s
+01:47:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: resumed from epoch 25 (best val 0.12863)
+01:47:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024: 1730 params | train 35504 windows, val 7084 | 139 steps/epoch | matrix 5.4 MB on device
+01:47:55 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  26/60  train 0.13912  val 0.13823  lr 2.03e-03  0.5s
+01:47:56 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  27/60  train 0.13781  val 0.13548  lr 1.95e-03  0.5s
+01:47:56 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  28/60  train 0.13980  val 0.13910  lr 1.87e-03  0.5s
+01:47:57 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  29/60  train 0.13640  val 0.13217  lr 1.79e-03  0.6s
+01:47:58 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  30/60  train 0.13671  val 0.14238  lr 1.71e-03  0.6s
+01:47:58 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  31/60  train 0.13516  val 0.15500  lr 1.63e-03  0.5s
+01:47:59 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  32/60  train 0.13655  val 0.14392  lr 1.55e-03  0.5s
+01:47:59 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  33/60  train 0.13471  val 0.14066  lr 1.46e-03  0.6s
+01:48:00 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  34/60  train 0.13560  val 0.15848  lr 1.38e-03  0.5s
+01:48:00 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  35/60  train 0.13356  val 0.13200  lr 1.30e-03  0.6s
+01:48:01 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  36/60  train 0.13276  val 0.13068  lr 1.22e-03  0.5s
+01:48:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  37/60  train 0.13231  val 0.13078  lr 1.14e-03  0.5s
+01:48:02 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  38/60  train 0.13264  val 0.13326  lr 1.06e-03  0.7s
+01:48:03 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  39/60  train 0.13108  val 0.13328  lr 9.81e-04  0.7s
+01:48:04 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  40/60  train 0.13100  val 0.12645  lr 9.04e-04  0.6s  *
+01:48:04 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  41/60  train 0.12986  val 0.13185  lr 8.30e-04  0.5s
+01:48:05 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  42/60  train 0.12943  val 0.13422  lr 7.58e-04  0.6s
+01:48:06 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  43/60  train 0.12981  val 0.14691  lr 6.87e-04  0.6s
+01:48:06 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  44/60  train 0.12931  val 0.13084  lr 6.20e-04  0.6s
+01:48:07 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  45/60  train 0.12783  val 0.13340  lr 5.55e-04  0.6s
+01:48:07 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  46/60  train 0.12824  val 0.13285  lr 4.92e-04  0.6s
+01:48:08 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  47/60  train 0.12757  val 0.12898  lr 4.33e-04  0.5s
+01:48:09 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  48/60  train 0.12707  val 0.13040  lr 3.78e-04  0.5s
+01:48:09 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  49/60  train 0.12686  val 0.14167  lr 3.25e-04  0.6s
+01:48:10 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  50/60  train 0.12703  val 0.13642  lr 2.76e-04  0.5s
+01:48:10 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  51/60  train 0.12652  val 0.13078  lr 2.31e-04  0.5s
+01:48:11 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  52/60  train 0.12616  val 0.12651  lr 1.90e-04  0.6s
+01:48:12 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  53/60  train 0.12552  val 0.13233  lr 1.53e-04  0.5s
+01:48:12 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  54/60  train 0.12533  val 0.13214  lr 1.20e-04  0.6s
+01:48:13 | INFO    | 21_lookback_frontier | dlinear_w48_H24_s2024 epoch  55/60  train 0.12484  val 0.13187  lr 9.10e-05  0.5s
+01:48:13 | INFO    | 21_lookback_frontier |     dlinear        w48   R=71   RMSE   64.53  avail 0.9535
+01:48:13 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: resumed from epoch 37 (best val 0.12523)
+01:48:13 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42: 866 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:48:14 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  38/60  train 0.13017  val 0.12848  lr 1.06e-03  0.6s
+01:48:14 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  39/60  train 0.12981  val 0.13477  lr 9.81e-04  0.6s
+01:48:15 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  40/60  train 0.12926  val 0.13308  lr 9.04e-04  0.6s
+01:48:15 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  41/60  train 0.12952  val 0.13047  lr 8.30e-04  0.6s
+01:48:16 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  42/60  train 0.12880  val 0.12926  lr 7.58e-04  0.7s
+01:48:17 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  43/60  train 0.12882  val 0.13138  lr 6.87e-04  0.7s
+01:48:17 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  44/60  train 0.12837  val 0.13212  lr 6.20e-04  0.6s
+01:48:18 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  45/60  train 0.12821  val 0.12911  lr 5.55e-04  0.6s
+01:48:19 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  46/60  train 0.12829  val 0.13492  lr 4.92e-04  0.6s
+01:48:19 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  47/60  train 0.12810  val 0.13858  lr 4.33e-04  0.8s
+01:48:20 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  48/60  train 0.12745  val 0.13121  lr 3.78e-04  0.6s
+01:48:21 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  49/60  train 0.12755  val 0.13281  lr 3.25e-04  0.6s
+01:48:21 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  50/60  train 0.12722  val 0.12879  lr 2.76e-04  0.6s
+01:48:22 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  51/60  train 0.12709  val 0.13256  lr 2.31e-04  0.5s
+01:48:22 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s42 epoch  52/60  train 0.12688  val 0.12966  lr 1.90e-04  0.6s
+01:48:23 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: resumed from epoch 27 (best val 0.12692)
+01:48:23 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337: 866 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:48:23 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  28/60  train 0.13253  val 0.13066  lr 1.87e-03  0.6s
+01:48:24 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  29/60  train 0.13235  val 0.13096  lr 1.79e-03  0.6s
+01:48:24 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  30/60  train 0.13223  val 0.14132  lr 1.71e-03  0.5s
+01:48:25 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  31/60  train 0.13205  val 0.13937  lr 1.63e-03  0.6s
+01:48:26 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  32/60  train 0.13130  val 0.13238  lr 1.55e-03  0.6s
+01:48:26 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  33/60  train 0.13145  val 0.13161  lr 1.46e-03  0.6s
+01:48:27 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  34/60  train 0.13048  val 0.12783  lr 1.38e-03  0.6s
+01:48:27 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  35/60  train 0.13112  val 0.13424  lr 1.30e-03  0.6s
+01:48:28 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  36/60  train 0.13062  val 0.13981  lr 1.22e-03  0.7s
+01:48:29 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  37/60  train 0.13074  val 0.12537  lr 1.14e-03  0.7s  *
+01:48:30 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  38/60  train 0.13015  val 0.12681  lr 1.06e-03  0.7s
+01:48:30 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  39/60  train 0.12978  val 0.13028  lr 9.81e-04  0.5s
+01:48:31 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  40/60  train 0.12948  val 0.14709  lr 9.04e-04  0.6s
+01:48:31 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  41/60  train 0.12914  val 0.13075  lr 8.30e-04  0.6s
+01:48:32 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  42/60  train 0.12882  val 0.13392  lr 7.58e-04  0.6s
+01:48:33 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  43/60  train 0.12876  val 0.13366  lr 6.87e-04  0.7s
+01:48:33 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  44/60  train 0.12865  val 0.13770  lr 6.20e-04  0.7s
+01:48:34 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  45/60  train 0.12830  val 0.13490  lr 5.55e-04  0.7s
+01:48:35 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  46/60  train 0.12791  val 0.13488  lr 4.92e-04  0.6s
+01:48:36 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  47/60  train 0.12819  val 0.13229  lr 4.33e-04  0.6s
+01:48:36 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  48/60  train 0.12769  val 0.13911  lr 3.78e-04  0.6s
+01:48:37 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  49/60  train 0.12728  val 0.12947  lr 3.25e-04  0.6s
+01:48:37 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  50/60  train 0.12737  val 0.13208  lr 2.76e-04  0.6s
+01:48:38 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  51/60  train 0.12677  val 0.12824  lr 2.31e-04  0.5s
+01:48:39 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s1337 epoch  52/60  train 0.12729  val 0.13267  lr 1.90e-04  0.7s
+01:48:39 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: resumed from epoch 34 (best val 0.12640)
+01:48:39 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024: 866 params | train 38155 windows, val 7381 | 150 steps/epoch | matrix 5.4 MB on device
+01:48:40 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  35/60  train 0.13134  val 0.14186  lr 1.30e-03  1.1s
+01:48:41 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  36/60  train 0.13047  val 0.13532  lr 1.22e-03  0.7s
+01:48:41 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  37/60  train 0.12985  val 0.13322  lr 1.14e-03  0.5s
+01:48:42 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  38/60  train 0.12966  val 0.13826  lr 1.06e-03  0.6s
+01:48:42 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  39/60  train 0.13017  val 0.13298  lr 9.81e-04  0.6s
+01:48:43 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  40/60  train 0.13025  val 0.13615  lr 9.04e-04  0.7s
+01:48:44 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  41/60  train 0.12893  val 0.13668  lr 8.30e-04  0.6s
+01:48:45 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  42/60  train 0.12853  val 0.13032  lr 7.58e-04  0.7s
+01:48:45 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  43/60  train 0.12848  val 0.13416  lr 6.87e-04  0.8s
+01:48:46 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  44/60  train 0.12912  val 0.12953  lr 6.20e-04  0.7s
+01:48:47 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  45/60  train 0.12870  val 0.14375  lr 5.55e-04  0.7s
+01:48:47 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  46/60  train 0.12821  val 0.13250  lr 4.92e-04  0.7s
+01:48:48 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  47/60  train 0.12847  val 0.13194  lr 4.33e-04  0.6s
+01:48:49 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  48/60  train 0.12804  val 0.13493  lr 3.78e-04  0.7s
+01:48:50 | INFO    | 21_lookback_frontier | dlinear_w24_H24_s2024 epoch  49/60  train 0.12718  val 0.13306  lr 3.25e-04  0.7s
+01:48:50 | INFO    | 21_lookback_frontier |     dlinear        w24   R=48   RMSE   64.89  avail 0.9760
+01:48:51 | INFO    | 21_lookback_frontier | wrote F:\BUP\results\lookback_frontier.json and the prediction bundle
+
+arm           model  tier  lookback_h  history_floor_h  radius_h  n_predictors  train_rows  availability  rmse_served
+  C           ridge tier2         NaN              168       192           102       25787        0.8348      59.3651
+  C   random_forest tier2         NaN              168       192           102       25787        0.8348      58.4997
+  C         xgboost tier2         NaN              168       192           102       25787        0.8348      58.6243
+  C        lightgbm tier2         NaN              168       192           102       25787        0.8348      59.0210
+  C  gru_h64_l2_w48 tier3         NaN              168       192            18       25787        0.8348      58.7178
+  C  gru_h64_l2_w24 tier3         NaN              168       192            18       25787        0.8348      58.6905
+  C lstm_h64_l1_w48 tier3         NaN              168       192            18       25787        0.8348      57.3758
+  C lstm_h64_l1_w24 tier3         NaN              168       192            18       25787        0.8348      57.7002
+  C     dlinear_w48 tier3         NaN              168       192            18       25787        0.8348      67.0599
+  C     dlinear_w24 tier3         NaN              168       192            18       25787        0.8348      66.1611
+B48           ridge tier2     48.0000              168       192            97       25787        0.8348      59.5439
+B48   random_forest tier2     48.0000              168       192            97       25787        0.8348      58.3661
+B48         xgboost tier2     48.0000              168       192            97       25787        0.8348      58.4651
+B48        lightgbm tier2     48.0000              168       192            97       25787        0.8348      58.4309
+A48           ridge tier2     48.0000               48        72            97       35399        0.9525      58.0065
+A48   random_forest tier2     48.0000               48        72            97       35399        0.9525      56.8100
+A48         xgboost tier2     48.0000               48        72            97       35399        0.9525      56.9291
+A48        lightgbm tier2     48.0000               48        72            97       35399        0.9525      57.0287
+A48  gru_h64_l2_w48 tier3     48.0000               48        72            18       35399        0.9525      57.5850
+A48  gru_h64_l2_w24 tier3     48.0000               48        72            18       35399        0.9525      58.1766
+A48 lstm_h64_l1_w48 tier3     48.0000               48        72            18       35399        0.9525      56.7669
+A48 lstm_h64_l1_w24 tier3     48.0000               48        72            18       35399        0.9525      56.1509
+A48     dlinear_w48 tier3     48.0000               48        72            18       35399        0.9525      63.7429
+A48     dlinear_w24 tier3     48.0000               48        72            18       35399        0.9525      65.2401
+B24           ridge tier2     24.0000              168       192            96       25787        0.8348      59.6047
+B24   random_forest tier2     24.0000              168       192            96       25787        0.8348      58.3918
+B24         xgboost tier2     24.0000              168       192            96       25787        0.8348      58.4514
+B24        lightgbm tier2     24.0000              168       192            96       25787        0.8348      58.5693
+A24           ridge tier2     24.0000               24        48            96       38155        0.9760      58.0075
+A24   random_forest tier2     24.0000               24        48            96       38155        0.9760      56.4981
+A24         xgboost tier2     24.0000               24        48            96       38155        0.9760      56.6386
+A24        lightgbm tier2     24.0000               24        48            96       38155        0.9760      56.8431
+A24  gru_h64_l2_w48 tier3     24.0000               24        71            18       35504        0.9535      58.0692
+A24  gru_h64_l2_w24 tier3     24.0000               24        48            18       38155        0.9760      56.6578
+A24 lstm_h64_l1_w48 tier3     24.0000               24        71            18       35504        0.9535      56.5920
+A24 lstm_h64_l1_w24 tier3     24.0000               24        48            18       38155        0.9760      55.7877
+A24     dlinear_w48 tier3     24.0000               24        71            18       35504        0.9535      64.5290
+A24     dlinear_w24 tier3     24.0000               24        48            18       38155        0.9760      64.8913

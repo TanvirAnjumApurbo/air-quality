@@ -1720,3 +1720,66 @@ def test_control_a_mediation_grid_is_not_mistaken_for_a_donor():
         ("ablation_gap_injection_wanliu_R48.json", 48),
         ("ablation_gap_injection_wanliu_R72.json", 72),
     ]
+
+
+# ---------------------------------------------------------------------------
+# Two cities share one results directory
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_city_suffix_separates_every_city():
+    """Artefacts under paths.results must not collide between cities."""
+    from src.results import city_suffix
+
+    primary = load_config("config.yaml")
+    comparison = load_config("config_beijing.yaml")
+    assert primary.get("paths.results") == comparison.get("paths.results"), (
+        "this test exists because the two cities share one results directory"
+    )
+    assert city_suffix(primary) != city_suffix(comparison)
+    assert city_suffix(primary) == ""
+
+
+@pytest.mark.leakage
+def test_control_a_bare_frontier_filename_would_collide():
+    """Negative control: the defect this repository has hit four times.
+
+    ``paths.results`` is identical for every city, so an artefact written under a
+    bare name is written twice and the city that runs second destroys the first
+    one's. That happened here: the comparison city's frontier overwrote the
+    primary city's, and the primary city's report then presented the comparison
+    city's numbers as its own.
+    """
+    from pathlib import Path
+
+    from src.results import city_suffix
+
+    cities = [load_config("config.yaml"), load_config("config_beijing.yaml")]
+    bare = {Path(str(c.get("paths.results"))) / "availability_frontier.json" for c in cities}
+    assert len(bare) == 1, "a bare name must collide -- that is the point of this control"
+
+    suffixed = {
+        Path(str(c.get("paths.results"))) / f"availability_frontier{city_suffix(c)}.json"
+        for c in cities
+    }
+    assert len(suffixed) == len(cities), "suffixed names must be distinct per city"
+
+
+@pytest.mark.leakage
+def test_frontier_scripts_do_not_write_bare_filenames():
+    """No new artefact may be written to paths.results under a bare name."""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    offenders = []
+    for name in ("21_lookback_frontier.py", "22_availability_frontier.py"):
+        text = (root / "scripts" / name).read_text(encoding="utf-8")
+        for artefact in (
+            '"lookback_frontier.json"',
+            '"availability_frontier.json"',
+            '"lookback_frontier_predictions.npz"',
+        ):
+            if artefact in text:
+                offenders.append(f"{name}: {artefact}")
+    assert not offenders, f"bare per-city artefact names: {offenders}"

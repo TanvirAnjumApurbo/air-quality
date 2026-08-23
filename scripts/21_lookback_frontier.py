@@ -67,7 +67,7 @@ from src.models.baselines import fit_climatology, predict_climatology, predict_p
 from src.models.data import build_sequence_index, get_split_arrays, invert
 from src.models.sequence import ModelSpec, evaluate_sampler, train_one
 from src.models.trees import fit_at_fixed_params
-from src.results import load_results, main_runs, save_results, upsert_run
+from src.results import city_suffix, load_results, main_runs, save_results, upsert_run
 from src.utils import Config, check_disk_space, load_config, resolve_device, set_seed, setup_logging
 
 #: Label carried by every run this script writes, so the headline experiment
@@ -467,7 +467,8 @@ def main() -> int:
 
     save_results(cfg, payload)
     frontier = pd.DataFrame(rows)
-    out = cfg.path_for("results") / "lookback_frontier.json"
+    suffix = city_suffix(cfg)
+    out = cfg.path_for("results") / f"lookback_frontier{suffix}.json"
     out.write_text(
         json.dumps(
             {
@@ -499,7 +500,7 @@ def main() -> int:
         encoding="utf-8",
     )
     np.savez_compressed(
-        cfg.path_for("results") / "lookback_frontier_predictions.npz",
+        cfg.path_for("results") / f"lookback_frontier_predictions{suffix}.npz",
         universe_index=np.array([str(t) for t in universe_index])
         if universe_index is not None
         else np.array([]),

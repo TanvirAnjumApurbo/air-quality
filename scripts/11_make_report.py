@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd
 from src.eval.ablation import FAMILY_ORDER
 from src.models.data import load_meta
-from src.results import load_results, main_runs
+from src.results import city_suffix, load_results, main_runs
 from src.utils import check_disk_space, load_config, setup_logging
 
 #: Plain-text unit for prose; figures use the mathtext form from src.viz.figures.
@@ -1360,7 +1360,8 @@ def main() -> int:
     # generated files only; nothing here is transcribed.
     results_dir = Path(str(cfg.get("paths.results")))
     law_path = results_dir / "missingness_law.json"
-    frontier_path = results_dir / "availability_frontier.json"
+    # Both cities share paths.results, so this name carries a city suffix.
+    frontier_path = results_dir / f"availability_frontier{city_suffix(cfg)}.json"
     if law_path.exists():
         law = json.loads(law_path.read_text(encoding="utf-8"))
         a(f"## {next_section}. What a gap costs, and how often a model can answer")
@@ -1915,6 +1916,128 @@ def main() -> int:
                         "nothing, so its gap is 0 by construction."
                     ),
                 }
+
+    # ---- the lookback contributions ---------------------------------------
+    # Read from the generated payloads, never from the prose above. A value that
+    # is absent stays absent rather than being filled in: the header of this file
+    # says any null "was not available and must not be invented".
+    results_dir_facts = Path(str(cfg.get("paths.results")))
+
+    law_file = results_dir_facts / "missingness_law.json"
+    if law_file.exists():
+        law_facts = json.loads(law_file.read_text(encoding="utf-8"))
+        fit_facts = law_facts.get("fit", {})
+        held = law_facts.get("held_out", {})
+        facts["missingness_law"] = {
+            "form": fit_facts.get("form"),
+            "alpha": fit_facts.get("alpha"),
+            "beta0": fit_facts.get("beta0"),
+            "sterilisation_radius_h": law_facts.get("radius_h"),
+            "fitted_on": fit_facts.get("source"),
+            "held_out_n_cells": held.get("n"),
+            "held_out_r2": held.get("r2"),
+            "held_out_median_ape_pct": held.get("median_ape_pct"),
+            "alpha_predicted_from_ffill": law_facts.get("alpha_predicted_from_ffill"),
+            "amplification_by_record": {
+                r["Record"]: r["Amplification"]
+                for r in law_facts.get("amplification_by_record", [])
+            },
+            "note": (
+                "A gap costs the hours it removes plus the sterilisation radius behind "
+                "them, so the cost follows the NUMBER of gaps rather than their length. "
+                "alpha should equal the share of gaps outliving the forward-fill limit; "
+                "the agreement is the evidence it is the imputation policy and not a "
+                "free parameter."
+            ),
+        }
+        avail_rows = law_facts.get("availability", [])
+        deepest_avail = [r for r in avail_rows if int(r["Lookback (h)"]) == 168]
+        facts["forecast_availability"] = {
+            "at_configured_lookback_h": 168,
+            "share_of_test_hours_by_record": {
+                r["Record"]: r["Availability (grid)"] for r in deepest_avail
+            },
+            "by_record_and_lookback": [
+                {
+                    "record": r["Record"],
+                    "lookback_h": r["Lookback (h)"],
+                    "availability_vs_grid": r["Availability (grid)"],
+                    "availability_vs_universe": r["Availability"],
+                }
+                for r in avail_rows
+            ],
+            "note": (
+                "Share of test hours any model in this study can forecast at all. Every "
+                "accuracy figure reported is conditional on it. It does not order these "
+                "records the way hourly coverage does."
+            ),
+        }
+
+    frontier_file = results_dir_facts / f"availability_frontier{city_suffix(cfg)}.json"
+    if frontier_file.exists():
+        fr_facts = json.loads(frontier_file.read_text(encoding="utf-8"))
+        dm_rows = pd.DataFrame(fr_facts.get("dm_tests", []))
+        allh_rows = pd.DataFrame(fr_facts.get("all_hours", []))
+        best_arm = {}
+        if not allh_rows.empty:
+            single_rows = allh_rows[allh_rows["policy"] == "single"]
+            sq = single_rows[single_rows["arm"] == "C"].set_index("model")["skill_all_hours"]
+            for idx in single_rows.groupby("model")["skill_all_hours"].idxmax():
+                row = single_rows.loc[idx]
+                if row["arm"] == "C" or row["model"] not in sq.index:
+                    continue
+                best_arm[str(row["model"])] = {
+                    "arm": row["arm"],
+                    "availability": row["availability"],
+                    "skill_all_hours": row["skill_all_hours"],
+                    "gain_vs_status_quo": row["skill_all_hours"] - float(sq[row["model"]]),
+                }
+        sig_rows = dm_rows[dm_rows["significant"]] if not dm_rows.empty else pd.DataFrame()
+        facts["lookback_frontier"] = {
+            "n_universe": fr_facts.get("n_universe"),
+            "n_common_subset": fr_facts.get("n_common"),
+            "n_arms_beating_status_quo_on_common_hours": (
+                int((sig_rows["better"] != "C").sum()) if not sig_rows.empty else 0
+            ),
+            "n_arms_losing_to_status_quo_on_common_hours": (
+                int((sig_rows["better"] == "C").sum()) if not sig_rows.empty else 0
+            ),
+            "best_arm_by_model": best_arm,
+            "unserved_hours": fr_facts.get("unserved_hours"),
+            "note": (
+                "rmse_served is NOT comparable across arms: a deeper reach is scored on "
+                "fewer, better-covered hours. The common subset and the all-hours columns "
+                "are the two comparisons that are."
+            ),
+        }
+
+    med_files = sorted(results_dir_facts.glob("mediation_*.json"))
+    if med_files:
+        med_facts = json.loads(med_files[0].read_text(encoding="utf-8"))
+        facts["mediation"] = {
+            "donor": med_facts.get("donor"),
+            "radii_h": med_facts.get("radii"),
+            "mediator_deficit_shrinks_with_radius": med_facts.get(
+                "mediator_deficit_shrinks_with_radius"
+            ),
+            "dilution_bound": med_facts.get("dilution_bound", {}).get(
+                "expected_gap_factor_under_pure_dilution"
+            ),
+            "by_family": {
+                r["family"]: {
+                    "gap_at_deepest": r.get(f"gap_R{max(med_facts.get('radii', [0]))}"),
+                    "gap_at_shallowest": r.get(f"gap_R{min(med_facts.get('radii', [0]))}"),
+                    "proportion_mediated": r.get("proportion_mediated"),
+                    "p_holm": r.get("p_holm"),
+                }
+                for r in med_facts.get("tests", [])
+            },
+            "note": (
+                "The mediator is manipulated by configuration rather than inferred from a "
+                "regression, so this is not a Baron-Kenny mediation and needs no "
+                "sequential-ignorability assumption. One donor and one horizon."
+            ),
+        }
 
     facts_path = Path(str(cfg.get("output.report.abstract_facts_json")))
     facts_path = (

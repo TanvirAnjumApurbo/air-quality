@@ -229,3 +229,28 @@ def stale_width_runs(payload: dict[str, Any], tier: str, n_features: int) -> lis
         for run in payload.get("runs", [])
         if run.get("tier") == tier and run.get("n_features") != n_features
     ]
+
+
+def city_suffix(cfg: Config) -> str:
+    """Filename suffix distinguishing this city's outputs from the other's.
+
+    ``paths.results`` is the SAME directory for every city -- only
+    ``paths.results_json`` differs -- so any new artefact written to
+    ``path_for("results")`` under a bare name is written twice, and the city that
+    runs second silently destroys the first one's. That has already happened
+    here: the comparison city once overwrote the primary city's RESULTS.md and
+    DATA_AUDIT.md, and the gap-injection experiment carries an explicit
+    ``output_name`` per donor for exactly this reason.
+
+    Derived from the results-file stem so it cannot drift from the city the run
+    actually belongs to: ``results.json`` gives ``""`` and
+    ``results_beijing.json`` gives ``"_beijing"``.
+
+    Args:
+        cfg: Loaded configuration.
+
+    Returns:
+        Empty string for the primary city, ``"_<city>"`` otherwise.
+    """
+    stem = Path(str(cfg.get("paths.results_json"))).stem
+    return stem[len("results") :] if stem.startswith("results") else f"_{stem}"

@@ -324,5 +324,258 @@
       }
     },
     "control_note": "The climatological family is the weakest model that DOES read the training record: hour-of-day and month means, insensitive to how the observed hours are arranged but fitted on them. It is not a no-training-data control. Because the test period is never degraded, any model that reads nothing from training has an arm gap of exactly zero in every cell, so it cannot vary and cannot falsify anything; that invariance is checked by equality instead (persistence_rmse_invariant). The undegraded level removes nothing, so its gap is 0 by construction."
+  },
+  "missingness_law": {
+    "form": "usable = observed * exp(beta0 - alpha * radius_h * n_gaps / observed)",
+    "alpha": 0.1555170534474895,
+    "beta0": -0.15963895460358943,
+    "sterilisation_radius_h": 192,
+    "fitted_on": "wanliu (101 cells)",
+    "held_out_n_cells": 202,
+    "held_out_r2": 0.9767156335894569,
+    "held_out_median_ape_pct": 5.217577290512552,
+    "alpha_predicted_from_ffill": 0.14175506268081003,
+    "amplification_by_record": {
+      "Dhaka": 2.2842281255805315,
+      "Beijing Wanliu": 34.23931623931624,
+      "Beijing Dingling": 14.040094339622641,
+      "Beijing Dongsi": 10.44007858546169
+    },
+    "note": "A gap costs the hours it removes plus the sterilisation radius behind them, so the cost follows the NUMBER of gaps rather than their length. alpha should equal the share of gaps outliving the forward-fill limit; the agreement is the evidence it is the imputation policy and not a free parameter."
+  },
+  "forecast_availability": {
+    "at_configured_lookback_h": 168,
+    "share_of_test_hours_by_record": {
+      "Dhaka": 0.7643692670201128,
+      "Beijing Wanliu": 0.7249049429657795,
+      "Beijing Dingling": 0.644106463878327,
+      "Beijing Dongsi": 0.6425855513307985
+    },
+    "by_record_and_lookback": [
+      {
+        "record": "Dhaka",
+        "lookback_h": 168,
+        "availability_vs_grid": 0.7643692670201128,
+        "availability_vs_universe": 0.8348345588235294
+      },
+      {
+        "record": "Dhaka",
+        "lookback_h": 48,
+        "availability_vs_grid": 0.8720861735252041,
+        "availability_vs_universe": 0.9524816176470589
+      },
+      {
+        "record": "Dhaka",
+        "lookback_h": 24,
+        "availability_vs_grid": 0.8936295548262223,
+        "availability_vs_universe": 0.9760110294117647
+      },
+      {
+        "record": "Dhaka",
+        "lookback_h": 12,
+        "availability_vs_grid": 0.9046537069763527,
+        "availability_vs_universe": 0.9880514705882353
+      },
+      {
+        "record": "Beijing Wanliu",
+        "lookback_h": 168,
+        "availability_vs_grid": 0.7249049429657795,
+        "availability_vs_universe": 0.7889509621353197
+      },
+      {
+        "record": "Beijing Wanliu",
+        "lookback_h": 48,
+        "availability_vs_grid": 0.8549429657794677,
+        "availability_vs_universe": 0.930477963997517
+      },
+      {
+        "record": "Beijing Wanliu",
+        "lookback_h": 24,
+        "availability_vs_grid": 0.8868821292775665,
+        "availability_vs_universe": 0.9652389819987586
+      },
+      {
+        "record": "Beijing Wanliu",
+        "lookback_h": 12,
+        "availability_vs_grid": 0.902851711026616,
+        "availability_vs_universe": 0.9826194909993793
+      },
+      {
+        "record": "Beijing Dingling",
+        "lookback_h": 168,
+        "availability_vs_grid": 0.644106463878327,
+        "availability_vs_universe": 0.730802415875755
+      },
+      {
+        "record": "Beijing Dingling",
+        "lookback_h": 48,
+        "availability_vs_grid": 0.80893536121673,
+        "availability_vs_universe": 0.9178170836928387
+      },
+      {
+        "record": "Beijing Dingling",
+        "lookback_h": 24,
+        "availability_vs_grid": 0.8454372623574145,
+        "availability_vs_universe": 0.9592320966350302
+      },
+      {
+        "record": "Beijing Dingling",
+        "lookback_h": 12,
+        "availability_vs_grid": 0.8631178707224335,
+        "availability_vs_universe": 0.9792924935289042
+      },
+      {
+        "record": "Beijing Dongsi",
+        "lookback_h": 168,
+        "availability_vs_grid": 0.6425855513307985,
+        "availability_vs_universe": 0.718384697130712
+      },
+      {
+        "record": "Beijing Dongsi",
+        "lookback_h": 48,
+        "availability_vs_grid": 0.811596958174905,
+        "availability_vs_universe": 0.9073326248671626
+      },
+      {
+        "record": "Beijing Dongsi",
+        "lookback_h": 24,
+        "availability_vs_grid": 0.8526615969581749,
+        "availability_vs_universe": 0.953241232731137
+      },
+      {
+        "record": "Beijing Dongsi",
+        "lookback_h": 12,
+        "availability_vs_grid": 0.8731939163498099,
+        "availability_vs_universe": 0.9761955366631243
+      }
+    ],
+    "note": "Share of test hours any model in this study can forecast at all. Every accuracy figure reported is conditional on it. It does not order these records the way hourly coverage does."
+  },
+  "lookback_frontier": {
+    "n_universe": 4833,
+    "n_common_subset": 3813,
+    "n_arms_beating_status_quo_on_common_hours": 3,
+    "n_arms_losing_to_status_quo_on_common_hours": 0,
+    "best_arm_by_model": {
+      "climatology": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.04930536933900487,
+        "gain_vs_status_quo": 0.029284867837649164
+      },
+      "dlinear_w24": {
+        "arm": "A48",
+        "availability": 0.930477963997517,
+        "skill_all_hours": 0.12082126495187784,
+        "gain_vs_status_quo": 0.10569944259628705
+      },
+      "dlinear_w48": {
+        "arm": "A48",
+        "availability": 0.930477963997517,
+        "skill_all_hours": 0.10132522715248704,
+        "gain_vs_status_quo": 0.0695962863165892
+      },
+      "gru_h64_l2_w24": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.14510120815022576,
+        "gain_vs_status_quo": 0.037879979056472
+      },
+      "gru_h64_l2_w48": {
+        "arm": "A24",
+        "availability": 0.9319263397475688,
+        "skill_all_hours": 0.11919222951022745,
+        "gain_vs_status_quo": 0.029347600730818657
+      },
+      "lightgbm": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.08794369478977748,
+        "gain_vs_status_quo": 0.06263963351621549
+      },
+      "lstm_h64_l1_w24": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.11656346889283131,
+        "gain_vs_status_quo": 0.0369293845120765
+      },
+      "lstm_h64_l1_w48": {
+        "arm": "A48",
+        "availability": 0.930477963997517,
+        "skill_all_hours": 0.10986569977580862,
+        "gain_vs_status_quo": 0.04976644118020601
+      },
+      "persistence": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.0,
+        "gain_vs_status_quo": 0.0
+      },
+      "random_forest": {
+        "arm": "A48",
+        "availability": 0.930477963997517,
+        "skill_all_hours": 0.08163023339747921,
+        "gain_vs_status_quo": 0.052738477037726605
+      },
+      "ridge": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.08623787910251302,
+        "gain_vs_status_quo": 0.03832018762857747
+      },
+      "xgboost": {
+        "arm": "A24",
+        "availability": 0.9652389819987586,
+        "skill_all_hours": 0.1069722846636888,
+        "gain_vs_status_quo": 0.07806343546929817
+      }
+    },
+    "unserved_hours": {
+      "n_served": 3813,
+      "n_unserved": 1020,
+      "reference_rmse_on_served": 97.29176691674544,
+      "reference_rmse_on_unserved": 96.50132580619264,
+      "observed_mean_on_served": 89.69971151324417,
+      "observed_mean_on_unserved": 72.28137254901961,
+      "unserved_hours_are_harder": false
+    },
+    "note": "rmse_served is NOT comparable across arms: a deeper reach is scored on fewer, better-covered hours. The common subset and the all-hours columns are the two comparisons that are."
+  },
+  "mediation": {
+    "donor": "wanliu",
+    "radii_h": [
+      192,
+      72,
+      48
+    ],
+    "mediator_deficit_shrinks_with_radius": true,
+    "dilution_bound": 0.7992283072632815,
+    "by_family": {
+      "sequence": {
+        "gap_at_deepest": -0.03942791812469932,
+        "gap_at_shallowest": -0.001172984276352423,
+        "proportion_mediated": 0.9702499058498953,
+        "p_holm": 1.5036977931259798e-05
+      },
+      "trees": {
+        "gap_at_deepest": -0.02630838776620914,
+        "gap_at_shallowest": -0.007176068935292985,
+        "proportion_mediated": 0.7272326605847725,
+        "p_holm": 0.0017207675959740598
+      },
+      "linear": {
+        "gap_at_deepest": -0.0015553228353569915,
+        "gap_at_shallowest": 0.0020975600766654522,
+        "proportion_mediated": 2.3486332412678825,
+        "p_holm": 0.2605125584310217
+      },
+      "climatological": {
+        "gap_at_deepest": -0.035651281915971146,
+        "gap_at_shallowest": -0.0005125915967680306,
+        "proportion_mediated": 0.9856220710947732,
+        "p_holm": 0.009674503529771172
+      }
+    },
+    "note": "The mediator is manipulated by configuration rather than inferred from a regression, so this is not a Baron-Kenny mediation and needs no sequential-ignorability assumption. One donor and one horizon."
   }
 }

@@ -51,6 +51,7 @@ from src.eval.metrics import (
     holm_bonferroni,
     rmse,
 )
+from src.results import city_suffix
 from src.utils import load_config, setup_logging
 from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
@@ -68,11 +69,13 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def load_bundle(results_dir: Path) -> tuple[dict, dict[str, np.ndarray]]:
+def load_bundle(results_dir: Path, suffix: str) -> tuple[dict, dict[str, np.ndarray]]:
     """Read the frontier payload and its prediction bundle.
 
     Args:
         results_dir: Directory holding the frontier outputs.
+        suffix: City suffix distinguishing this city's artefacts from the
+            other's; both cities share one results directory.
 
     Returns:
         ``(payload, predictions)``.
@@ -80,8 +83,8 @@ def load_bundle(results_dir: Path) -> tuple[dict, dict[str, np.ndarray]]:
     Raises:
         FileNotFoundError: If either artefact is absent.
     """
-    payload_path = results_dir / "lookback_frontier.json"
-    bundle_path = results_dir / "lookback_frontier_predictions.npz"
+    payload_path = results_dir / f"lookback_frontier{suffix}.json"
+    bundle_path = results_dir / f"lookback_frontier_predictions{suffix}.npz"
     if not payload_path.exists() or not bundle_path.exists():
         raise FileNotFoundError(
             f"run 21_lookback_frontier.py first; missing {payload_path.name} or {bundle_path.name}"
@@ -112,7 +115,8 @@ def main() -> int:
     log = setup_logging(cfg, "22_availability_frontier")
     results_dir = cfg.path_for("results")
 
-    payload, bundle = load_bundle(results_dir)
+    suffix = city_suffix(cfg)
+    payload, bundle = load_bundle(results_dir, suffix)
     y_true = bundle["y_true"]
     reference = bundle["reference"]
     horizon = int(payload["horizon_h"])
@@ -406,7 +410,7 @@ def main() -> int:
                 "harder" if harder else "EASIER, not harder",
             )
 
-    out = results_dir / "availability_frontier.json"
+    out = results_dir / f"availability_frontier{suffix}.json"
     out.write_text(
         json.dumps(
             {
