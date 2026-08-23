@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\caption{How many usable hours each missing hour destroys. A gap costs the hours it removes plus the 192-hour radius behind it, so amplification is governed by the number of runs rather than the number of missing hours -- which is why the near-complete record is punished hardest per hour absent. The geometric identity is an upper bound on the actual valid rows; the residual is the rule that a target may never be a forward-filled value. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:amplification_by_record}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Record & Grid hours & Missing hours & Missing (\%) & Runs & Hours lost to short history & Amplification & Identity (geometric) & Actual valid rows \\
+\midrule
+Dhaka & 79216 & 10766 & 13.59 & 295 & 24592 & 2.28 & 41828 & 40825 \\
+Beijing Wanliu & 35064 & 117 & 0.33 & 27 & 4006 & 34.24 & 30413 & 29796 \\
+Beijing Dingling & 35064 & 424 & 1.21 & 43 & 5953 & 14.04 & 27921 & 27495 \\
+Beijing Dongsi & 35064 & 509 & 1.45 & 39 & 5314 & 10.44 & 28627 & 28140 \\
+\bottomrule
+\end{tabular}
+\end{table}

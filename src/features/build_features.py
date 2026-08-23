@@ -24,7 +24,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from src.utils import Config
+from src.utils import Config, ConfigError
 
 
 @dataclass
@@ -38,6 +38,11 @@ class FeatureBuildReport:
         n_runs: Number of maximal gap-free runs after forward-fill.
         longest_run_h: Length of the longest run, hours.
         max_lag_h: Longest backward dependency in the feature set.
+        history_floor_h: Hours of unbroken history a row must carry to be
+            scored. Equals ``max_lag_h`` unless ``features.history_floor_h``
+            decouples the two for the lookback frontier's control arm.
+        lookback_cap_h: The configured ``features.lookback_h``, or None when
+            the lists are used as written.
         n_features: Number of predictor columns produced.
         rows_valid_per_horizon: Usable supervised rows per horizon.
         rows_rejected_per_horizon: Rows dropped per horizon, by reason.
@@ -49,6 +54,8 @@ class FeatureBuildReport:
     n_runs: int
     longest_run_h: int
     max_lag_h: int
+    history_floor_h: int
+    lookback_cap_h: int | None
     n_features: int
     rows_valid_per_horizon: dict[int, int] = field(default_factory=dict)
     rows_rejected_per_horizon: dict[int, dict[str, int]] = field(default_factory=dict)
@@ -164,6 +171,115 @@ def add_calendar_features(frame: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     return out
 
 
+#: Config keys holding a backward reach, in the order they are reported.
+LOOKBACK_KEYS = (
+    "features.pm25_lags_h",
+    "features.rolling_windows_h",
+    "features.diff_horizons_h",
+    "features.met_lags_h",
+)
+
+
+def capped_lookbacks(cfg: Config) -> dict[str, list[int]]:
+    """The backward-dependency lists after ``features.lookback_h`` is applied.
+
+    :func:`add_target_history`, :func:`add_met_history`,
+    :func:`derived_history_columns` and :func:`max_backward_dependency` all read
+    the same four config lists. If a cap were applied in some of them and not
+    others, the columns actually built and the names generated to exclude them
+    from the sequence channels would disagree -- which is precisely the drift
+    :func:`derived_history_columns` was written to prevent. So the cap is applied
+    here, once, and those four read this.
+
+    Args:
+        cfg: Loaded configuration.
+
+    Returns:
+        Dotted config key to its list of hours, ascending, cap applied.
+
+    Raises:
+        ConfigError: If the cap is below one, or empties any of the lists.
+    """
+    cap = cfg.get("features.lookback_h", None)
+    lists = {key: sorted(int(x) for x in cfg.get(key)) for key in LOOKBACK_KEYS}
+    if cap is None:
+        return lists
+
+    cap = int(cap)
+    if cap < 1:
+        raise ConfigError(f"features.lookback_h must be >= 1, got {cap}")
+
+    capped = {key: [v for v in values if v <= cap] for key, values in lists.items()}
+    empty = [key for key, values in capped.items() if not values]
+    if empty:
+        raise ConfigError(
+            f"features.lookback_h={cap} leaves {', '.join(empty)} empty; "
+            f"the cap must admit at least the shortest configured lag of each"
+        )
+    return capped
+
+
+def history_floor(cfg: Config) -> int:
+    """Hours of unbroken history a row must carry to be scored.
+
+    Defaults to :func:`max_backward_dependency`, which is the status quo: the
+    supervision floor and the deepest feature are welded together. Setting
+    ``features.history_floor_h`` **above** the cap decouples them, which is the
+    identical-row-count control arm of the lookback frontier -- the same device
+    the gap-injection experiment uses when it holds the removed hour count
+    constant across arms.
+
+    A floor **below** the deepest feature is a leakage-adjacent error, not an
+    option. The row's deepest lag would be NaN because it reaches outside the
+    run, and ``models.data.get_split_arrays`` replaces NaN with 0.0 *after*
+    scaling -- that is, with the training mean, silently and without a warning.
+
+    Args:
+        cfg: Loaded configuration.
+
+    Returns:
+        The floor in hours.
+
+    Raises:
+        ConfigError: If the configured floor is below the deepest feature.
+    """
+    deepest = max_backward_dependency(cfg)
+    floor = cfg.get("features.history_floor_h", None)
+    if floor is None:
+        return deepest
+    floor = int(floor)
+    if floor < deepest:
+        raise ConfigError(
+            f"features.history_floor_h={floor} is below the deepest configured feature "
+            f"({deepest} h). Every backward dependency must resolve inside the run, or the "
+            f"deepest lag arrives at the model as the training mean rather than as data."
+        )
+    return floor
+
+
+def scoreable_mask(frame: pd.DataFrame, horizon: int) -> pd.Series:
+    """Rows a forecast could be scored on at all, at any history floor.
+
+    This is ``valid_h{h}`` minus the history condition: the row sits in a run,
+    the target lies inside that same run ``horizon`` hours ahead, and the target
+    is a genuine observation. It is the one set every arm of the lookback sweep
+    is scored over, so RMSE stays comparable across arms for exactly the reason
+    the gap-injection experiment protects its test period -- a denominator that
+    moves with the treatment is not a denominator.
+
+    Args:
+        frame: Built feature frame.
+        horizon: Forecast horizon in hours.
+
+    Returns:
+        Boolean mask over the frame's index.
+    """
+    in_run = frame["run_id"] >= 0
+    horizon_ok = (frame["run_len"] - frame["pos_in_run"]) > horizon
+    target_observed = frame["is_observed"].shift(-horizon).fillna(False).astype(bool)
+    return in_run & horizon_ok & target_observed
+
+
 def add_target_history(frame: pd.DataFrame, cfg: Config, target: str) -> pd.DataFrame:
     """Add lags, rolling statistics and differences of the target.
 
@@ -183,18 +299,19 @@ def add_target_history(frame: pd.DataFrame, cfg: Config, target: str) -> pd.Data
     """
     out = frame.copy()
     series = out[target]
+    caps = capped_lookbacks(cfg)
 
-    for lag in cfg.get("features.pm25_lags_h"):
+    for lag in caps["features.pm25_lags_h"]:
         out[f"{target}_lag_{lag}"] = series.shift(int(lag))
 
     stats = list(cfg.get("features.rolling_stats"))
-    for window in cfg.get("features.rolling_windows_h"):
+    for window in caps["features.rolling_windows_h"]:
         w = int(window)
         roller = series.rolling(window=w, min_periods=w)
         for stat in stats:
             out[f"{target}_roll{w}_{stat}"] = getattr(roller, stat)()
 
-    for horizon in cfg.get("features.diff_horizons_h"):
+    for horizon in caps["features.diff_horizons_h"]:
         d = int(horizon)
         out[f"{target}_diff_{d}"] = series.diff(d)
         # Rate of change per hour, guarded against division by a near-zero base.
@@ -219,10 +336,11 @@ def add_met_history(frame: pd.DataFrame, cfg: Config) -> pd.DataFrame:
         The frame with lagged meteorology added.
     """
     out = frame.copy()
+    met_lags = capped_lookbacks(cfg)["features.met_lags_h"]
     met_vars = [v for v in cfg.get("features.met_vars") if v in out.columns]
     extra = [c for c in ("wind_u", "wind_v") if c in out.columns]
     for var in met_vars + extra:
-        for lag in cfg.get("features.met_lags_h"):
+        for lag in met_lags:
             out[f"{var}_lag_{int(lag)}"] = out[var].shift(int(lag))
     return out
 
@@ -307,14 +425,15 @@ def derived_history_columns(cfg: Config, frame: pd.DataFrame | None = None) -> s
         The set of derived-history column names.
     """
     target = str(cfg.get("features.target"))
+    caps = capped_lookbacks(cfg)
     names: set[str] = set()
 
-    for lag in cfg.get("features.pm25_lags_h"):
+    for lag in caps["features.pm25_lags_h"]:
         names.add(f"{target}_lag_{int(lag)}")
-    for window in cfg.get("features.rolling_windows_h"):
+    for window in caps["features.rolling_windows_h"]:
         for stat in cfg.get("features.rolling_stats"):
             names.add(f"{target}_roll{int(window)}_{stat}")
-    for horizon in cfg.get("features.diff_horizons_h"):
+    for horizon in caps["features.diff_horizons_h"]:
         names.add(f"{target}_diff_{int(horizon)}")
         names.add(f"{target}_roc_{int(horizon)}")
 
@@ -322,7 +441,7 @@ def derived_history_columns(cfg: Config, frame: pd.DataFrame | None = None) -> s
     if frame is not None:
         met_vars = [v for v in met_vars if v in frame.columns]
     for var in [*met_vars, "wind_u", "wind_v"]:
-        for lag in cfg.get("features.met_lags_h"):
+        for lag in caps["features.met_lags_h"]:
             names.add(f"{var}_lag_{int(lag)}")
 
     return names
@@ -387,14 +506,10 @@ def max_backward_dependency(cfg: Config) -> int:
         cfg: Loaded configuration.
 
     Returns:
-        The maximum of all configured lags and rolling windows.
+        The maximum of all configured lags and rolling windows, after
+        ``features.lookback_h`` is applied.
     """
-    return max(
-        [int(x) for x in cfg.get("features.pm25_lags_h")]
-        + [int(x) for x in cfg.get("features.rolling_windows_h")]
-        + [int(x) for x in cfg.get("features.diff_horizons_h")]
-        + [int(x) for x in cfg.get("features.met_lags_h")]
-    )
+    return max(max(values) for values in capped_lookbacks(cfg).values())
 
 
 def build_features(
@@ -448,6 +563,10 @@ def build_features(
     fused = add_oracle_met(fused, cfg, horizons)
 
     max_lag = max_backward_dependency(cfg)
+    # The floor, not the deepest feature. They are the same number unless the
+    # lookback frontier's control arm has deliberately decoupled them.
+    floor_h = history_floor(cfg)
+    cap = cfg.get("features.lookback_h", None)
 
     report = FeatureBuildReport(
         n_rows_grid=n_grid,
@@ -456,6 +575,8 @@ def build_features(
         n_runs=n_runs,
         longest_run_h=longest,
         max_lag_h=max_lag,
+        history_floor_h=floor_h,
+        lookback_cap_h=None if cap is None else int(cap),
         n_features=len(feature_columns(fused, cfg)),
     )
 
@@ -465,7 +586,7 @@ def build_features(
         target_observed = fused["is_observed"].shift(-h).fillna(False).astype(bool)
 
         # Every backward dependency must resolve inside this run...
-        history_ok = fused["pos_in_run"] >= max_lag
+        history_ok = fused["pos_in_run"] >= floor_h
         # ...and the target must lie inside the same run, h steps ahead.
         horizon_ok = (fused["run_len"] - fused["pos_in_run"]) > h
         in_run = fused["run_id"] >= 0

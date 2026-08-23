@@ -1,0 +1,8 @@
+Quantity,Value,Note
+alpha (fitted),0.156,share of counted gaps that break a run
+alpha (predicted),0.142,share of gaps longer than max_ffill_hours=3
+beta0,-0.160,log-scale intercept
+R^2 (fitted donor),0.987,101 cells
+median APE (fitted donor),3.429,per cent
+R^2 (held out),0.977,"202 cells, donors not fitted on"
+median APE (held out),5.218,per cent

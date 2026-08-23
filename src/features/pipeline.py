@@ -31,6 +31,7 @@ from src.features.build_features import (
     FeatureBuildReport,
     build_features,
     feature_columns,
+    history_floor,
     max_backward_dependency,
 )
 from src.utils import Config
@@ -99,12 +100,16 @@ def build_feature_matrix(
     frame["split"] = assign_splits(frame.index, boundaries)
     logger.info("split: %s", boundaries.caption())
 
+    # The purge uses the FLOOR, not the deepest feature. The floor is always >=
+    # the cap, and using it is what makes the control arm's row set exactly the
+    # status quo's rather than merely close to it.
     max_lag = max_backward_dependency(cfg)
+    floor_h = history_floor(cfg)
     horizons = [int(h) for h in cfg.get("task.horizons_h")]
 
     purge_counts: dict[int, int] = {}
     for h in horizons:
-        keep = purge_boundary_rows(frame, frame["split"], max_lag, h)
+        keep = purge_boundary_rows(frame, frame["split"], floor_h, h)
         before = int(frame[f"valid_h{h}"].sum())
         frame[f"valid_h{h}"] = frame[f"valid_h{h}"] & keep
         after = int(frame[f"valid_h{h}"].sum())
@@ -131,6 +136,8 @@ def build_feature_matrix(
         "boundaries": boundaries.to_dict(),
         "caption": boundaries.caption(),
         "max_backward_dependency_h": max_lag,
+        "history_floor_h": floor_h,
+        "lookback_cap_h": cfg.get("features.lookback_h", None),
         "n_predictors": len(predictors),
         "predictors": predictors,
         "n_oracle_columns": len(oracle_cols),

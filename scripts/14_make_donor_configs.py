@@ -39,7 +39,6 @@ Run::
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -47,6 +46,11 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import yaml
+from src.config_edit import (
+    replace_block_scalar,
+    replace_scalar,
+    verify_overrides,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -59,126 +63,6 @@ def parse_args() -> argparse.Namespace:
         help="verify the generated configs match the registry without writing",
     )
     return p.parse_args()
-
-
-def _flatten(node: Any, prefix: str = "") -> dict[str, Any]:
-    """Flatten a nested mapping to dotted keys.
-
-    Args:
-        node: Mapping to flatten.
-        prefix: Key prefix for recursion.
-
-    Returns:
-        Dotted key to leaf value.
-    """
-    out: dict[str, Any] = {}
-    for key, value in (node or {}).items():
-        name = f"{prefix}.{key}" if prefix else str(key)
-        if isinstance(value, dict):
-            out.update(_flatten(value, name))
-        else:
-            out[name] = value
-    return out
-
-
-def _section_span(text: str, section: str) -> tuple[int, int]:
-    """Return the character span of one top-level block.
-
-    Args:
-        text: Whole config text.
-        section: Top-level key, e.g. ``"paths"``.
-
-    Returns:
-        ``(start, end)`` offsets covering the block's body.
-
-    Raises:
-        ValueError: If the section is absent or appears more than once.
-    """
-    starts = list(re.finditer(rf"^{re.escape(section)}:[ \t]*$", text, re.MULTILINE))
-    if len(starts) != 1:
-        raise ValueError(f"expected exactly one top-level {section!r} block, found {len(starts)}")
-    start = starts[0].end()
-    nxt = re.search(r"^[A-Za-z_][A-Za-z0-9_]*:", text[start:], re.MULTILINE)
-    return start, start + nxt.start() if nxt else len(text)
-
-
-def _replace_scalar(text: str, key: str, value: str, *, indent: int, section: str) -> str:
-    """Replace the value of one ``key:`` line, preserving its trailing comment.
-
-    Scoped to a top-level section because indent alone does not identify a key:
-    ``tables`` and ``figures`` each appear at indent 2 under both ``paths`` and
-    ``output``, and editing the wrong one would send this donor's tables to the
-    primary donor's directory -- silently, and in the direction that destroys
-    the experiment rather than failing it.
-
-    Args:
-        text: Whole config text.
-        key: Bare key name, e.g. ``"station"``.
-        value: Replacement value, already YAML-quoted if it needs to be.
-        indent: Exact leading-space count of the line to edit.
-        section: Top-level block the key must live in.
-
-    Returns:
-        The edited text.
-
-    Raises:
-        ValueError: If the key line is absent or matches more than once.
-    """
-    lo, hi = _section_span(text, section)
-    body = text[lo:hi]
-    pattern = re.compile(
-        rf"^(?P<lead>{' ' * indent}{re.escape(key)}:)(?P<gap>[ \t]*)"
-        rf"(?P<value>[^\n#]*?)(?P<comment>[ \t]*#.*)?$",
-        re.MULTILINE,
-    )
-    matches = list(pattern.finditer(body))
-    if len(matches) != 1:
-        raise ValueError(
-            f"expected exactly one {key!r} line at indent {indent} inside {section!r}, "
-            f"found {len(matches)}"
-        )
-    m = matches[0]
-    gap = m.group("gap") or " "
-    comment = m.group("comment") or ""
-    edited = body[: m.start()] + f"{m.group('lead')}{gap}{value}{comment}" + body[m.end() :]
-    return text[:lo] + edited + text[hi:]
-
-
-def _replace_block_scalar(text: str, key: str, value: str, *, indent: int, section: str) -> str:
-    """Replace a folded (``>-``) block scalar with a single-line quoted value.
-
-    ``project.title`` is written as a folded block over two lines. Editing it as
-    a scalar would leave the continuation lines behind as stray YAML.
-
-    Args:
-        text: Whole config text.
-        key: Bare key name.
-        value: Replacement value, unquoted.
-        indent: Leading-space count of the key line.
-        section: Top-level block the key must live in.
-
-    Returns:
-        The edited text.
-
-    Raises:
-        ValueError: If the key line is absent or ambiguous.
-    """
-    lo, hi = _section_span(text, section)
-    body = text[lo:hi]
-    lead = " " * indent
-    pattern = re.compile(
-        rf"^{lead}{re.escape(key)}:[ \t]*>-[ \t]*\n((?:{lead}  .*\n)+)", re.MULTILINE
-    )
-    matches = list(pattern.finditer(body))
-    if len(matches) != 1:
-        raise ValueError(
-            f"expected exactly one folded {key!r} block at indent {indent} inside "
-            f"{section!r}, found {len(matches)}"
-        )
-    m = matches[0]
-    escaped = value.replace('"', '\\"')
-    edited = body[: m.start()] + f'{lead}{key}: "{escaped}"\n' + body[m.end() :]
-    return text[:lo] + edited + text[hi:]
 
 
 def build_donor_config(base_text: str, slug: str, station: str) -> tuple[str, dict[str, Any]]:
@@ -224,9 +108,9 @@ def build_donor_config(base_text: str, slug: str, station: str) -> tuple[str, di
     text = base_text
     for key, value, indent, section, folded in edits:
         text = (
-            _replace_block_scalar(text, key, value, indent=indent, section=section)
+            replace_block_scalar(text, key, value, indent=indent, section=section)
             if folded
-            else _replace_scalar(text, key, value, indent=indent, section=section)
+            else replace_scalar(text, key, value, indent=indent, section=section)
         )
 
     expected = {
@@ -249,46 +133,6 @@ def build_donor_config(base_text: str, slug: str, station: str) -> tuple[str, di
     return text, expected
 
 
-def verify(base_text: str, donor_text: str, expected: dict[str, Any]) -> list[str]:
-    """Check a generated config changed exactly the intended keys.
-
-    Args:
-        base_text: Text of the base config.
-        donor_text: Text of the generated config.
-        expected: Dotted key to intended value.
-
-    Returns:
-        Human-readable problems; empty when the config is sound.
-    """
-    problems: list[str] = []
-    try:
-        donor = yaml.safe_load(donor_text)
-    except yaml.YAMLError as exc:
-        return [f"generated config does not parse: {exc}"]
-
-    base_flat = _flatten(yaml.safe_load(base_text))
-    donor_flat = _flatten(donor)
-
-    changed = {k for k in set(base_flat) | set(donor_flat) if base_flat.get(k) != donor_flat.get(k)}
-    for key, value in expected.items():
-        if donor_flat.get(key) != value:
-            problems.append(f"{key}: expected {value!r}, got {donor_flat.get(key)!r}")
-    for key in sorted(changed - set(expected)):
-        problems.append(
-            f"{key}: changed unintentionally ({base_flat.get(key)!r} -> {donor_flat.get(key)!r})"
-        )
-
-    # The comments are the reason this script edits lines instead of dumping.
-    base_comments = sum(1 for line in base_text.splitlines() if line.lstrip().startswith("#"))
-    donor_comments = sum(1 for line in donor_text.splitlines() if line.lstrip().startswith("#"))
-    if donor_comments < base_comments:
-        problems.append(
-            f"lost {base_comments - donor_comments} comment lines "
-            f"({base_comments} -> {donor_comments}); the edit is not comment-preserving"
-        )
-    return problems
-
-
 def main() -> int:
     """Generate or verify the donor configs."""
     args = parse_args()
@@ -306,7 +150,7 @@ def main() -> int:
     for donor in registry["donors"]:
         slug, station = str(donor["slug"]), str(donor["station"])
         text, expected = build_donor_config(base_text, slug, station)
-        problems = verify(base_text, text, expected)
+        problems = verify_overrides(base_text, text, expected)
 
         target = out_dir / f"{slug}.yaml"
         if problems:

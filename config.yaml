@@ -311,6 +311,30 @@ features:
   sequence_channels:
     mode: contemporaneous          # contemporaneous | engineered
 
+  # Cap on the backward reach of every engineered history feature, in hours.
+  # null = no cap, i.e. the lists above are used as written (the status quo).
+  #
+  # A cap DROPS the offending columns rather than merely renaming the bound.
+  # Keeping pm25_lag_168 while admitting rows that carry only 48 h of history
+  # would hand the model a NaN, and models/data.py::get_split_arrays replaces
+  # NaN with 0.0 AFTER scaling -- that is, with the training mean, silently.
+  #
+  # The cap is what the lookback frontier manipulates. It matters because the
+  # deepest feature sets the SUPERVISION FLOOR: a row needs that many unbroken
+  # hours behind it to exist at all, so every gap sterilises the lookback's
+  # worth of hours behind it. See src/eval/missingness_law.py.
+  lookback_h: null
+
+  # Minimum hours of unbroken history a row must carry to be scored.
+  # null = max_backward_dependency(cfg), which is the status quo and welds the
+  # floor to the deepest feature.
+  #
+  # Setting it ABOVE the cap decouples them, which is the identical-row-count
+  # control arm of the lookback frontier: same feature set, same rows as the
+  # status quo, so the supervision-volume effect separates from the
+  # feature-richness effect. Setting it BELOW the deepest feature raises.
+  history_floor_h: null
+
   gap_aware:
     enabled: true
     # A window is valid only if its internal timestamps are strictly contiguous

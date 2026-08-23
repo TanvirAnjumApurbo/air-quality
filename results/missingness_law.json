@@ -1,0 +1,226 @@
+{
+  "fit": {
+    "alpha": 0.15551705344748945,
+    "beta0": -0.15963895460358948,
+    "radius_h": 192,
+    "n_fit": 101,
+    "source": "wanliu (101 cells)",
+    "form": "usable = observed * exp(beta0 - alpha * radius_h * n_gaps / observed)"
+  },
+  "alpha_predicted_from_ffill": 0.14175506268081003,
+  "max_ffill_hours": 3,
+  "radius_h": 192,
+  "horizon_h": 24,
+  "in_sample": {
+    "n": 101,
+    "r2": 0.9874549190618697,
+    "median_ape_pct": 3.4293302564972343,
+    "mean_ape_pct": 4.263186073954061
+  },
+  "held_out": {
+    "n": 202,
+    "r2": 0.9767156335894569,
+    "median_ape_pct": 5.217577290512572,
+    "mean_ape_pct": 6.177116292974798
+  },
+  "n_cells": 303,
+  "donors": [
+    "dingling",
+    "dongsi",
+    "wanliu"
+  ],
+  "fit_donor": "wanliu",
+  "amplification_by_record": [
+    {
+      "Record": "Dhaka",
+      "Grid hours": 79216,
+      "Missing hours": 10766,
+      "Missing (%)": 13.590688749747526,
+      "Runs": 295,
+      "Hours lost to short history": 24592,
+      "Amplification": 2.2842281255805315,
+      "Identity (geometric)": 41828,
+      "Actual valid rows": 40825
+    },
+    {
+      "Record": "Beijing Wanliu",
+      "Grid hours": 35064,
+      "Missing hours": 117,
+      "Missing (%)": 0.3336755646817248,
+      "Runs": 27,
+      "Hours lost to short history": 4006,
+      "Amplification": 34.23931623931624,
+      "Identity (geometric)": 30413,
+      "Actual valid rows": 29796
+    },
+    {
+      "Record": "Beijing Dingling",
+      "Grid hours": 35064,
+      "Missing hours": 424,
+      "Missing (%)": 1.2092174309833448,
+      "Runs": 43,
+      "Hours lost to short history": 5953,
+      "Amplification": 14.040094339622641,
+      "Identity (geometric)": 27921,
+      "Actual valid rows": 27495
+    },
+    {
+      "Record": "Beijing Dongsi",
+      "Grid hours": 35064,
+      "Missing hours": 509,
+      "Missing (%)": 1.4516313027606662,
+      "Runs": 39,
+      "Hours lost to short history": 5314,
+      "Amplification": 10.44007858546169,
+      "Identity (geometric)": 28627,
+      "Actual valid rows": 28140
+    }
+  ],
+  "availability": [
+    {
+      "Record": "Dhaka",
+      "Lookback (h)": 168,
+      "Radius (h)": 192,
+      "Universe": 10880,
+      "Served": 9083,
+      "Availability": 0.8348345588235294,
+      "Availability (grid)": 0.7643692670201128
+    },
+    {
+      "Record": "Dhaka",
+      "Lookback (h)": 48,
+      "Radius (h)": 72,
+      "Universe": 10880,
+      "Served": 10363,
+      "Availability": 0.9524816176470589,
+      "Availability (grid)": 0.8720861735252041
+    },
+    {
+      "Record": "Dhaka",
+      "Lookback (h)": 24,
+      "Radius (h)": 48,
+      "Universe": 10880,
+      "Served": 10619,
+      "Availability": 0.9760110294117647,
+      "Availability (grid)": 0.8936295548262223
+    },
+    {
+      "Record": "Dhaka",
+      "Lookback (h)": 12,
+      "Radius (h)": 36,
+      "Universe": 10880,
+      "Served": 10750,
+      "Availability": 0.9880514705882353,
+      "Availability (grid)": 0.9046537069763527
+    },
+    {
+      "Record": "Beijing Wanliu",
+      "Lookback (h)": 168,
+      "Radius (h)": 192,
+      "Universe": 4833,
+      "Served": 3813,
+      "Availability": 0.7889509621353197,
+      "Availability (grid)": 0.7249049429657795
+    },
+    {
+      "Record": "Beijing Wanliu",
+      "Lookback (h)": 48,
+      "Radius (h)": 72,
+      "Universe": 4833,
+      "Served": 4497,
+      "Availability": 0.930477963997517,
+      "Availability (grid)": 0.8549429657794677
+    },
+    {
+      "Record": "Beijing Wanliu",
+      "Lookback (h)": 24,
+      "Radius (h)": 48,
+      "Universe": 4833,
+      "Served": 4665,
+      "Availability": 0.9652389819987586,
+      "Availability (grid)": 0.8868821292775665
+    },
+    {
+      "Record": "Beijing Wanliu",
+      "Lookback (h)": 12,
+      "Radius (h)": 36,
+      "Universe": 4833,
+      "Served": 4749,
+      "Availability": 0.9826194909993793,
+      "Availability (grid)": 0.902851711026616
+    },
+    {
+      "Record": "Beijing Dingling",
+      "Lookback (h)": 168,
+      "Radius (h)": 192,
+      "Universe": 4636,
+      "Served": 3388,
+      "Availability": 0.730802415875755,
+      "Availability (grid)": 0.644106463878327
+    },
+    {
+      "Record": "Beijing Dingling",
+      "Lookback (h)": 48,
+      "Radius (h)": 72,
+      "Universe": 4636,
+      "Served": 4255,
+      "Availability": 0.9178170836928387,
+      "Availability (grid)": 0.80893536121673
+    },
+    {
+      "Record": "Beijing Dingling",
+      "Lookback (h)": 24,
+      "Radius (h)": 48,
+      "Universe": 4636,
+      "Served": 4447,
+      "Availability": 0.9592320966350302,
+      "Availability (grid)": 0.8454372623574145
+    },
+    {
+      "Record": "Beijing Dingling",
+      "Lookback (h)": 12,
+      "Radius (h)": 36,
+      "Universe": 4636,
+      "Served": 4540,
+      "Availability": 0.9792924935289042,
+      "Availability (grid)": 0.8631178707224335
+    },
+    {
+      "Record": "Beijing Dongsi",
+      "Lookback (h)": 168,
+      "Radius (h)": 192,
+      "Universe": 4705,
+      "Served": 3380,
+      "Availability": 0.718384697130712,
+      "Availability (grid)": 0.6425855513307985
+    },
+    {
+      "Record": "Beijing Dongsi",
+      "Lookback (h)": 48,
+      "Radius (h)": 72,
+      "Universe": 4705,
+      "Served": 4269,
+      "Availability": 0.9073326248671626,
+      "Availability (grid)": 0.811596958174905
+    },
+    {
+      "Record": "Beijing Dongsi",
+      "Lookback (h)": 24,
+      "Radius (h)": 48,
+      "Universe": 4705,
+      "Served": 4485,
+      "Availability": 0.953241232731137,
+      "Availability (grid)": 0.8526615969581749
+    },
+    {
+      "Record": "Beijing Dongsi",
+      "Lookback (h)": 12,
+      "Radius (h)": 36,
+      "Universe": 4705,
+      "Served": 4593,
+      "Availability": 0.9761955366631243,
+      "Availability (grid)": 0.8731939163498099
+    }
+  ],
+  "mechanism_note": "A row needs floor hours of unbroken history and a target horizon hours further on inside the same run, so each run of length l yields max(0, l - floor - horizon) rows. The cost of missingness is therefore driven by the number of gaps, not their total length."
+}
