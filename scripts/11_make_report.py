@@ -29,6 +29,9 @@ from src.models.data import load_meta
 from src.results import load_results, main_runs
 from src.utils import check_disk_space, load_config, setup_logging
 
+#: Plain-text unit for prose; figures use the mathtext form from src.viz.figures.
+UNIT_PM25_TEXT = "ug/m3"
+
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -1303,6 +1306,27 @@ def main() -> int:
             a("hour without error: it is an hour that must fall back on persistence. That is")
             a("where the recovered availability turns into recovered skill.")
             a("")
+            un = fr.get("unserved_hours") or {}
+            if un:
+                a(
+                    f"One number in that table looks wrong and is not. All-hours RMSE comes "
+                    f"out *below* served RMSE for the status quo, because the hours it "
+                    f"cannot reach are **easier**, not harder: persistence scores "
+                    f"{un['reference_rmse_on_unserved']:.2f} on the "
+                    f"{un['n_unserved']:,} unserved hours against "
+                    f"{un['reference_rmse_on_served']:.2f} on the {un['n_served']:,} it "
+                    f"serves, and their observed mean is "
+                    f"{un['observed_mean_on_unserved']:.1f} against "
+                    f"{un['observed_mean_on_served']:.1f} " + UNIT_PM25_TEXT + "."
+                )
+                a("")
+                a("A gap is followed by a stretch of hours no deep-reach model can forecast,")
+                a("and on this record those stretches sit disproportionately in the cleaner")
+                a("part of the distribution. So the gain from a shorter reach is not the")
+                a("rescue of catastrophic hours; it is a model beating persistence on a large")
+                a("block of ordinary ones. That is a smaller and more honest claim, and it is")
+                a("the one the numbers support.")
+                a("")
         decomp = pd.DataFrame(fr.get("decomposition", []))
         if not decomp.empty:
             decomp = decomp[~decomp["model"].isin(tier1)]

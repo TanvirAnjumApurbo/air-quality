@@ -372,6 +372,40 @@ def main() -> int:
     log.info("wrote %s", ", ".join(p.name for p in written))
     plt.close(fig)
 
+    # Are the hours a deep-reach model cannot serve harder or easier than the ones
+    # it can? It is not rhetorical: all-hours RMSE comes out BELOW served RMSE on
+    # this record, which looks like an error until you see that the reference does
+    # better on the unserved hours than on the served ones. Reported so the reader
+    # is not left to wonder, and computed rather than asserted.
+    deep_pred = next(
+        (p for k, p in bundle.items() if k.endswith(f"|{deepest_arm}") and np.isnan(p).any()),
+        None,
+    )
+    unserved_note = {}
+    if deep_pred is not None:
+        served_rows = ~np.isnan(deep_pred)
+        if served_rows.any() and (~served_rows).any():
+            unserved_note = {
+                "n_served": int(served_rows.sum()),
+                "n_unserved": int((~served_rows).sum()),
+                "reference_rmse_on_served": rmse(y_true[served_rows], reference[served_rows]),
+                "reference_rmse_on_unserved": rmse(y_true[~served_rows], reference[~served_rows]),
+                "observed_mean_on_served": float(np.mean(y_true[served_rows])),
+                "observed_mean_on_unserved": float(np.mean(y_true[~served_rows])),
+            }
+            harder = (
+                unserved_note["reference_rmse_on_unserved"]
+                > unserved_note["reference_rmse_on_served"]
+            )
+            unserved_note["unserved_hours_are_harder"] = bool(harder)
+            log.info(
+                "reference RMSE on served %.4f vs unserved %.4f -- the hours the deepest "
+                "arm cannot reach are %s",
+                unserved_note["reference_rmse_on_served"],
+                unserved_note["reference_rmse_on_unserved"],
+                "harder" if harder else "EASIER, not harder",
+            )
+
     out = results_dir / "availability_frontier.json"
     out.write_text(
         json.dumps(
@@ -384,6 +418,7 @@ def main() -> int:
                 "dm_tests": dm_table.to_dict(orient="records"),
                 "decomposition": decomp.to_dict(orient="records"),
                 "all_hours": all_hours.to_dict(orient="records"),
+                "unserved_hours": unserved_note,
                 "comparability_note": (
                     "rmse_served is not comparable across arms: a deeper arm is scored "
                     "on fewer, better-covered hours. The common subset and the all-hours "

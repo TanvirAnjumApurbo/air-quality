@@ -983,5 +983,14 @@
       "fallback_share": "{\"C\": 0.8348, \"B48\": 0.0, \"B24\": 0.0, \"A48\": 0.1176, \"A24\": 0.0235, \"persistence\": 0.024}"
     }
   ],
+  "unserved_hours": {
+    "n_served": 9083,
+    "n_unserved": 1797,
+    "reference_rmse_on_served": 73.76441129626997,
+    "reference_rmse_on_unserved": 56.89878154340474,
+    "observed_mean_on_served": 123.58306726852362,
+    "observed_mean_on_unserved": 83.99443516972732,
+    "unserved_hours_are_harder": false
+  },
   "comparability_note": "rmse_served is not comparable across arms: a deeper arm is scored on fewer, better-covered hours. The common subset and the all-hours columns are the two comparisons that are."
 }
