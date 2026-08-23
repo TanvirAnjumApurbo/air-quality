@@ -1467,3 +1467,107 @@ def test_both_configs_declare_the_lookback_keys_as_null():
         assert "history_floor_h" in features, f"{path.name} is missing features.history_floor_h"
         assert features["lookback_h"] is None, f"{path.name} pins a lookback cap"
         assert features["history_floor_h"] is None, f"{path.name} pins a history floor"
+
+
+# ---------------------------------------------------------------------------
+# Resume identity: a grid must not be resumed under the wrong label
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.leakage
+def test_resume_allows_a_matching_grid():
+    """A grid recorded for this donor at this radius may be resumed."""
+    from src.eval.ablation import resume_identity_problem
+
+    payload = {"donor": "Beijing Wanliu", "sterilisation_radius_h": 192, "cells": {"a": {}}}
+    assert resume_identity_problem(payload, donor="Beijing Wanliu", radius_h=192) is None
+
+
+@pytest.mark.leakage
+def test_resume_accepts_a_grid_predating_the_radius_field():
+    """Absence of a recorded radius is not disagreement.
+
+    Every grid written before the mediation experiment ran at the configured
+    reach, so refusing them would be a false alarm that forced needless refits.
+    """
+    from src.eval.ablation import resume_identity_problem
+
+    payload = {"donor": "Beijing Wanliu", "cells": {"a": {}}}
+    assert resume_identity_problem(payload, donor="Beijing Wanliu", radius_h=192) is None
+
+
+@pytest.mark.leakage
+def test_control_resume_refuses_a_grid_from_another_donor():
+    """Negative control: the defect that reported a complete grid for an untouched station."""
+    from src.eval.ablation import resume_identity_problem
+
+    payload = {"donor": "Beijing Wanliu", "sterilisation_radius_h": 192, "cells": {"a": {}}}
+    problem = resume_identity_problem(payload, donor="Beijing Dingling", radius_h=192)
+    assert problem is not None
+    assert "Wanliu" in problem and "Dingling" in problem
+
+
+@pytest.mark.leakage
+def test_control_resume_refuses_a_grid_at_another_radius():
+    """Negative control: mixing two backward reaches under one label.
+
+    The mediation experiment's claim is that the reach drives the arm gap, so a
+    grid that silently blended two reaches would corrupt the one result it exists
+    to produce.
+    """
+    from src.eval.ablation import resume_identity_problem
+
+    payload = {"donor": "Beijing Wanliu", "sterilisation_radius_h": 192, "cells": {"a": {}}}
+    problem = resume_identity_problem(payload, donor="Beijing Wanliu", radius_h=48)
+    assert problem is not None
+    assert "192" in problem and "48" in problem
+
+
+@pytest.mark.leakage
+def test_empty_grid_is_always_resumable():
+    """With no cells recorded there is nothing to mislabel."""
+    from src.eval.ablation import resume_identity_problem
+
+    assert resume_identity_problem({}, donor="anything", radius_h=1) is None
+    assert (
+        resume_identity_problem(
+            {"donor": "other", "sterilisation_radius_h": 1, "cells": {}},
+            donor="mismatched",
+            radius_h=999,
+        )
+        is None
+    )
+
+
+@pytest.mark.leakage
+def test_every_mediation_config_has_a_distinct_output_and_matching_radius():
+    """Two grids sharing an output path is the defect this repo hits most often.
+
+    Here it would be worst: resume keys on (arm, coverage, seed) and knows
+    nothing about the reach, so a shared path makes every cell read as already
+    recorded and the run reports a complete grid for a radius it never ran.
+    """
+    from pathlib import Path
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    configs = sorted((root / "config" / "lookback").glob("*.yaml"))
+    if not configs:
+        pytest.skip("mediation configs not generated")
+
+    seen: dict[str, str] = {}
+    for path in configs:
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        gap = raw["ablation"]["gap_injection"]
+        name = str(gap["output_name"])
+        assert name not in seen, f"{path.name} shares {name} with {seen[name]}"
+        seen[name] = path.name
+
+        windows = {int(s["window_h"]) for s in gap["sequence_models"]}
+        assert len(windows) == 1, f"{path.name} mixes windows {sorted(windows)}"
+        lookback = int(raw["features"]["lookback_h"])
+        radius = max(lookback, next(iter(windows)) - 1) + int(gap["horizon_h"])
+        assert f"_R{radius}." in name, (
+            f"{path.name} resolves to radius {radius} h but writes to {name}"
+        )

@@ -46,7 +46,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
 import pandas as pd
+from src.eval.ablation import resume_identity_problem
 from src.eval.metrics import all_metrics, skill_score
+from src.features.build_features import max_backward_dependency
 from src.features.gap_injection import empirical_gap_profile, inject_gaps
 from src.features.pipeline import build_feature_matrix
 from src.models.baselines import fit_climatology, predict_climatology, predict_persistence
@@ -168,26 +170,18 @@ def main() -> int:
     payload = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
     cells = payload.get("cells", {})
 
-    # Resume keys on (arm, coverage, injection seed) and says nothing about WHICH
-    # record produced the cell. If two configs ever resolve to one output path,
-    # every cell reads as "already recorded" and the run reports a complete grid
-    # for a station it never touched -- which is exactly what happened when the
-    # make shim dropped --config and three stations resumed off Wanliu's file.
-    # The donor label is the identity that matters, so disagreement is fatal
-    # rather than a warning: a silently mislabelled grid is worse than no grid.
+    # Identity guards, both fatal. See ablation.resume_identity_problem.
     this_donor = str(cfg.get("data.openaq.site_label") or cfg.get("data.site.city"))
-    recorded_donor = str(payload.get("donor", this_donor))
-    if cells and recorded_donor != this_donor:
-        log.error(
-            "%s holds %d cells recorded for %r, but this config is %r. Resuming "
-            "would attribute another record's results to this one. Point "
-            "ablation.gap_injection.output_name at a distinct file, or delete "
-            "the existing one to recompute.",
-            out_path,
-            len(cells),
-            recorded_donor,
-            this_donor,
+    this_radius = (
+        max(
+            max_backward_dependency(cfg),
+            max(int(s.get("window_h", 0)) for s in spec_cfg["sequence_models"]) - 1,
         )
+        + horizon
+    )
+    problem = resume_identity_problem(payload, donor=this_donor, radius_h=this_radius)
+    if problem:
+        log.error("%s %s", out_path, problem)
         return 1
 
     if args.dry_run:
@@ -427,6 +421,8 @@ def main() -> int:
         # no analysis rather than silently omitting the section.
         payload = {
             "donor": cfg.get("data.openaq.site_label") or cfg.get("data.site.city"),
+            "sterilisation_radius_h": this_radius,
+            "lookback_h": cfg.get("features.lookback_h", None),
             "gap_profile_source": profile.source,
             "gap_profile": profile.summary(),
             "horizon_h": horizon,

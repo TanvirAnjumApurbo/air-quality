@@ -406,3 +406,62 @@ def dose_response(
     out["p_holm"] = [r["p_adjusted"] for r in adjusted]
     out["significant_holm"] = [r["reject"] for r in adjusted]
     return out
+
+
+def resume_identity_problem(
+    payload: dict[str, Any],
+    *,
+    donor: str,
+    radius_h: int,
+) -> str | None:
+    """Why an existing grid must not be resumed, or None if it may be.
+
+    ``16_gap_injection.py`` keys its resume on ``(arm, coverage, injection seed)``
+    and says nothing about which record produced a cell or what backward reach it
+    was trained at. If two configs ever resolve to one output path, every cell
+    reads as "already recorded" and the run reports a complete grid for a
+    configuration it never touched -- which is what happened when the make shim
+    dropped ``--config`` and three stations resumed off one file.
+
+    Both identities are fatal rather than advisory. A silently mislabelled grid
+    is worse than no grid: it looks finished.
+
+    The radius matters for the same reason the donor does, and more sharply. The
+    mediation experiment's whole claim is that the backward reach is what drives
+    the arm gap, so a grid that mixed two reaches under one label would corrupt
+    precisely the result it exists to produce.
+
+    A payload with no recorded radius predates the field and is accepted: those
+    grids were all run at the configured reach, so absence is not disagreement.
+
+    Args:
+        payload: Contents of an existing grid file, or an empty mapping.
+        donor: Donor label this config resolves to.
+        radius_h: Sterilisation radius this config resolves to.
+
+    Returns:
+        A human-readable reason to refuse, or None.
+    """
+    cells = payload.get("cells", {})
+    if not cells:
+        return None
+
+    recorded_donor = str(payload.get("donor", donor))
+    if recorded_donor != donor:
+        return (
+            f"holds {len(cells)} cells recorded for {recorded_donor!r}, but this config "
+            f"is {donor!r}. Resuming would attribute another record's results to this "
+            f"one. Point ablation.gap_injection.output_name at a distinct file, or "
+            f"delete the existing one to recompute."
+        )
+
+    recorded_radius = int(payload.get("sterilisation_radius_h", radius_h))
+    if recorded_radius != radius_h:
+        return (
+            f"holds {len(cells)} cells recorded at a sterilisation radius of "
+            f"{recorded_radius} h, but this config resolves to {radius_h} h. Resuming "
+            f"would mix two backward reaches under one label. Point "
+            f"ablation.gap_injection.output_name at a distinct file, or delete the "
+            f"existing one to recompute."
+        )
+    return None

@@ -1,0 +1,853 @@
+# =============================================================================
+# CROSS-CITY GENERALISATION CHECK -- Beijing (UCI Multi-Site, station Wanliu)
+# -----------------------------------------------------------------------------
+# Derived from config.yaml. Only what MUST differ is changed, so that any
+# difference in results is attributable to the city rather than to the setup.
+#
+# Deliberate restrictions, both of which make Beijing HARDER than it needs to be
+# in order to keep the comparison about the method:
+#   * co-located PM10/SO2/NO2/CO/O3 are excluded, because Dhaka has no
+#     co-pollutant measurements and including them would change the problem;
+#   * the model grid, seeds, horizons, split fractions, QC thresholds, loss and
+#     early-stopping rules are all identical to Dhaka's.
+#
+# Unavoidable differences:
+#   * seven meteorological drivers instead of eight -- this record has no
+#     shortwave-irradiance equivalent;
+#   * calendar features in Asia/Shanghai, not Asia/Dhaka;
+#   * RH2M is derived from temperature and dew point rather than reported.
+# =============================================================================
+
+# =============================================================================
+# Short-Horizon PM2.5 Forecasting for Dhaka
+# A Lightweight Sequence Model on Fused OpenAQ and NASA POWER Data
+# -----------------------------------------------------------------------------
+# SINGLE SOURCE OF TRUTH. No hyperparameter, path, date, seed, threshold or
+# horizon may be hardcoded in any script -- everything is read from here.
+#
+# Fields whose value must be backed by a citation carry an explicit
+# `_status: VERIFIED | PENDING_VERIFICATION` marker. A PENDING field must never
+# be silently used to produce a paper number: the pipeline raises instead.
+# =============================================================================
+
+project:
+  name: dhaka-pm25-shortterm-beijing-check
+  title: >-
+    Cross-City Generalisation Check: the Dhaka PM2.5 Pipeline Applied Unchanged
+    to the Beijing Multi-Site Record
+  timezone_local: Asia/Shanghai     # UTC+08:00, no DST
+  timezone_data: UTC                # all merges happen in UTC
+
+# -----------------------------------------------------------------------------
+# Paths (all relative to repo root unless absolute)
+# -----------------------------------------------------------------------------
+paths:
+  data_raw: data/raw
+  data_interim: data/interim/beijing
+  data_processed: data/processed/beijing
+  results: results
+  tables: results/tables/beijing
+  figures: results/figures/beijing
+  logs: results/logs
+  results_json: results/results_beijing.json
+  reports: reports
+  checkpoints: data/interim/beijing/checkpoints    # gitignored; *.ckpt also ignored
+  cache: data/interim/beijing/cache                # memmap / feather tensor cache
+
+# -----------------------------------------------------------------------------
+# Reproducibility
+# -----------------------------------------------------------------------------
+seeds:
+  primary: 42
+  # Every stochastic model is run with ALL of these. Reported as mean +/- std.
+  # A single-seed deep-learning number is not a result.
+  multi: [42, 1337, 2024, 7, 31415]
+
+determinism:
+  torch_deterministic: true
+  cudnn_benchmark: false        # set true only for fixed-shape speed runs
+  # PyTorch needs this env var for deterministic CUDA matmul reductions
+  cublas_workspace_config: ":4096:8"
+
+# -----------------------------------------------------------------------------
+# Machine / runtime constraints for this box
+#   RTX 5060 Ti 8 GB (Blackwell, sm_120) -- requires the cu128 PyTorch build
+# -----------------------------------------------------------------------------
+runtime:
+  device: auto                  # auto | cuda | cpu
+  min_free_disk_gb: 5.0         # every writing script asserts this first
+  max_minutes_per_run: 10       # thermal ceiling; trainer aborts + warns past this
+  # ---- host RAM cache (box has 23.7 GB total, ~8.5 GB typically free) ------
+  ram_cache:
+    enabled: true
+    budget_gb: 8.0              # hard ceiling for the in-RAM tensor cache
+    # Measured headroom, not total RAM: the trainer clamps the cache to
+    # min(budget_gb, max_frac_of_available * psutil available RAM) at start-up,
+    # so a busy desktop degrades to a smaller cache instead of swapping.
+    max_frac_of_available: 0.6
+    # The whole windowed dataset is materialised once as float32 and pinned;
+    # falls back to on-the-fly windowing if even the clamped budget is exceeded.
+    # Worst case here (~50k windows x 168 h x ~60 features x 4 B) is ~2 GB, so
+    # the full dataset is expected to fit comfortably.
+    pin_memory: true
+    persist_to_disk: true       # reuse across runs via .npy memmap in paths.cache
+  dataloader:
+    num_workers: 0              # 0 is fastest when the dataset is already in RAM
+    prefetch_factor: null
+    persistent_workers: false
+    drop_last: false
+  amp:
+    enabled: true               # mixed precision
+    dtype: bf16                 # bf16 is safe on Blackwell; falls back to fp32 on CPU
+  compile:
+    enabled: false              # torch.compile: big warmup cost, tiny models -> off
+  # ---- checkpointing / resume ---------------------------------------------
+  checkpointing:
+    enabled: true
+    save_every_epoch: true      # atomic write: last.ckpt + best.ckpt
+    keep_last_n: 1
+    resume: auto                # auto | never | always  (auto = resume if ckpt found)
+  progress:
+    enabled: true
+    backend: tqdm               # tqdm | plain  (plain = one line per epoch, log-safe)
+    log_every_n_steps: 50
+
+# =============================================================================
+# DATA
+# =============================================================================
+data:
+  # --- study location -------------------------------------------------------
+  site:
+    city: Beijing
+    # Deliberately null. These three keys are read only by fetch_openaq.py and
+    # fetch_power.py, and neither runs on this path -- the Beijing target and
+    # meteorology both come out of the UCI record via 12_prepare_beijing.py.
+    # They previously carried Dhaka's values, inherited when this config was
+    # derived, so running discovery against it would have silently queried
+    # Dhaka and labelled the result Beijing. Null fails loudly instead.
+    country_iso: null
+    latitude: null
+    longitude: null
+    discovery_radius_m: null
+    # The energy accounting is NOT affected: CodeCarbon reads
+    # green.energy.country_iso_code, which stays BGD because the hardware that
+    # ran both cities is physically in Bangladesh.
+
+  # Where the meteorological drivers actually come from, quoted verbatim into
+  # abstract_facts.json. Dhaka's is NASA POWER; Beijing's is the station record
+  # itself, and the report must not claim otherwise.
+  meteorology_source: >-
+    UCI Beijing Multi-Site station record (co-located, hourly);
+    RH2M derived from TEMP and DEWP via Magnus-Tetens
+
+  # --- OpenAQ (target variable) --------------------------------------------
+  openaq:
+    # Discovery only (needs free key in .env as OPENAQ_API_KEY)
+    api_base: https://api.openaq.org/v3
+    api_key_env: OPENAQ_API_KEY
+    # Bulk download (no credentials, unsigned S3)
+    s3_bucket: openaq-data-archive
+    s3_prefix_template: records/csv.gz/locationid={location_id}/year={year}/month={month:02d}/
+    s3_region: us-east-1
+    parameter: pm25
+    target_units: "ug/m3"       # anything else is converted or rejected, and logged
+    # Deliberately null. Beijing's target does not come from OpenAQ at all -- it
+    # comes from the UCI Multi-Site record via 12_prepare_beijing.py. These keys
+    # previously held Dhaka's IDs [2445, 8415], inherited when this config was
+    # derived, and the audit report printed them under a Beijing heading as if
+    # they were this record's provenance. The whole OpenAQ block above is dead
+    # on this path and kept only so the two configs stay diffable.
+    location_ids: null
+    combine_as_single_site: true
+    site_label: "Beijing Wanliu (UCI Multi-Site, id 501)"
+    request:
+      max_retries: 5
+      backoff_base_s: 1.5
+      sleep_between_calls_s: 0.2
+      timeout_s: 60
+
+  # --- NASA POWER (meteorological drivers) ---------------------------------
+  # No key required. Hourly point endpoint.
+  #
+  # TIME STANDARD -- verified against the live API, and it is NOT what is
+  # commonly assumed. The hourly endpoint defaults to time_standard="LST"
+  # (Local Solar Time), not UTC. Requesting UTC explicitly is therefore
+  # mandatory, otherwise every meteorological driver is silently offset by about
+  # six hours relative to the OpenAQ target and the fusion is meaningless.
+  # Evidence (Dhaka, 2024-01-01, T2M): under LST the daily minimum falls at 06h
+  # and maximum at 13h; under UTC they fall at 23h and 07h, which map to 05:00
+  # and 13:00 Asia/Dhaka -- dawn and mid-afternoon, as expected.
+  power:
+    endpoint: https://power.larc.nasa.gov/api/temporal/hourly/point
+    community: RE
+    time_standard: UTC   # sent as the `time-standard` query parameter
+    # Verified present in the live response for this point and period; the
+    # fetcher re-checks and fails loudly if any requested name is not returned.
+    parameters:
+      - T2M              # Temperature at 2 Meters                        [C]
+      - T2MDEW           # Dew/Frost Point at 2 Meters                    [C]
+      - RH2M             # Relative Humidity at 2 Meters                  [%]
+      - WS10M            # Wind Speed at 10 Meters                        [m/s]
+      - WD10M            # Wind Direction at 10 Meters                    [Degrees]
+      - PS               # Surface Pressure                               [kPa]
+      - PRECTOTCORR      # Precipitation Corrected                        [mm/day]
+    # Units above are quoted verbatim from the API `parameters` block and differ
+    # from what is often assumed: PRECTOTCORR is reported as mm/day (not mm/hour)
+    # and ALLSKY_SFC_SW_DWN as Wh/m^2 (not W/m^2). Values are used as returned
+    # and never rescaled on an assumption; the observed units are recorded in
+    # the data audit.
+    fill_value: -999.0   # POWER missing sentinel -- treated as NaN, never as data
+    chunk_by: year       # one request per calendar year, cached to data/raw
+    request:
+      max_retries: 5
+      backoff_base_s: 2.0
+      sleep_between_calls_s: 3.0
+      timeout_s: 180
+
+  # --- UCI Beijing Multi-Site (fallback + cross-city generalisation) -------
+  uci:
+    repo_id: 501        # ucimlrepo.fetch_ucirepo(id=501)
+    name: Beijing Multi-Site Air-Quality Data
+    # Beijing local time = Asia/Shanghai (UTC+8), no DST. Source columns are
+    # year/month/day/hour in local time.
+    timezone_local: Asia/Shanghai
+    target_column: "PM2.5"
+    # Station used as the Beijing analogue of a single Dhaka monitor.
+    # null => the station with the most complete PM2.5 record is chosen and logged.
+    # Pinned rather than left null: this is also the PRIMARY DONOR of the
+    # gap-injection experiment, and donors.yaml names the replication stations
+    # relative to it. If the archive ever shifted which station is most complete,
+    # a null here would silently move the donor and invalidate the comparison.
+    # Wanliu is what null resolved to (98.91%, the most complete of the 12).
+    station: "Wanliu"
+
+  # --- interim filenames -----------------------------------------------------
+  # Named here rather than hardcoded so a second city can reuse every downstream
+  # stage unchanged: the cross-city run points paths.data_interim at its own
+  # directory and writes the same filenames.
+  files:
+    target: openaq_pm25_hourly.parquet
+    meteorology: power_hourly.parquet
+    met_units: power_units.json
+    qc_ledger: openaq_qc_ledger.json
+
+  # --- date range requested from every source ------------------------------
+  # Bounded by the chosen OpenAQ site: the archive begins 2016-03-10 and the
+  # feed stops 2025-03-24 (there is no Dhaka reference-monitor data after that).
+  # Requested slightly wider than the target coverage so the audit can show the
+  # true edges rather than edges imposed by this setting.
+  range:
+    start: "2016-01-01"
+    end: "2025-12-31"
+
+# -----------------------------------------------------------------------------
+# Quality control. Every filter logs the number of rows it removed.
+# -----------------------------------------------------------------------------
+qc:
+  pm25:
+    drop_negative: true
+    # Physically implausible upper cap for a 1-hour PM2.5 mean.
+    # Dhaka hourly peaks exceed 500 ug/m3 in winter, so the cap is deliberately
+    # loose; it is a sanity guard against sensor faults, not an outlier filter.
+    sanity_cap_ugm3: 1000.0
+    # Repeated identical values usually mean a stuck sensor, not still air.
+    flatline_max_repeats: 12       # >12 consecutive identical hourly values -> drop
+    drop_exact_zero: true          # exact 0.000 PM2.5 for an hour is a sensor fault
+  resample:
+    freq: "1h"
+    # An hourly bin needs at least this many sub-hourly obs to count as observed.
+    min_obs_per_hour: 1
+    aggregation: mean
+  meteorology:
+    # Ranges used only to flag absurd values, applied after fill_value -> NaN.
+    plausible:
+      T2M: [-10.0, 55.0]
+      T2MDEW: [-20.0, 40.0]
+      RH2M: [0.0, 100.0]
+      WS10M: [0.0, 60.0]
+      WD10M: [0.0, 360.0]
+      PS: [80.0, 110.0]
+      PRECTOTCORR: [0.0, 200.0]
+
+# -----------------------------------------------------------------------------
+# Missing-data handling. Leakage rule 3: imputation must be backward-looking
+# only, or fitted per-split. Linear interpolation across a split boundary is
+# leakage and is forbidden.
+# -----------------------------------------------------------------------------
+impute:
+  method: ffill_limited          # ffill_limited | per_split_interpolate | none
+  max_ffill_hours: 3             # gaps longer than this stay NaN and are excluded
+  # Rows whose target is NaN are never imputed -- they are dropped from
+  # supervision (but still break window contiguity, see features.gap_aware).
+
+# =============================================================================
+# FEATURES
+# =============================================================================
+features:
+  target: pm25
+  # Calendar features are derived in Asia/Dhaka so the diurnal cycle is physical.
+  calendar_tz: Asia/Shanghai
+
+  pm25_lags_h: [1, 2, 3, 6, 12, 24, 48, 168]
+  rolling_windows_h: [3, 6, 12, 24, 168]
+  rolling_stats: [mean, std, min, max]
+  diff_horizons_h: [1, 3, 24]        # differences and rate-of-change
+
+  # Seven drivers, not Dhaka's eight: this record has no shortwave-irradiance
+  # equivalent to ALLSKY_SFC_SW_DWN, and RH2M is derived from temperature and
+  # dew point rather than reported. Co-located PM10/SO2/NO2/CO/O3 are
+  # deliberately excluded -- Dhaka has no co-pollutant measurements, so using
+  # them here would change the problem rather than test the method.
+  met_vars: [T2M, T2MDEW, RH2M, WS10M, WD10M, PS, PRECTOTCORR]
+
+  met_lags_h: [1, 3, 6, 12, 24]
+  # Wind speed+direction -> u/v components. Meteorological convention:
+  # WD10M is the direction the wind blows FROM, degrees clockwise from north.
+  wind_uv_from: {speed: WS10M, direction: WD10M}
+
+  cyclical:
+    hour_of_day: {period: 24}
+    day_of_week: {period: 7}
+    day_of_year: {period: 365.25}
+
+  # Season indicator. Boundaries taken verbatim from the Bangladesh Department of
+  # Environment, which defines "dry season (November to April) and wet season
+  # (May to October)". See citations.season. Note this is a two-season split
+  # covering all 12 months, not a monsoon-core subset.
+  season:
+    # East Asian summer monsoon over North China, not the Bangladesh calendar.
+    # Beijing's rainfall is concentrated in June-September; the DoE boundaries
+    # used for Dhaka do not apply here and reusing them would mislabel the strata.
+    monsoon_months: [6, 7, 8, 9]
+    dry_months: [11, 12, 1, 2, 3, 4]
+    _status: VERIFIED
+
+  # Must match config.yaml: the cross-city comparison tests the METHOD, so both
+  # cities have to feed their sequence models the same kind of input. See the
+  # long note in config.yaml for why contemporaneous is the honest default.
+  # Beijing has one fewer met var (no ALLSKY_SFC_SW_DWN), so this resolves to 17
+  # channels here against 18 in Dhaka.
+  sequence_channels:
+    mode: contemporaneous          # contemporaneous | engineered
+
+  # Cap on the backward reach of every engineered history feature, in hours.
+  # null = no cap, i.e. the lists above are used as written (the status quo).
+  #
+  # A cap DROPS the offending columns rather than merely renaming the bound.
+  # Keeping pm25_lag_168 while admitting rows that carry only 48 h of history
+  # would hand the model a NaN, and models/data.py::get_split_arrays replaces
+  # NaN with 0.0 AFTER scaling -- that is, with the training mean, silently.
+  #
+  # The cap is what the lookback frontier manipulates. It matters because the
+  # deepest feature sets the SUPERVISION FLOOR: a row needs that many unbroken
+  # hours behind it to exist at all, so every gap sterilises the lookback's
+  # worth of hours behind it. See src/eval/missingness_law.py.
+  lookback_h: 48
+
+  # Minimum hours of unbroken history a row must carry to be scored.
+  # null = max_backward_dependency(cfg), which is the status quo and welds the
+  # floor to the deepest feature.
+  #
+  # Setting it ABOVE the cap decouples them, which is the identical-row-count
+  # control arm of the lookback frontier: same feature set, same rows as the
+  # status quo, so the supervision-volume effect separates from the
+  # feature-richness effect. Setting it BELOW the deepest feature raises.
+  history_floor_h: null
+
+  gap_aware:
+    enabled: true
+    # A window is valid only if its internal timestamps are strictly contiguous
+    # at qc.resample.freq. Rejected windows are counted and reported.
+    require_contiguous: true
+    max_internal_nan_frac: 0.0     # 0.0 = no NaNs allowed inside a kept window
+
+# =============================================================================
+# FORECASTING TASK
+# =============================================================================
+task:
+  # Direct multi-horizon: one head/model per h. No recursive rollout.
+  horizons_h: [1, 3, 6, 12, 24]
+  headline_horizon_h: 24
+  # Leakage rule 1: to predict t+h only information up to and including t is
+  # available. `oracle_met` is an explicitly-labelled upper bound, never headline.
+  allow_future_meteorology: false
+  oracle_met_variant:
+    enabled: true
+    label: "Oracle-Met (upper bound, NOT a forecast)"
+
+split:
+  method: chronological_fraction     # chronological_fraction | explicit
+  train_frac: 0.70
+  val_frac: 0.15
+  test_frac: 0.15
+  shuffle: false                     # never. any true value raises.
+  # Resolved from the audited coverage in Phase 2 and written back here so that
+  # every table caption can print the exact boundary dates.
+  explicit_boundaries:
+    train_end: "2015-12-18T08:06:00+00:00"
+    val_end: "2016-07-24T11:33:00+00:00"
+  _status: VERIFIED   # resolved by scripts/04_build_features.py
+
+scaling:
+  method: standard                   # fitted on TRAIN ONLY, then applied to val/test
+  target_transform: log1p            # PM2.5 is right-skewed; metrics reported in ug/m3
+  clip_sigma: null
+
+# =============================================================================
+# MODELS
+# =============================================================================
+models:
+  # ---- Tier 1: honest baselines -------------------------------------------
+  baselines:
+    persistence:      {enabled: true}
+    seasonal_naive:   {enabled: true, period_h: 24}
+    climatology:      {enabled: true, by: [hour_of_day, month]}   # train-set means
+    sarimax:
+      enabled: true
+      order: [2, 0, 1]
+      seasonal_order: [1, 0, 1, 24]
+      trend: c
+      # SARIMAX on 50k+ hourly points is slow; fit on a capped recent train tail.
+      max_train_hours: 8760
+      enforce_stationarity: false
+      enforce_invertibility: false
+
+  # ---- Tier 2: classical ML -----------------------------------------------
+  trees:
+    tuning:
+      cv: TimeSeriesSplit
+      n_splits: 4
+      # Tuning uses TRAIN+VAL only. Test is never touched during tuning.
+      scoring: neg_root_mean_squared_error
+      n_iter: 10                     # RandomizedSearchCV budget, per model per horizon
+    ridge:
+      enabled: true
+      alphas: [0.01, 0.1, 1.0, 10.0, 100.0]
+      # Must match config.yaml -- see the note there. Same method, both cities.
+      log_scale_history: true
+    random_forest:
+      enabled: true
+      # Deliberately bounded rather than left to grow freely. An unconstrained
+      # forest (max_depth null, min_samples_leaf 1, max_features 1.0) on 33k rows
+      # x 102 features takes over ten minutes for a single horizon's search,
+      # which breaks the per-run time budget for no measurable accuracy gain on
+      # this data. Depth and leaf size are capped and the feature subsample is
+      # kept well below 1.0; the resulting forest is the one reported.
+      grid:
+        n_estimators: [200]
+        max_depth: [10, 20]
+        min_samples_leaf: [5, 20]
+        max_features: [0.2, 0.4]
+      n_jobs: -1
+    xgboost:
+      enabled: true
+      grid:
+        n_estimators: [400, 800]
+        max_depth: [4, 6, 8]
+        learning_rate: [0.03, 0.06, 0.1]
+        subsample: [0.8, 1.0]
+        colsample_bytree: [0.6, 0.8, 1.0]
+        min_child_weight: [1, 5]
+      early_stopping_rounds: 50
+      tree_method: hist
+      device: auto                   # 'cuda' when available
+    lightgbm:
+      enabled: true                  # skipped with a logged note if import fails
+      grid:
+        n_estimators: [400, 800]
+        num_leaves: [31, 63, 127]
+        learning_rate: [0.03, 0.06, 0.1]
+        min_child_samples: [10, 30]
+        subsample: [0.8, 1.0]
+        colsample_bytree: [0.6, 0.8, 1.0]
+      early_stopping_rounds: 50
+
+  # ---- Tier 3: sequence models (the contribution) -------------------------
+  # HARD CONSTRAINT: every sequence model stays under max_params. This IS the
+  # green-AI story -- it is not relaxed to chase RMSE.
+  sequence:
+    max_params: 100000
+    input_windows_h: [24, 48, 168]
+    architectures:
+      gru:
+        enabled: true
+        hidden_sizes: [32, 64, 128]
+        num_layers: [1, 2]
+      lstm:
+        enabled: true
+        hidden_sizes: [32, 64, 128]
+        num_layers: [1, 2]
+      gru_attention:
+        # Only after tiers 1 and 2 are committed. First thing cut if time runs out.
+        enabled: false
+        hidden_sizes: [64]
+        num_layers: [1]
+        attention_dim: 32
+      # Must mirror config.yaml -- see the note there. The comparison city runs
+      # the same architecture set or it is not the same method.
+      dlinear:
+        enabled: true
+        kernel_size: 25
+      nlinear:
+        enabled: true
+    train:
+      # EVERY VALUE BELOW IS INHERITED FROM config.yaml ON PURPOSE, and must be
+      # copied across whenever the primary city's recipe changes.
+      #
+      # The recipe is tuned once, on the primary city, and applied unchanged
+      # here. Tuning per city would mean the cross-city comparison measured
+      # tuning effort per city as well as method, and the claim this run exists
+      # to test -- that the same pipeline run unchanged ranks methods differently
+      # in the two cities -- would no longer be about the pipeline.
+      epochs: 60
+      batch_size: 256
+      # Selected on Dhaka validation RMSE (not validation loss -- see config.yaml
+      # for why Huber loss is not comparable across huber_delta).
+      lr: 0.003
+      optimizer: adamw
+      weight_decay: 0.001
+      dropout: 0.2
+      loss: huber
+      huber_delta: 1.0
+      grad_clip_norm: 1.0
+      scheduler:
+        name: warmup_cosine
+        warmup_epochs: 3
+        min_lr: 0.00001
+        factor: 0.5
+        patience: 4
+      early_stopping:
+        monitor: val_loss
+        patience: 15
+        min_epochs: 20
+        min_delta: 0.0001
+        mode: min
+    tuning:
+      # The search runs on the primary city only; see the block above.
+      enabled: false
+      archs: [gru, lstm]
+      hidden_sizes: [64]
+      num_layers: [1]
+      windows_h: [48]
+      horizons_h: [24]
+      seeds: [42]
+      grid:
+        lr: [0.0003, 0.001, 0.003]
+        weight_decay: [0.0001, 0.001, 0.01]
+        huber_delta: [0.3, 1.0]
+
+# ---- Secondary task: AQI-category classification ---------------------------
+classification:
+  enabled: true
+  horizon_h: 24                      # next-day health advisory
+  class_weight: balanced             # imbalance handled explicitly and reported
+  # The EPA breakpoints below are defined for a 24-HOUR AVERAGE PM2.5
+  # concentration. Applying them to an instantaneous hourly value is a common
+  # shortcut but is not what the standard specifies, so the classification target
+  # is the 24-hour mean ending at t+h. That mean is computed from observations at
+  # and before t+h only, and the predictor still sees nothing after t.
+  target_basis: rolling_24h_mean     # rolling_24h_mean | hourly_instantaneous
+  breakpoints:
+    scheme: us_epa_pm25_2024
+    # Bangladesh does not publish its own PM2.5 concentration breakpoints. The
+    # DoE states it applies the USEPA AQI equation and category scale directly:
+    # "The following equation (eq. 1) adopted by the United States Environment
+    # Protection Agency (USEPA) is used to calculate the AQI in Bangladesh too."
+    # So the US EPA concentration breakpoints are the correct ones to use here,
+    # and the DoE report is the citation for that being Bangladesh practice.
+    source_title: >-
+      Technical Assistance Document for the Reporting of Daily Air Quality --
+      the Air Quality Index (AQI), Table 6: Breakpoints for the AQI
+    source_url: https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
+    source_org: US Environmental Protection Agency / AirNow
+    source_year: 2024
+    # Reflects the 2024 PM2.5 AQI revision (effective 6 May 2024): the Good/
+    # Moderate boundary moved from 12.0 to 9.0 ug/m3.
+    revision: "2024 revision, effective 2024-05-06"
+    # Inclusive upper bounds of each category, ug/m3, 24-hour basis. The final
+    # category is open-ended (> 225.4).
+    edges_ugm3: [9.0, 35.4, 55.4, 125.4, 225.4]
+    labels:
+      - Good                            # AQI   0-50
+      - Moderate                        # AQI  51-100
+      - Unhealthy for Sensitive Groups  # AQI 101-150
+      - Unhealthy                       # AQI 151-200
+      - Very Unhealthy                  # AQI 201-300
+      - Hazardous                       # AQI 301+
+    _status: VERIFIED
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  metrics: [rmse, mae, r2, smape]    # sMAPE, not MAPE: PM2.5 approaches zero
+  # Headline column. Most air-quality papers omit it.
+  skill_score:
+    reference: persistence
+    formula: "1 - RMSE_model / RMSE_reference"
+  stratify:
+    by_season: true                  # monsoon vs dry, per features.season
+    by_pollution_level:
+      enabled: true
+      # Thresholds on OBSERVED PM2.5, from the Bangladesh Air Pollution (Control)
+      # Rules 2022 (S.R.O 255-Law/2022), Table 3 of the DoE report. Both are
+      # Bangladesh national standards for PM2.5 -- they differ in averaging
+      # period, which is the distinction that matters here:
+      #   65 ug/m3 = 24-hour standard  -> the operative SHORT-TERM threshold, and
+      #                                   therefore the headline stratification
+      #                                   for an hourly forecasting task
+      #   35 ug/m3 = ANNUAL standard   -> reported as a secondary, more sensitive
+      #                                   cut. It coincides numerically with the
+      #                                   US EPA 24-hour PM2.5 NAAQS, which is a
+      #                                   coincidence and not the reason it is used.
+      # Retained as the Dhaka comparison cut so the two cities are stratified at
+      # the same concentrations. These are Bangladesh standards and carry no
+      # regulatory meaning in China; they are used here purely as fixed
+      # concentration thresholds to keep the cross-city comparison aligned.
+      threshold_ugm3: 65.0
+      secondary_thresholds_ugm3: [35.0]
+      _status: VERIFIED
+  diebold_mariano:
+    enabled: true
+    # Compares best deep model vs best classical baseline.
+    loss: squared
+    h: null                          # defaults to the forecast horizon under test
+    alternative: two-sided
+    # Must match config.yaml -- see the note there.
+    alpha: 0.05
+    multiplicity: holm
+  bootstrap_ci:
+    enabled: true
+    n_resamples: 1000
+    block_size_h: 24                 # moving-block bootstrap for autocorrelation
+    alpha: 0.05
+  # Must match config.yaml -- see the note there.
+  model_confidence_set:
+    enabled: true
+    alpha: 0.05
+    n_bootstrap: 1000
+    block_size_h: 24
+
+# =============================================================================
+# ABLATION: the gap-injection experiment (scripts/16_gap_injection.py)
+#
+# The study's central claim is that record FRAGMENTATION, not model class,
+# decides which method wins. Across two cities that is only an observation --
+# Dhaka and Beijing differ in coverage, span, climate and instrument at once.
+# This block turns it into a controlled experiment on a single record.
+#
+# This near-complete record (98.9% coverage, 180 gaps) is the donor. It is
+# degraded to each coverage level by two arms that remove an IDENTICAL number of
+# observed hours and differ only in how those hours are arranged. Data volume is
+# therefore constant along the coverage axis, and the gap between the arms
+# isolates fragmentation.
+#
+# Measured effect at 82% coverage, h=24 (Dhaka's own coverage level):
+#   contiguous   21,732 -> 16,400 usable training rows   (-25%, i.e. the volume lost)
+#   fragmented   21,732 ->  4,059 usable training rows   (-81%)
+# Same hours removed; four times the damage. Gap-aware windowing rejects almost
+# everything once contiguity is broken, which is the mechanism the paper argues
+# separates the model classes.
+# =============================================================================
+ablation:
+  gap_injection:
+    enabled: true
+    horizon_h: 24
+    # Written under paths.results. Named here rather than hardcoded because a
+    # second donor station runs this same experiment through this same script,
+    # and two configs writing to one output path is the defect this repository
+    # has hit most often -- here it would silently destroy the very experiment
+    # the second donor exists to replicate. scripts/14_make_donor_configs.py
+    # overrides this per donor.
+    output_name: ablation_gap_injection_wanliu_R72.json
+    # 0.99 is a no-op on this record (it already sits at 0.9894) and serves as
+    # the undegraded reference cell. 0.82 is Dhaka's measured coverage.
+    coverage_levels: [0.95, 0.90, 0.85, 0.82, 0.75]
+    arms: [fragmented, contiguous]
+    # Ten draws per cell. Three was enough to see the trend but not to test it:
+    # the analysis pairs each (coverage level, injection seed) across the two
+    # arms and runs a Wilcoxon signed-rank on the differences, so the number of
+    # seeds IS the sample size of the paper's central test. Five levels x 10
+    # seeds gives 50 matched pairs per family instead of 15.
+    injection_seeds: [42, 1337, 2024, 7, 31415, 101, 2718, 8191, 60613, 4096]
+    # Several blocks, not one. A single block large enough to remove 25% of a
+    # multi-year record would delete whole seasons, confounding fragmentation
+    # with seasonal composition -- the arms have to differ in contiguity ONLY.
+    contiguous_blocks: 8
+    # Hyperparameters come from the undegraded run, never re-tuned per cell.
+    # Equalise the OPTIMIZER-STEP budget across cells, not the epoch budget.
+    # Fragmentation shrinks the training set, so at a fixed 60 epochs a
+    # fragmented cell takes 16 steps/epoch where a contiguous one takes 65 --
+    # four times fewer gradient updates for the same nominal training. Part of
+    # the fragmented arm's degradation would then be undertraining rather than
+    # lost information, which is precisely the confound this experiment exists
+    # to avoid. Epochs, patience and the minimum-epoch floor are rescaled per
+    # cell so every cell receives ~target_optimizer_steps updates.
+    # 5100 = the undegraded reference cell's own budget (85 steps x 60 epochs).
+    target_optimizer_steps: 5100
+    max_epoch_scale: 8.0           # ceiling on the rescale, for pathological cells
+    tabular_models: [ridge, random_forest, xgboost, lightgbm]
+    # Filled in from the main sweep's validation-selected winners.
+    sequence_models:
+      - {name: gru, arch: gru, hidden_size: 64, num_layers: 2, window_h: 48}
+      - {name: lstm, arch: lstm, hidden_size: 64, num_layers: 1, window_h: 48}
+      - {name: dlinear, arch: dlinear, window_h: 48}
+    model_seeds: [42, 1337, 2024]
+
+# =============================================================================
+# GREEN AI
+# =============================================================================
+green:
+  complexity:
+    macs_backend: thop               # thop | ptflops
+    latency:
+      n_warmup: 100
+      n_runs: 1000                   # single-sample latency, mean over >=1000
+      batch_size: 1
+    measure_peak_gpu_memory: true
+  energy:
+    tracker: codecarbon
+    # CodeCarbon reports ESTIMATES, not metered values, and falls back to modelled
+    # numbers when Intel RAPL is unreadable (always the case on Windows without
+    # admin). This limitation is stated in RESULTS.md and the paper.
+    # Sampling interval. Individual sequence runs finish in tens of seconds, so a
+    # 15 s interval would capture barely one sample per run; 5 s gives usable
+    # resolution without meaningful overhead.
+    measure_power_secs: 5
+    log_level: warning
+    output_file: emissions.csv       # gitignored
+    country_iso_code: BGD
+  grid_carbon_intensity:
+    # Lifecycle carbon intensity of Bangladesh electricity generation, i.e.
+    # grams of CO2-EQUIVALENT per kilowatt-hour (not CO2 only).
+    value_gco2_per_kwh: 696.13
+    year: 2025
+    source_name: Ember (2026), with major processing by Our World in Data
+    source_url: https://ourworldindata.org/grapher/carbon-intensity-electricity
+    source_dataset: Ember, "Yearly Electricity Data"
+    source_note: >-
+      Retrieved 2026-08-01 from the Our World in Data machine-readable export of
+      the Ember Yearly Electricity Data series. Bangladesh values for recent
+      years: 2022 = 676.48, 2023 = 682.72, 2024 = 695.70, 2025 = 696.13
+      gCO2e/kWh. The 2025 figure is used as the most recent complete year.
+    _status: VERIFIED
+
+# =============================================================================
+# CITATIONS -- every externally-sourced constant is registered here.
+# Anything still PENDING_VERIFICATION blocks the number that depends on it.
+# =============================================================================
+citations:
+  season:
+    claim: >-
+      Bangladesh dry season is November-April and wet (rainy) season is
+      May-October.
+    quote: >-
+      "Wind patterns are completely opposite in dry season (November to April)
+      and wet season (May to October)"
+    source_name: >-
+      Department of Environment, Ministry of Environment, Forest and Climate
+      Change, Government of Bangladesh (2025). Ambient Air Quality in Bangladesh
+      (2018-2023), section 2.7 Meteorology of the Country, p. 13.
+    source_url: https://objectstorage.ap-dcc-gazipur-1.oraclecloud15.com/n/axvjbnqprylg/b/V2Ministry/o/office-doe/2024/12/014a6e225cf849098389d835538afdc9.pdf
+    _status: VERIFIED
+
+  aqi_breakpoints:
+    claim: >-
+      PM2.5 24-hour AQI category breakpoints are 0.0-9.0, 9.1-35.4, 35.5-55.4,
+      55.5-125.4, 125.5-225.4 and 225.5+ ug/m3, and Bangladesh applies the USEPA
+      AQI scale rather than a national concentration scale.
+    quote: >-
+      "The following equation (eq. 1) adopted by the United States Environment
+      Protection Agency (USEPA) is used to calculate the AQI in Bangladesh too."
+    source_name: >-
+      US EPA / AirNow, Technical Assistance Document for the Reporting of Daily
+      Air Quality -- the Air Quality Index (AQI), Table 6 (breakpoints; reflects
+      the 2024 PM2.5 AQI revision effective 2024-05-06). Bangladesh adoption of
+      the USEPA scale per DoE (2025), Ambient Air Quality in Bangladesh
+      (2018-2023), section 3.3 and Table 4, pp. 22-23.
+    source_url: https://document.airnow.gov/technical-assistance-document-for-the-reporting-of-daily-air-quailty.pdf
+    _status: VERIFIED
+
+  pm25_standard:
+    claim: >-
+      Bangladesh national ambient air quality standards for PM2.5 are 65 ug/m3
+      (24-hour) and 35 ug/m3 (annual), set by the Air Pollution (Control) Rules
+      2022. The 24-hour value is the operative short-term standard.
+    quote: >-
+      "The government of Bangladesh has revised the ambient air quality standards
+      in 2022, applicable for all over the country, vide the Air Pollution
+      (Control) Rules - 2022" (S.R.O 255 Law/2022)" -- Table 3: PM2.5, 35 ug/m3
+      annual; 65 ug/m3 24-hour.
+    source_name: >-
+      Department of Environment, Ministry of Environment, Forest and Climate
+      Change, Government of Bangladesh (2025). Ambient Air Quality in Bangladesh
+      (2018-2023), section 2.6, Table 3, p. 13, citing Air Pollution (Control)
+      Rules 2022 (S.R.O 255-Law/2022).
+    source_url: https://objectstorage.ap-dcc-gazipur-1.oraclecloud15.com/n/axvjbnqprylg/b/V2Ministry/o/office-doe/2024/12/014a6e225cf849098389d835538afdc9.pdf
+    _status: VERIFIED
+
+  grid_carbon_intensity:
+    claim: >-
+      Bangladesh lifecycle electricity carbon intensity was 696.13 gCO2e/kWh in
+      2025.
+    source_name: >-
+      Ember (2026), "Yearly Electricity Data", with major processing by Our World
+      in Data, "Lifecycle carbon intensity of electricity generation".
+    source_url: https://ourworldindata.org/grapher/carbon-intensity-electricity
+    _status: VERIFIED
+
+# =============================================================================
+# OUTPUT / FIGURES
+# =============================================================================
+output:
+  figures:
+    dpi: 300
+    formats: [png, pdf]
+    # Categorical series colours, assigned in THIS fixed order and never cycled.
+    #
+    # Derived from Okabe-Ito, then machine-validated for colourblind separation
+    # rather than assumed safe. The full 8-colour Okabe-Ito set fails on a light
+    # print surface: #F0E442 (yellow) sits outside the usable lightness band at
+    # L=0.902 with 1.29:1 contrast, #000000 has zero chroma and reads as ink
+    # rather than a series, and pink-adjacent-to-green gives a deuteranope
+    # separation of only dE 7.6. Dropping those two and reordering so that
+    # #56B4E9 neighbours #CC79A7 lifts the worst adjacent pair to dE 9.6
+    # (deuteranopia) and dE 20.0 (normal vision).
+    #
+    # Validation result (light surface, categorical):
+    #   lightness band     PASS  all 6 within L 0.43-0.77
+    #   chroma floor       PASS  all 6 >= 0.1
+    #   CVD separation     PASS  worst adjacent #56B4E9<->#CC79A7 dE 9.6 deutan
+    #   normal-vision      PASS  worst adjacent dE 20.0
+    #   contrast vs white  WARN  #E69F00 2.19, #56B4E9 2.25, #CC79A7 2.98
+    #
+    # The contrast WARN is relieved, not dismissed: every figure in this study
+    # ships with direct series labels and a matching results table in
+    # results/tables, so identity is never carried by colour alone.
+    palette: ["#0072B2", "#D55E00", "#009E73", "#E69F00", "#CC79A7", "#56B4E9"]
+    # Reserved, outside the categorical order:
+    observed_colour: "#222222"    # ground-truth series in predicted-vs-actual
+    reference_colour: "#767676"   # persistence / reference baseline, recessive
+    grid_colour: "#D9D9D9"        # recessive grid, never competes with marks
+    style: seaborn-v0_8-whitegrid
+    # Sized for the printed column, not the screen. Figures go into LaTeX at
+    # width=\linewidth with no rescaling, so 9 pt here is 9 pt on the page --
+    # one point under a 10 pt body, which is the convention. Scaling a figure in
+    # LaTeX is what makes legends unreadable at 100% zoom.
+    font_size: 9
+    # Column widths: 3.5 in single, 7.16 in double. These are the narrower of
+    # {Elsevier 90/190 mm, IEEE 3.5/7.16 in}, so one artefact fits either.
+    # src/viz/figures.py mirrors them as COL_SINGLE / COL_DOUBLE.
+    figsize_single: [3.5, 2.8]
+    figsize_wide: [7.16, 3.0]
+  tables:
+    formats: [csv, tex]
+    tex_style: booktabs
+    float_fmt: "%.3f"
+  report:
+    # Separate directory from the Dhaka run. Both configs previously wrote to
+    # reports/RESULTS.md, so running the comparison city overwrote the primary
+    # city's report -- silently, because the file is regenerated wholesale.
+    results_md: reports/beijing/RESULTS.md
+    data_audit_md: reports/beijing/DATA_AUDIT.md
+    abstract_facts_json: reports/beijing/abstract_facts.json
