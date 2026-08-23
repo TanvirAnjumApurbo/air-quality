@@ -28,7 +28,8 @@ CONFIG_B := config_beijing.yaml
 .PHONY: help env check discover data audit features test baselines deep \
         classify green eval figures stability report all lint fmt clean clean-results \
         beijing beijing-post cross-city tune ablation donor-configs donors \
-        replication donor-list everything
+        replication donor-list everything law frontier frontier-analysis \
+        lookback-configs lookback-list mediation
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -158,6 +159,28 @@ donors: donor-configs donor-list  ## Prep + gap injection for every replication 
 
 replication:  ## Cross-donor comparison only (requires `ablation` and `donors`)
 	$(PY) $(SCRIPTS)/18_donor_replication.py --config $(CONFIG_B)
+
+law:  ## Amplification law + availability audit (no training, seconds)
+	$(PY) $(SCRIPTS)/20_missingness_law.py --config $(CONFIG)
+
+# The only new target that trains. Three arms per lookback cap: the status quo,
+# the same rows with fewer features, and the recovered rows -- so the difference
+# decomposes into feature richness and supervision volume exactly.
+frontier:  ## Lookback frontier (TRAINS), then score it honestly
+	$(PY) $(SCRIPTS)/21_lookback_frontier.py --config $(CONFIG) --progress plain
+	$(PY) $(SCRIPTS)/22_availability_frontier.py --config $(CONFIG)
+
+frontier-analysis:  ## Score the frontier without refitting (requires `frontier`)
+	$(PY) $(SCRIPTS)/22_availability_frontier.py --config $(CONFIG)
+
+lookback-configs:  ## Generate config/lookback/*.yaml for the mediation grid
+	$(PY) $(SCRIPTS)/15_make_lookback_configs.py --base $(CONFIG_B)
+
+lookback-list:  ## Print the radius configs that would run, verify nothing
+	$(PY) $(SCRIPTS)/15_make_lookback_configs.py --base $(CONFIG_B) --check
+
+mediation:  ## Does the arm gap shrink with the radius (requires the radius grids)
+	$(PY) $(SCRIPTS)/23_mediation.py --config $(CONFIG_B)
 
 cross-city:  ## Rank-transfer comparison (requires `all` and `beijing` first)
 	$(PY) $(SCRIPTS)/13_cross_city.py --config $(CONFIG) --config-b $(CONFIG_B)

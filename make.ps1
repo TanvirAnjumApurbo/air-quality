@@ -94,6 +94,12 @@ Targets:
   donor-list  Print the donor slugs parsed from donors.yaml
   donors      Replication donors: prep + gap injection for each (needs 'beijing')
   replication Cross-donor comparison only (needs 'ablation' and 'donors')
+  law         Amplification law + availability audit (no training, seconds)
+  frontier    Lookback frontier: refits tier 2 and tier 3 per arm (TRAINS)
+  frontier-analysis  Score the frontier honestly (needs 'frontier')
+  lookback-configs   Generate config/lookback/*.yaml for the mediation grid
+  lookback-list      Print the radius configs that would run
+  mediation   Does the arm gap shrink with the radius (needs the radius grids)
   everything  all + beijing + cross-city + ablation + report
   lint        ruff check + format check
   clean       Remove caches and checkpoints (keeps raw data)
@@ -188,6 +194,30 @@ Targets:
     }
     'replication' {
         Invoke-Step '18_donor_replication.py' $commonB
+    }
+    'law' {
+        # Free: reads the donor grids and the built records already on disk.
+        Invoke-Step '20_missingness_law.py' ($common + $Rest)
+    }
+    'frontier' {
+        # The only new target that trains. Tier 2 is minutes; tier 3 depends on
+        # how many distinct sterilisation radii the windows reach.
+        Invoke-Step '21_lookback_frontier.py' ($common + @('--progress', 'plain') + $Rest)
+        Invoke-Step '22_availability_frontier.py' $common
+    }
+    'frontier-analysis' {
+        Invoke-Step '22_availability_frontier.py' ($common + $Rest)
+    }
+    'lookback-configs' {
+        Invoke-Step '15_make_lookback_configs.py' (@('--base', $CfgB) + $Rest)
+    }
+    'lookback-list' {
+        # Mirrors donor-list: a foreach over an empty list is silent, and this
+        # target once reported success having trained nothing.
+        Invoke-Step '15_make_lookback_configs.py' @('--base', $CfgB, '--check')
+    }
+    'mediation' {
+        Invoke-Step '23_mediation.py' ($commonB + $Rest)
     }
     'tune'      { Invoke-Step '06_train_sequence.py' ($common + @('--tune', '--progress', 'plain') + $Rest) }
     'ablation' {

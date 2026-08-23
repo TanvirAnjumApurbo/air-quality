@@ -29,6 +29,10 @@ dependencies installed and fails at `import pandas`.
 .\make.ps1 replication     # cross-donor comparison only (needs `ablation` + `donors`)
 .\make.ps1 stability       # tier-3 selection stability; reads existing runs, no refit
 .\make.ps1 everything      # all + beijing + cross-city + ablation + report
+.\make.ps1 law             # amplification law + availability audit; free, seconds
+.\make.ps1 frontier        # lookback frontier; TRAINS, then scores it
+.\make.ps1 lookback-configs # generate config/lookback/*.yaml
+.\make.ps1 mediation       # arm gap against radius (needs the radius grids)
 ```
 
 `stability` (19) must precede `report` (11), which renders its subsection; `all`
@@ -138,8 +142,27 @@ cheapest way to kill a wrong claim — and it is **not** evidence of generality.
 Never describe it as a multi-city panel. `donors.yaml` says this too; keep both.
 
 `src/eval/ablation.py` holds the shared paired-test code (`paired_arm_gaps`,
-`test_arm_gaps`, the family map) so `17` and `18` cannot compute the arm gap two
-different ways and make a disagreement between donors look real.
+`test_arm_gaps`, `family_contrasts`, `dose_response`, `resume_identity_problem`,
+the family map) so `17` and `18` cannot compute the arm gap two different ways and
+make a disagreement between donors look real.
+
+**The family formerly called `naive` is `climatological`, and it was never a
+control.** `paired_arm_gaps` picks each family's representative by highest skill on
+the reference cell; persistence scores identically zero there by construction, so
+climatology always wins the slot — and climatology is fitted on the *degraded*
+training split. There is no useful no-training-data control for skill in this
+design: because the test period is never degraded, any model reading nothing from
+training has an arm gap of exactly zero in every cell, so it cannot vary and
+cannot falsify anything. `17` asserts that invariance by equality instead, which
+is stronger than a test that can only fail to reject.
+
+**Significance on every donor is not a contrast between families.** The
+replication rule tests each family against its own null; the claim that the
+sequence tier is the family fragmentation hurts *most* is a comparison, and
+`family_contrasts` is the test of it — differencing families within matched
+(coverage, seed, donor) triples, as an intersection-union test because the claim
+is a conjunction. It does not currently reject: the sequence tier separates from
+`linear` and `climatological` but not from `trees`.
 
 ### Data flow
 
@@ -152,10 +175,16 @@ different ways and make a disagreement between donors look real.
 10, 11             -> results/figures, results/tables, reports/
 13_cross_city      -> results.json cross_city{}      (must run before the final report)
 14_make_donor_cfgs -> config/donors/*.yaml           (from donors.yaml)
+15_make_lookback   -> config/lookback/*.yaml        (one per sterilisation radius)
 16_gap_injection   -> results/ablation_gap_injection*.json  cells{}   (one per donor)
 17_ablation_analys -> same file, analysis{}          (ALWAYS re-run after 16)
 18_donor_replicat  -> results/donor_replication.json (needs >=2 donor grids)
 19_selection_stab  -> results.json selection_stability[]  (before 11; §3 renders it)
+20_missingness_law -> results/missingness_law.json  FREE, no training
+21_lookback_front  -> results.json runs[] tagged experiment=lookback_frontier
+                      + results/lookback_frontier{,_predictions}.{json,npz}   TRAINS
+22_availability    -> results/availability_frontier.json  (needs 21)
+23_mediation       -> results/mediation_<slug>.json  (needs >=2 radius grids)
 ```
 
 `features.parquet` is the handoff. It carries every predictor, a `split` column, and
@@ -204,6 +233,79 @@ degraded matrix through the *same* code as `04_build_features.py`. The boundary 
 and per-horizon validity masks are where the leakage rules live; a second copy would
 be a second definition of a usable row. The extraction was verified to reproduce the
 existing `features.parquet`, `scaler.json` and `features_meta.json` byte for byte.
+
+### The lookback cap sets the supervision floor, and they can be decoupled
+
+`features.lookback_h` caps the backward reach of every engineered history
+feature; `features.history_floor_h` sets how much unbroken history a row must
+carry to be scored. Both are `null` by default, and with both null the build is
+**bit-identical** to what it was before they existed — every `valid_h{h}` mask
+elementwise equal, every numeric column unchanged. Keep it that way: the null
+path is the headline pipeline.
+
+They are normally the same number, because a row cannot support a feature that
+reaches further back than its own history. Setting the floor *above* the cap
+decouples them, which is the identical-row-count control arm of the frontier —
+the same device the ablation uses when it holds the removed hour count constant.
+Setting it *below* raises, and must keep raising: the deepest lag would be
+NaN-because-outside-the-run, and `get_split_arrays` replaces NaN with 0.0 **after**
+scaling, i.e. with the training mean, with no warning. The negative control
+`test_control_short_floor_feeds_the_train_mean_to_the_model` demonstrates the
+harm the guard prevents.
+
+`capped_lookbacks` is the single place the cap is applied. Four readers —
+`add_target_history`, `add_met_history`, `derived_history_columns` and
+`max_backward_dependency` — consume the same four config lists, and applying the
+cap in some but not others would make the built columns disagree with the names
+generated to exclude them from the sequence channels. That is exactly the drift
+`derived_history_columns` exists to prevent.
+
+**A cap does not change the sequence tier's input by one channel.**
+`sequence_channel_columns` already excludes every derived-history column, so for
+tier 3 the cap moves only the validity floor. Tier-3 runs are a function of the
+**sterilisation radius**
+
+```text
+R = max(lookback_h, window_h - 1) + horizon_h
+```
+
+and nothing else, so configurations sharing a radius share a run. This also means
+a naive lookback sweep is a trap: at the ablation's 48-hour window, caps of 48, 24
+and 12 all collapse onto the same experiment.
+
+**Two radii that share a window will resume each other's checkpoints unless the
+cell tree is separated.** `train_one` resumes by `(run_tag, run_id)` and `run_id`
+encodes the window but not the lookback, while the cell directory derives from
+`paths.data_interim`. `16_gap_injection.py` therefore puts a capped run under
+`ablation_R{radius}` and leaves an uncapped run on the historical `ablation` path
+so existing grids still resume. Removing that would let the shorter radius
+continue from the longer one's weights, silently.
+
+### Availability is a first-class metric, and RMSE across arms is not comparable
+
+`src/eval/availability.py` defines the **fixed evaluation universe**: scoreable at
+all, in the split, purged at `UNIVERSE_FLOOR_H` (168 h, the deepest floor in the
+sweep) so every arm's served set is a subset of one common set. A model that
+declines the hard hours will always look good on the hours it accepts, so
+`rmse_served` must never be compared between configurations with different
+availability. The two comparisons that *are* valid, both produced by
+`22_availability_frontier.py`, are the common subset and `all_hours_skill`.
+
+`all_hours_skill` scores a fallback cascade over the universe and **raises** if the
+chain is not ordered by declared history requirement. A chain is a selection, and
+ordering it by test error is rule 6 one level up. It also raises if the reference
+is undefined anywhere in the universe: persistence is the denominator precisely
+because it needs no history and is therefore defined everywhere, and a denominator
+that moved with the arm would not be a denominator.
+
+### Side experiments write into `results.json` and must not reach the headline
+
+The frontier writes runs into the city's own `results.json`, tagged
+`experiment: "lookback_frontier"` with a lookback-tagged variant. Variant tagging
+prevents a collision; it does **not** prevent `_best_per_horizon` from *selecting*
+one of those runs as the headline model. `src/results.py::main_runs` is the
+chokepoint every consumer of `runs[]` goes through, and a test greps the repo for
+survivors. Nine call sites is nine places to forget.
 
 ### Tier vocabulary
 
