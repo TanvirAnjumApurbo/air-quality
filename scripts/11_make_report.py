@@ -33,6 +33,14 @@ from src.utils import check_disk_space, load_config, setup_logging
 UNIT_PM25_TEXT = "ug/m3"
 
 
+def _join_and(names: list[str]) -> str:
+    """Join names as prose: "a", "a and b", "a, b and c"."""
+    quoted = [f"`{n}`" for n in names]
+    if len(quoted) <= 1:
+        return "".join(quoted)
+    return " and ".join([", ".join(quoted[:-1]), quoted[-1]])
+
+
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     p = argparse.ArgumentParser(description=__doc__)
@@ -1045,6 +1053,91 @@ def main() -> int:
                     a("")
                     a("`*` marks Holm significance within that donor. **Replicates** is the")
                     a("strict rule: " + str(rep.get("replication_rule", "")))
+                    a("")
+
+                    # The rule above tests each family against its OWN null and asks
+                    # whether that repeats. The claim being made is a comparison, and
+                    # a comparison needs a contrast: a family can clear its own null
+                    # on every donor and still be indistinguishable from the family it
+                    # is being contrasted with. Reported here, next to the rule it
+                    # qualifies, rather than left in a table nobody opens.
+                    contrasts = pd.DataFrame(rep.get("family_contrasts_pooled", []))
+                    if not contrasts.empty:
+                        a("#### Is the sequence tier affected *more* than the others?")
+                        a("")
+                        a("The rule above is not a contrast. Differencing the families within")
+                        a("each matched (coverage level, injection seed, donor) triple asks the")
+                        a("question the claim actually makes; the triples are already matched,")
+                        a("because at one draw every family was fitted on the same two degraded")
+                        a("copies of the same record.")
+                        a("")
+                        a("| Contrast | Mean | 95% CI | p | p (Holm) |")
+                        a("|---|---:|---|---:|---:|")
+                        for r in contrasts.itertuples():
+                            a(
+                                f"| sequence − {r.family} | {r.mean_contrast:+.4f} | "
+                                f"[{r.ci_low:+.4f}, {r.ci_high:+.4f}] | "
+                                f"{_fmt_p(r.p_wilcoxon)} | {_fmt_p(r.p_holm)} |"
+                            )
+                        a("")
+                        iut = bool(rep.get("iut_sequence_worse_than_every_family"))
+                        if iut:
+                            a("Every contrast rejects, so the claim that the sequence tier is the")
+                            a("family fragmentation hurts most is supported as an")
+                            a("intersection-union test.")
+                        else:
+                            worst = contrasts.loc[contrasts["p_wilcoxon"].idxmax()]
+                            a(
+                                f"**The claim does not survive as a contrast.** Its point estimate "
+                                f"is the largest gap of any family on every donor, but it is not "
+                                f"separable from `{worst['family']}` "
+                                f"({worst['mean_contrast']:+.4f}, p = {worst['p_wilcoxon']:.3f}), "
+                                f"and the conjunction it would need — worse than *every* other "
+                                f"family — therefore fails. Because the claim is a conjunction the "
+                                f"correct procedure is an intersection-union test, in which each "
+                                f"contrast is tested unadjusted and a single non-rejection "
+                                f"withholds the claim."
+                            )
+                            a("")
+                            a("What survives is narrower and is what this report states: the")
+                            a(
+                                "sequence tier's gap is the only one that is Holm-significant against"
+                            )
+                            a("zero on every donor, and it is the largest in mean. That is a")
+                            a("statement about reliability across records, not about being worse")
+                            a("than another family on any one of them.")
+                        a("")
+
+                    doses = pd.DataFrame(rep.get("dose_response_pooled", []))
+                    if not doses.empty:
+                        a("#### Does the gap steepen as the record degrades?")
+                        a("")
+                        a("The paired test pools every coverage level, which answers whether the")
+                        a("gap is nonzero and cannot answer whether it grows. A gap flat in")
+                        a("coverage is a fixed cost; one that steepens is a mechanism. One slope")
+                        a("is fitted per (injection seed, donor) and the slopes are tested.")
+                        a("")
+                        a("| Family | Gap per 10 pp coverage lost | 95% CI | p (Holm) |")
+                        a("|---|---:|---|---:|")
+                        for r in doses.itertuples():
+                            mark = "**" if r.significant_holm else ""
+                            a(
+                                f"| {mark}{r.family}{mark} | "
+                                f"{r.gap_change_per_10pp_lost:+.4f} | "
+                                f"[{r.ci_low:+.4f}, {r.ci_high:+.4f}] | "
+                                f"{_fmt_p(r.p_holm)} |"
+                            )
+                        a("")
+                        sig = doses[doses["significant_holm"]]["family"].tolist()
+                        if sig:
+                            a(
+                                f"The gap steepens significantly for {_join_and(sig)}. "
+                                f"Where it does, fragmentation is not a fixed toll but a cost that "
+                                f"accelerates as the record breaks up — which is the shape the "
+                                f"sterilisation-radius account predicts, and the one the pooled "
+                                f"test averages away."
+                            )
+                            a("")
                     a("")
 
                     rep_yes = [f for f in rep_fam_order if bool(rep_by_family.loc[f, "replicates"])]

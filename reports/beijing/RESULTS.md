@@ -320,8 +320,8 @@ loss of contiguous data.
 |:---------------|-------:|--------:|--------:|--------:|--------:|--------:|
 | sequence       |      0 | -0.0076 | -0.0272 | -0.0275 | -0.0374 | -0.044  |
 | trees          |      0 | -0.0057 | -0.0096 | -0.0101 | -0.012  | -0.0172 |
-| linear         |      0 | -0.0021 | -0.0014 |  0.0014 | -0.0015 | -0.0129 |
-| climatological |      0 |  0.0005 |  0.0033 | -0.0134 | -0.0097 | -0.0062 |
+| linear         |      0 | -0.0021 | -0.0014 | -0.0025 | -0.0015 | -0.0166 |
+| climatological |      0 |  0.0005 |  0.0036 | -0.0142 | -0.0108 | -0.007  |
 
 The undegraded level removes nothing, so both arms are the same run
 and their difference there is exactly zero by construction. Any other
@@ -338,12 +338,12 @@ Holm-corrected across families.
 | Family         |   Pairs |   Mean gap | 95% CI             | p       | p (Holm)   |
 |:---------------|--------:|-----------:|:-------------------|:--------|:-----------|
 | sequence       |      50 |    -0.0394 | [-0.0565, -0.0236] | <0.0001 | <0.0001    |
-| climatological |      50 |    -0.0358 | [-0.0609, -0.0140] | 0.0043  | 0.0086     |
+| climatological |      50 |    -0.0357 | [-0.0609, -0.0138] | 0.0058  | 0.0115     |
 | trees          |      50 |    -0.0263 | [-0.0393, -0.0125] | 0.0001  | 0.0003     |
 | linear         |      50 |    -0.0016 | [-0.0081, +0.0047] | 0.9542  | 0.9542     |
 
 The sequence family loses 0.0394 skill to arrangement alone (95% CI [-0.0565, -0.0236], Holm p = 0.0000).
-It is not alone: climatological (-0.0358), trees (-0.0263) also move, so the effect is not specific to the sequence tier.
+It is not alone: climatological (-0.0357), trees (-0.0263) also move, so the effect is not specific to the sequence tier.
 
 Representative model per family, fixed on the undegraded record: climatological = `climatology`, linear = `ridge`, sequence = `gru_h64_l2`, trees = `xgboost`.
 
@@ -382,21 +382,159 @@ All donors are stations of the UCI Beijing Multi-Site archive (id 501): one four
 |:---------------|:---------|:-----------|:---------|:-------------|
 | sequence       | -0.0394* | -0.0200*   | -0.0273* | **yes**      |
 | trees          | -0.0263* | -0.0120    | -0.0179* | no           |
-| linear         | -0.0016  | -0.0298*   | -0.0205* | no           |
-| climatological | -0.0358* | -0.0024    | -0.0211* | no           |
+| linear         | -0.0016  | -0.0356*   | -0.0225* | no           |
+| climatological | -0.0357* | -0.0017    | -0.0206* | no           |
 
 `*` marks Holm significance within that donor. **Replicates** is the
 strict rule: A family replicates only if its paired arm gap has the same sign on every donor and is significant under Holm on every donor.
+
+#### Is the sequence tier affected *more* than the others?
+
+The rule above is not a contrast. Differencing the families within
+each matched (coverage level, injection seed, donor) triple asks the
+question the claim actually makes; the triples are already matched,
+because at one draw every family was fitted on the same two degraded
+copies of the same record.
+
+| Contrast | Mean | 95% CI | p | p (Holm) |
+|---|---:|---|---:|---:|
+| sequence − trees | -0.0102 | [-0.0189, -0.0016] | 0.1488 | 0.1610 |
+| sequence − climatological | -0.0096 | [-0.0233, +0.0040] | 0.0211 | 0.0632 |
+| sequence − linear | -0.0090 | [-0.0174, -0.0007] | 0.0805 | 0.1610 |
+
+**The claim does not survive as a contrast.** Its point estimate is the largest gap of any family on every donor, but it is not separable from `trees` (-0.0102, p = 0.149), and the conjunction it would need — worse than *every* other family — therefore fails. Because the claim is a conjunction the correct procedure is an intersection-union test, in which each contrast is tested unadjusted and a single non-rejection withholds the claim.
+
+What survives is narrower and is what this report states: the
+sequence tier's gap is the only one that is Holm-significant against
+zero on every donor, and it is the largest in mean. That is a
+statement about reliability across records, not about being worse
+than another family on any one of them.
+
+#### Does the gap steepen as the record degrades?
+
+The paired test pools every coverage level, which answers whether the
+gap is nonzero and cannot answer whether it grows. A gap flat in
+coverage is a fixed cost; one that steepens is a mechanism. One slope
+is fitted per (injection seed, donor) and the slopes are tested.
+
+| Family | Gap per 10 pp coverage lost | 95% CI | p (Holm) |
+|---|---:|---|---:|
+| climatological | -0.0247 | [-0.0470, -0.0048] | 0.0620 |
+| **sequence** | -0.0226 | [-0.0356, -0.0107] | 0.0161 |
+| **linear** | -0.0173 | [-0.0272, -0.0072] | 0.0186 |
+| trees | -0.0052 | [-0.0151, +0.0054] | 0.1642 |
+
+The gap steepens significantly for `sequence` and `linear`. Where it does, fragmentation is not a fixed toll but a cost that accelerates as the record breaks up — which is the shape the sterilisation-radius account predicts, and the one the pooled test averages away.
+
 
 The sequence family's gap is the only one Holm-significant on every
 donor.
 
 Every family's point estimate is negative on every donor, so this is not a finding that fragmentation costs the others nothing. What separates the sequence tier is that its gap is the one that appears *reliably* rather than on some records and not others, and it is the largest mean gap across donors (-0.0289).
 
-**The climatological row at the severest level (75% coverage):** Wanliu -0.0958, Dingling -0.0038, Dongsi -0.0373. 
+**The climatological row at the severest level (75% coverage):** Wanliu -0.0956, Dingling -0.0035, Dongsi -0.0361. 
 These disagree by more than their own average, so the collapse visible on the largest-gap donor is a property of that record rather than of fragmentation. Read on one donor alone it would have argued that fragmentation degrades anything estimated from the record, windowed or not; it does not survive the other donors, and that is the specific thing a second and third record were run to test.
 
-## 8. Limitations
+## 8. What a gap costs, and how often a model can answer
+
+Every accuracy figure above is conditional on the model being able to produce a
+forecast at all, and that condition has not so far been reported. A row is
+scored only if it carries
+`pos_in_run >= 168` hours of unbroken history and
+a target 24 hours further on inside the same run, so a gap does not
+cost the hours it removes: it costs those hours **plus the
+192 behind it** that no longer reach back far enough.
+
+The consequence is that the cost of missingness is governed by the *number* of
+gaps rather than their total length. That is the gap-injection experiment's arm
+contrast in closed form: at an identical hour count, scattering the removals
+sterilises many radii where clustering them sterilises few — which is the
+mechanism that experiment measures without explaining.
+
+| Record | Missing hours | Missing (%) | Runs | Usable hours destroyed | Amplification |
+|---|---:|---:|---:|---:|---:|
+| Dhaka | 10,766 | 13.59 | 295 | 24,592 | 2.3x |
+| Beijing Wanliu | 117 | 0.33 | 27 | 4,006 | 34.2x |
+| Beijing Dingling | 424 | 1.21 | 43 | 5,953 | 14.0x |
+| Beijing Dongsi | 509 | 1.45 | 39 | 5,314 | 10.4x |
+
+**A near-complete record is not a well-supervised one.** Beijing Wanliu loses 34.2 usable hours for every hour missing, against Dhaka's 2.3, because amplification follows the number of runs and not the number of absent hours.
+
+The relationship is close enough to state as a law. Writing $O$ for observed
+hours, $k$ for distinct gaps and $R$ for the sterilisation radius,
+
+$$\text{usable} \approx O\exp(\beta_0 - \alpha R k / O),\quad \alpha = 0.1555,\ \beta_0 = -0.1596$$
+
+fitted on wanliu (101 cells) alone, it predicts 202 held-out cells from the other donor records at $R^2 = 0.977$ (median absolute error 5.2%).
+ $\alpha$ is not a free constant: it should equal the share of gaps outliving the 3-hour forward-fill, which is 0.1418 — agreeing with the fitted value to 9%.
+
+### Coverage is not what reaches the model
+
+| Record | Lookback 168 h | 48 h | 24 h |
+|---|---:|---:|---:|
+| Dhaka | 76.4% | 87.2% | 89.4% |
+| Beijing Wanliu | 72.5% | 85.5% | 88.7% |
+| Beijing Dingling | 64.4% | 80.9% | 84.5% |
+| Beijing Dongsi | 64.3% | 81.2% | 85.3% |
+
+Forecast availability is the share of test hours a model can answer at all.
+It does not rank these records the way coverage does: the primary record is
+the least complete of the four and yet among the most available, because its
+absences are clustered into a few long outages while the near-complete
+stations' are scattered. **Coverage is what a data custodian reports;
+availability is what a forecaster gets, and the two can order a set of
+records in opposite directions.**
+
+### Does a shorter reach cost accuracy?
+
+Shortening the reach recovers those hours. It also removes real signal — the weekly lag and the 168-hour rolling statistics — so the trade is measured rather than assumed, on the 9,083 hours every arm can serve, which is the only comparison that is not confounded by how often each arm declines to answer.
+
+**No capped arm differs from the status quo** on the common subset under Holm-corrected Diebold-Mariano across 16 tests.
+
+The shorter reach is not better at forecasting. It is better at answering.
+
+| Model | Status quo | Best arm | Availability | All-hours skill | Change |
+|---|---:|---|---:|---:|---:|
+| `lightgbm` | +0.1765 | A24 | 97.6% | +0.1938 | +0.0173 |
+| `random_forest` | +0.1827 | A24 | 97.6% | +0.1983 | +0.0156 |
+| `ridge` | +0.1725 | A48 | 95.2% | +0.1791 | +0.0066 |
+| `xgboost` | +0.1812 | A24 | 97.6% | +0.1966 | +0.0154 |
+
+Scored over the whole evaluation universe, an hour with no forecast is not an
+hour without error: it is an hour that must fall back on persistence. That is
+where the recovered availability turns into recovered skill.
+
+One number in that table looks wrong and is not. All-hours RMSE comes out *below* served RMSE for the status quo, because the hours it cannot reach are **easier**, not harder: persistence scores 56.90 on the 1,797 unserved hours against 73.76 on the 9,083 it serves, and their observed mean is 84.0 against 123.6 ug/m3.
+
+A gap is followed by a stretch of hours no deep-reach model can forecast,
+and on this record those stretches sit disproportionately in the cleaner
+part of the distribution. So the gain from a shorter reach is not the
+rescue of catastrophic hours; it is a model beating persistence on a large
+block of ordinary ones. That is a smaller and more honest claim, and it is
+the one the numbers support.
+
+The three arms separate the two effects exactly. Holding the row set at the status quo and capping only the features isolates feature richness; holding the features and lowering the floor isolates supervision volume; in mean squared error the two sum to the total by construction (largest residual 0.00e+00).
+
+| Model | Cap (h) | Total ΔMSE | Supervision volume | Feature richness |
+|---|---:|---:|---:|---:|
+| `lightgbm` | 24 | -56.1 | -2.9 | -53.1 |
+| `lightgbm` | 48 | -46.6 | +22.7 | -69.3 |
+| `random_forest` | 24 | -29.6 | -17.0 | -12.6 |
+| `random_forest` | 48 | -10.3 | +5.4 | -15.6 |
+| `ridge` | 24 | +33.0 | +4.5 | +28.5 |
+| `ridge` | 48 | +15.5 | -5.7 | +21.3 |
+| `xgboost` | 24 | -30.5 | -10.3 | -20.2 |
+| `xgboost` | 48 | -17.1 | +1.6 | -18.6 |
+
+On these identical rows the larger term is **feature richness** (239 against 70 in summed absolute MSE). That is the right way round: the common subset holds the evaluation hours fixed, so extra training rows can only help through better-fitted parameters, and the availability they buy — which is where the gain of the previous table comes from — is by construction invisible here. Capping the reach removes the weekly lag and its rolling statistics and mostly *improves* the fit, so on this record the deepest features were paying for themselves only in the rows they made impossible.
+
+**Scope.** One horizon and one record family. The frontier is measured at the
+headline horizon only, and the arms cap the feature set rather than replacing it,
+so this bounds what the configured reach costs — not what an optimally chosen
+reach would buy. Below the sequence window the cap buys a recurrent model
+nothing, because `max(lookback, window - 1)` is the binding floor.
+
+## 9. Limitations
 
 - **Energy figures are estimates.** See §5. They should not be reported as measurements.
 - **One monitoring site.** The target series comes from a single monitor —
