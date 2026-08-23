@@ -216,7 +216,15 @@ def main() -> int:
     base_processed = cfg.raw["paths"]["data_processed"]
     base_checkpoints = cfg.raw["paths"]["checkpoints"]
     base_tables = cfg.raw["paths"]["tables"]
+    # Checkpoints live under the cell directory and train_one resumes them by
+    # (run_tag, run_id) -- and run_id encodes the WINDOW but not the lookback. Two
+    # radii that share a window would therefore resume each other's weights,
+    # silently, which would bias the mediation toward whichever ran first. So a
+    # capped run gets its own tree. An uncapped run keeps the historical path so
+    # the grids already on disk still resume.
     cell_root = Path(cfg.get("paths.data_interim")) / "ablation"
+    if cfg.get("features.lookback_h", None) is not None:
+        cell_root = cell_root.parent / f"ablation_R{this_radius}"
 
     started_all = time.perf_counter()
     for n, (arm, coverage, inj_seed) in enumerate(grid, start=1):

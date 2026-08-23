@@ -45,10 +45,12 @@ from src.config_edit import replace_scalar, section_span, verify_overrides
 
 #: (lookback_h, window_h) pairs and the radius each produces at h=24.
 #:
-#: 192 is the status quo and is generated so the mediation compares like with
-#: like -- the same script, the same output-name convention, the same resume
-#: semantics -- rather than comparing a generated grid against the hand-run one.
-RADII: tuple[tuple[int, int], ...] = ((168, 48), (48, 48), (24, 24))
+#: The status quo radius is deliberately absent. The base grid already IS that
+#: radius, so generating a config for it would retrain 101 cells to reproduce a
+#: file on disk -- and worse, under a capped config it would land in a separate
+#: checkpoint tree and lose the resume. 23_mediation.py reads the base grid as
+#: the deepest radius instead.
+RADII: tuple[tuple[int, int], ...] = ((48, 48), (24, 24))
 
 
 def parse_args() -> argparse.Namespace:

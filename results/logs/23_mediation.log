@@ -1,0 +1,2 @@
+13:04:12 | ERROR   | 23_mediation | need at least 2 radius grids for wanliu, found 0. Generate them with 15_make_lookback_configs.py and run 16 against each.
+13:05:53 | ERROR   | 23_mediation | need at least 2 radius grids for wanliu, found 1. Generate them with 15_make_lookback_configs.py and run 16 against each.
