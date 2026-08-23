@@ -1,0 +1,13 @@
+\begin{table}[htbp]
+\caption{Sequence-family arm gap MINUS each other family's, differenced within the same (coverage level, injection seed, donor) triple and pooled across donors. The replication rule above asks whether a family clears its OWN null on every donor; it cannot show that one family is affected more than another, which is the comparison the headline claim makes. Rejection of that claim requires every row to reject (intersection-union), so a single non-rejecting row withholds it. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:donor_family_contrasts}
+\begin{tabular}{lrrrrrr}
+\toprule
+Family & Triples & Mean contrast & Median & 95\% CI & p (Wilcoxon) & p (Holm) \\
+\midrule
+linear & 150 & -0.012 & -0.008 & [-0.0202, -0.0036] & 0.0110 & 0.0331 \\
+trees & 150 & -0.010 & -0.003 & [-0.0189, -0.0016] & 0.1488 & 0.1488 \\
+climatological & 150 & -0.009 & -0.009 & [-0.0229, +0.0045] & 0.0228 & 0.0456 \\
+\bottomrule
+\end{tabular}
+\end{table}

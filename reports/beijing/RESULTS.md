@@ -316,12 +316,12 @@ difference is the effect of *arrangement* with volume held constant.
 Negative means fragmentation costs that family more than the equivalent
 loss of contiguous data.
 
-| family   |   100% |     95% |     90% |     85% |     82% |     75% |
-|:---------|-------:|--------:|--------:|--------:|--------:|--------:|
-| sequence |      0 | -0.0076 | -0.0272 | -0.0275 | -0.0374 | -0.044  |
-| trees    |      0 | -0.0057 | -0.0096 | -0.0101 | -0.012  | -0.0172 |
-| linear   |      0 | -0.0021 | -0.0014 |  0.0014 | -0.0015 | -0.0129 |
-| naive    |      0 |  0.0005 |  0.0033 | -0.0134 | -0.0097 | -0.0062 |
+| family         |   100% |     95% |     90% |     85% |     82% |     75% |
+|:---------------|-------:|--------:|--------:|--------:|--------:|--------:|
+| sequence       |      0 | -0.0076 | -0.0272 | -0.0275 | -0.0374 | -0.044  |
+| trees          |      0 | -0.0057 | -0.0096 | -0.0101 | -0.012  | -0.0172 |
+| linear         |      0 | -0.0021 | -0.0014 |  0.0014 | -0.0015 | -0.0129 |
+| climatological |      0 |  0.0005 |  0.0033 | -0.0134 | -0.0097 | -0.0062 |
 
 The undegraded level removes nothing, so both arms are the same run
 and their difference there is exactly zero by construction. Any other
@@ -335,32 +335,32 @@ family is fixed on the undegraded record and never re-chosen per arm,
 so the difference cannot absorb a change of model. Wilcoxon signed-rank,
 Holm-corrected across families.
 
-| Family   |   Pairs |   Mean gap | 95% CI             | p       | p (Holm)   |
-|:---------|--------:|-----------:|:-------------------|:--------|:-----------|
-| sequence |      50 |    -0.0394 | [-0.0565, -0.0236] | <0.0001 | <0.0001    |
-| naive    |      50 |    -0.0358 | [-0.0609, -0.0140] | 0.0043  | 0.0086     |
-| trees    |      50 |    -0.0263 | [-0.0393, -0.0125] | 0.0001  | 0.0003     |
-| linear   |      50 |    -0.0016 | [-0.0081, +0.0047] | 0.9542  | 0.9542     |
+| Family         |   Pairs |   Mean gap | 95% CI             | p       | p (Holm)   |
+|:---------------|--------:|-----------:|:-------------------|:--------|:-----------|
+| sequence       |      50 |    -0.0394 | [-0.0565, -0.0236] | <0.0001 | <0.0001    |
+| climatological |      50 |    -0.0358 | [-0.0609, -0.0140] | 0.0043  | 0.0086     |
+| trees          |      50 |    -0.0263 | [-0.0393, -0.0125] | 0.0001  | 0.0003     |
+| linear         |      50 |    -0.0016 | [-0.0081, +0.0047] | 0.9542  | 0.9542     |
 
 The sequence family loses 0.0394 skill to arrangement alone (95% CI [-0.0565, -0.0236], Holm p = 0.0000).
-It is not alone: naive (-0.0358), trees (-0.0263) also move, so the effect is not specific to the sequence tier.
+It is not alone: climatological (-0.0358), trees (-0.0263) also move, so the effect is not specific to the sequence tier.
 
-Representative model per family, fixed on the undegraded record: linear = `ridge`, naive = `climatology`, sequence = `gru_h64_l2`, trees = `xgboost`.
+Representative model per family, fixed on the undegraded record: climatological = `climatology`, linear = `ridge`, sequence = `gru_h64_l2`, trees = `xgboost`.
 
 Family rank within each cell (1 = best skill). The sequence row is
 the result: it moves under fragmented removal and does not move under
 contiguous removal of the same number of hours.
 
-| arm / family          |   100% |   95% |   90% |   85% |   82% |   75% |
-|:----------------------|-------:|------:|------:|------:|------:|------:|
-| fragmented / sequence |      1 |     1 |     1 |     2 |     2 |     2 |
-| fragmented / trees    |      3 |     3 |     3 |     3 |     3 |     3 |
-| fragmented / linear   |      2 |     2 |     2 |     1 |     1 |     1 |
-| fragmented / naive    |      4 |     4 |     4 |     4 |     4 |     4 |
-| contiguous / sequence |      1 |     1 |     1 |     1 |     1 |     1 |
-| contiguous / trees    |      3 |     3 |     3 |     3 |     3 |     3 |
-| contiguous / linear   |      2 |     2 |     2 |     2 |     2 |     2 |
-| contiguous / naive    |      4 |     4 |     4 |     4 |     4 |     4 |
+| arm / family                |   100% |   95% |   90% |   85% |   82% |   75% |
+|:----------------------------|-------:|------:|------:|------:|------:|------:|
+| fragmented / sequence       |      1 |     1 |     1 |     2 |     2 |     2 |
+| fragmented / trees          |      3 |     3 |     3 |     3 |     3 |     3 |
+| fragmented / linear         |      2 |     2 |     2 |     1 |     1 |     1 |
+| fragmented / climatological |      4 |     4 |     4 |     4 |     4 |     4 |
+| contiguous / sequence       |      1 |     1 |     1 |     1 |     1 |     1 |
+| contiguous / trees          |      3 |     3 |     3 |     3 |     3 |     3 |
+| contiguous / linear         |      2 |     2 |     2 |     2 |     2 |     2 |
+| contiguous / climatological |      4 |     4 |     4 |     4 |     4 |     4 |
 
 **What this does and does not establish.** The claim is causal for this
 record: fragmentation is manipulated, volume is held constant, the test
@@ -378,12 +378,12 @@ The same experiment on 3 donor records: Wanliu, Dingling, Dongsi.
 
 All donors are stations of the UCI Beijing Multi-Site archive (id 501): one four-year window, one regional weather regime, spatially correlated PM2.5. This is a station-robustness check, not evidence of generality across records or cities.
 
-| Family   | Wanliu   | Dingling   | Dongsi   | Replicates   |
-|:---------|:---------|:-----------|:---------|:-------------|
-| sequence | -0.0394* | -0.0200*   | -0.0273* | **yes**      |
-| trees    | -0.0263* | -0.0120    | -0.0179* | no           |
-| linear   | -0.0016  | -0.0298*   | -0.0205* | no           |
-| naive    | -0.0358* | -0.0024    | -0.0211* | no           |
+| Family         | Wanliu   | Dingling   | Dongsi   | Replicates   |
+|:---------------|:---------|:-----------|:---------|:-------------|
+| sequence       | -0.0394* | -0.0200*   | -0.0273* | **yes**      |
+| trees          | -0.0263* | -0.0120    | -0.0179* | no           |
+| linear         | -0.0016  | -0.0298*   | -0.0205* | no           |
+| climatological | -0.0358* | -0.0024    | -0.0211* | no           |
 
 `*` marks Holm significance within that donor. **Replicates** is the
 strict rule: A family replicates only if its paired arm gap has the same sign on every donor and is significant under Holm on every donor.
@@ -393,8 +393,8 @@ donor.
 
 Every family's point estimate is negative on every donor, so this is not a finding that fragmentation costs the others nothing. What separates the sequence tier is that its gap is the one that appears *reliably* rather than on some records and not others, and it is the largest mean gap across donors (-0.0289).
 
-**The naive control at the severest level (75% coverage):** Wanliu -0.0958, Dingling -0.0038, Dongsi -0.0373. 
-These disagree by more than their own average, so the naive collapse visible on the largest-gap donor is a property of that record rather than of fragmentation. Read on one donor alone it would have argued that fragmentation degrades anything estimated from the record, windowed or not; it does not survive the other donors, and that is the specific thing a second and third record were run to test.
+**The climatological row at the severest level (75% coverage):** Wanliu -0.0958, Dingling -0.0038, Dongsi -0.0373. 
+These disagree by more than their own average, so the collapse visible on the largest-gap donor is a property of that record rather than of fragmentation. Read on one donor alone it would have argued that fragmentation degrades anything estimated from the record, windowed or not; it does not survive the other donors, and that is the specific thing a second and third record were run to test.
 
 ## 8. Limitations
 

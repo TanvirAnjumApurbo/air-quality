@@ -24,6 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pandas as pd
+from src.eval.ablation import FAMILY_ORDER
 from src.models.data import load_meta
 from src.results import load_results
 from src.utils import check_disk_space, load_config, setup_logging
@@ -823,7 +824,7 @@ def main() -> int:
                 )
                 table = table[sorted(table.columns, reverse=True)]
                 table.columns = [f"{c * 100:.0f}%" for c in table.columns]
-                order = [f for f in ("sequence", "trees", "linear", "naive") if f in table.index]
+                order = [f for f in FAMILY_ORDER if f in table.index]
                 a("**Fragmented minus contiguous skill, at matched coverage.** Both arms")
                 a("remove the same number of observed hours at each level, so this")
                 a("difference is the effect of *arrangement* with volume held constant.")
@@ -900,12 +901,14 @@ def main() -> int:
                     a("the experiment does not support the mechanism §7 proposes.")
                 a("")
 
-            # Which model stands for each family matters to the reader, and the
-            # naive row is a control only if its representative is named: the
-            # selected model is climatology, which reads the training record but
-            # only as hour-of-day and season means. Those are insensitive to how
-            # the observed hours are arranged, which is exactly the point --
-            # it is the "reads the record, needs no windows" control.
+            # Which model stands for each family matters to the reader, and for
+            # the climatological row it matters most: the representative is
+            # chosen by highest skill on the reference cell, persistence scores
+            # identically zero there by construction, so climatology always wins
+            # the slot -- and climatology is fitted on the DEGRADED training
+            # split. The row is "reads the record, needs no windows", which is
+            # informative, but it is not the no-training-data control this
+            # section used to call it.
             gaps = pd.DataFrame(abl.get("analysis", {}).get("paired_gaps", []))
             if not gaps.empty and "model" in gaps.columns:
                 reps = gaps.groupby("family")["model"].first()
@@ -931,7 +934,7 @@ def main() -> int:
                 idx = [
                     (arm, fam)
                     for arm in ("fragmented", "contiguous")
-                    for fam in ("sequence", "trees", "linear", "naive")
+                    for fam in FAMILY_ORDER
                     if (arm, fam) in ranks.index
                 ]
                 a("Family rank within each cell (1 = best skill). The sequence row is")
@@ -988,9 +991,7 @@ def main() -> int:
                         values="significant_holm",
                         aggfunc="first",
                     )
-                    rep_fam_order = [
-                        f for f in ("sequence", "trees", "linear", "naive") if f in rep_grid.index
-                    ]
+                    rep_fam_order = [f for f in FAMILY_ORDER if f in rep_grid.index]
                     rep_by_family = rep_verdict.set_index("family")
                     rep_shown = pd.DataFrame({"Family": rep_fam_order})
                     for d in rep_donor_names:
@@ -1060,17 +1061,18 @@ def main() -> int:
                         a("effect seen on the primary donor is not established as a property of")
                         a("fragmentation, and no claim in this report should rest on it.")
 
-                    # The naive row at the most severe level is the internal
-                    # control, and on one donor alone it is the reading that
-                    # would sink the specificity claim: models that never touch
-                    # the training record should not care how that record is
-                    # arranged. Reporting whether that collapse reproduces is
-                    # the whole reason a second and third donor were run.
+                    # The climatological row at the most severe level is the
+                    # reading that would sink the specificity claim on one donor
+                    # alone: a model that needs no contiguous window should not
+                    # care how the record is arranged, yet on the largest-gap
+                    # donor it collapses as far as the sequence tier does.
+                    # Reporting whether that collapse reproduces is the whole
+                    # reason a second and third donor were run.
                     rep_levels = pd.DataFrame(rep.get("per_level_gaps", []))
-                    if not rep_levels.empty and "naive" in set(rep_levels["family"]):
+                    if not rep_levels.empty and "climatological" in set(rep_levels["family"]):
                         rep_worst = float(rep_levels["target_coverage"].min())
                         rep_naive = rep_levels[
-                            (rep_levels["family"] == "naive")
+                            (rep_levels["family"] == "climatological")
                             & (rep_levels["target_coverage"] == rep_worst)
                         ].set_index("donor")["arm_gap"]
                         rep_spread = ", ".join(
@@ -1080,14 +1082,15 @@ def main() -> int:
                         )
                         a("")
                         a(
-                            f"**The naive control at the severest level ({rep_worst * 100:.0f}% "
+                            f"**The climatological row at the severest level "
+                            f"({rep_worst * 100:.0f}% "
                             f"coverage):** {rep_spread}. "
                         )
                         if float(rep_naive.max()) - float(rep_naive.min()) > abs(
                             float(rep_naive.mean())
                         ):
                             a(
-                                "These disagree by more than their own average, so the naive "
+                                "These disagree by more than their own average, so the "
                                 "collapse visible on the largest-gap donor is a property of that "
                                 "record rather than of fragmentation. Read on one donor alone it "
                                 "would have argued that fragmentation degrades anything estimated "
@@ -1427,9 +1430,15 @@ def main() -> int:
                         for fam, grp in wide.groupby("family")
                     },
                     "control_note": (
-                        "The naive family never reads the training record, so its arm gap "
-                        "is the internal control and should be ~0. The undegraded level "
-                        "removes nothing, so its gap is 0 by construction."
+                        "The climatological family is the weakest model that DOES read the "
+                        "training record: hour-of-day and month means, insensitive to how "
+                        "the observed hours are arranged but fitted on them. It is not a "
+                        "no-training-data control. Because the test period is never "
+                        "degraded, any model that reads nothing from training has an arm "
+                        "gap of exactly zero in every cell, so it cannot vary and cannot "
+                        "falsify anything; that invariance is checked by equality instead "
+                        "(persistence_rmse_invariant). The undegraded level removes "
+                        "nothing, so its gap is 0 by construction."
                     ),
                 }
 

@@ -94,7 +94,7 @@ def main() -> int:
         else:
             log.info("seasonal_naive undefined for h>24; skipping")
 
-        clim = fit_climatology(train, h)
+        clim = fit_climatology(train, h, cfg)
         predictions["climatology"] = predict_climatology(clim, test, h)
 
         if not args.skip_sarimax and cfg.get("models.baselines.sarimax.enabled"):

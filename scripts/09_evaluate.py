@@ -185,7 +185,7 @@ def main() -> int:
         else:
             log.warning("%s missing; falling back to naive baselines only", pred_path.name)
             classical["persistence"] = predict_persistence(test)
-            classical["climatology"] = predict_climatology(fit_climatology(train, h), test, h)
+            classical["climatology"] = predict_climatology(fit_climatology(train, h, cfg), test, h)
             if h <= 24:
                 classical["seasonal_naive"] = predict_seasonal_naive(test)
 

@@ -25,7 +25,7 @@
     },
     {
       "donor": "Wanliu",
-      "family": "naive",
+      "family": "climatological",
       "n_pairs": 50,
       "mean_arm_gap": -0.035762489295106184,
       "median_arm_gap": -0.00916445855721254,
@@ -97,7 +97,7 @@
     },
     {
       "donor": "Dingling",
-      "family": "naive",
+      "family": "climatological",
       "n_pairs": 50,
       "mean_arm_gap": -0.0024115170867100534,
       "median_arm_gap": 0.01723968055382602,
@@ -121,7 +121,7 @@
     },
     {
       "donor": "Dongsi",
-      "family": "naive",
+      "family": "climatological",
       "n_pairs": 50,
       "mean_arm_gap": -0.021076203183670084,
       "median_arm_gap": -0.009323788391257803,
@@ -158,6 +158,36 @@
   ],
   "per_level_gaps": [
     {
+      "family": "climatological",
+      "target_coverage": 0.75,
+      "arm_gap": -0.09576916302329744,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.82,
+      "arm_gap": -0.05143901291273527,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.85,
+      "arm_gap": -0.035394438082152715,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.9,
+      "arm_gap": 0.0032557763811900562,
+      "donor": "Wanliu"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.95,
+      "arm_gap": 0.0005343911614644314,
+      "donor": "Wanliu"
+    },
+    {
       "family": "linear",
       "target_coverage": 0.75,
       "arm_gap": -0.004151671944512691,
@@ -185,36 +215,6 @@
       "family": "linear",
       "target_coverage": 0.95,
       "arm_gap": -0.00209930809746004,
-      "donor": "Wanliu"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.75,
-      "arm_gap": -0.09576916302329744,
-      "donor": "Wanliu"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.82,
-      "arm_gap": -0.05143901291273527,
-      "donor": "Wanliu"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.85,
-      "arm_gap": -0.035394438082152715,
-      "donor": "Wanliu"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.9,
-      "arm_gap": 0.0032557763811900562,
-      "donor": "Wanliu"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.95,
-      "arm_gap": 0.0005343911614644314,
       "donor": "Wanliu"
     },
     {
@@ -278,6 +278,36 @@
       "donor": "Wanliu"
     },
     {
+      "family": "climatological",
+      "target_coverage": 0.75,
+      "arm_gap": -0.0037884213053872573,
+      "donor": "Dingling"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.82,
+      "arm_gap": -0.021586853388558026,
+      "donor": "Dingling"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.85,
+      "arm_gap": -0.0025394652265557037,
+      "donor": "Dingling"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.9,
+      "arm_gap": 0.018516520921467362,
+      "donor": "Dingling"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.95,
+      "arm_gap": -0.0026593664345166412,
+      "donor": "Dingling"
+    },
+    {
       "family": "linear",
       "target_coverage": 0.75,
       "arm_gap": -0.0941920121691191,
@@ -305,36 +335,6 @@
       "family": "linear",
       "target_coverage": 0.95,
       "arm_gap": -0.007042577696135167,
-      "donor": "Dingling"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.75,
-      "arm_gap": -0.0037884213053872573,
-      "donor": "Dingling"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.82,
-      "arm_gap": -0.021586853388558026,
-      "donor": "Dingling"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.85,
-      "arm_gap": -0.0025394652265557037,
-      "donor": "Dingling"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.9,
-      "arm_gap": 0.018516520921467362,
-      "donor": "Dingling"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.95,
-      "arm_gap": -0.0026593664345166412,
       "donor": "Dingling"
     },
     {
@@ -398,6 +398,36 @@
       "donor": "Dingling"
     },
     {
+      "family": "climatological",
+      "target_coverage": 0.75,
+      "arm_gap": -0.03733581585067926,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.82,
+      "arm_gap": -0.028415381156383944,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.85,
+      "arm_gap": -0.018854823625864547,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.9,
+      "arm_gap": -0.013458667092753151,
+      "donor": "Dongsi"
+    },
+    {
+      "family": "climatological",
+      "target_coverage": 0.95,
+      "arm_gap": -0.007316328192669541,
+      "donor": "Dongsi"
+    },
+    {
       "family": "linear",
       "target_coverage": 0.75,
       "arm_gap": -0.02956804077899674,
@@ -425,36 +455,6 @@
       "family": "linear",
       "target_coverage": 0.95,
       "arm_gap": -0.015502961565210749,
-      "donor": "Dongsi"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.75,
-      "arm_gap": -0.03733581585067926,
-      "donor": "Dongsi"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.82,
-      "arm_gap": -0.028415381156383944,
-      "donor": "Dongsi"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.85,
-      "arm_gap": -0.018854823625864547,
-      "donor": "Dongsi"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.9,
-      "arm_gap": -0.013458667092753151,
-      "donor": "Dongsi"
-    },
-    {
-      "family": "naive",
-      "target_coverage": 0.95,
-      "arm_gap": -0.007316328192669541,
       "donor": "Dongsi"
     },
     {
@@ -550,7 +550,7 @@
       "replicates": false
     },
     {
-      "family": "naive",
+      "family": "climatological",
       "n_donors": 3,
       "mean_gap_across_donors": -0.019750069855162106,
       "min_gap": -0.035762489295106184,
@@ -560,6 +560,307 @@
       "replicates": false
     }
   ],
+  "family_contrasts_pooled": [
+    {
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 150,
+      "mean_contrast": -0.01158741379708268,
+      "median_contrast": -0.008170904347893006,
+      "ci_low": -0.02020719099232131,
+      "ci_high": -0.003591796362079936,
+      "p_wilcoxon": 0.011042014527395711,
+      "reject_iut": true,
+      "p_holm": 0.03312604358218713,
+      "reject_holm": true
+    },
+    {
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 150,
+      "mean_contrast": -0.010157667041923502,
+      "median_contrast": -0.00299739093855661,
+      "ci_low": -0.01893398315534354,
+      "ci_high": -0.0016398781618554776,
+      "p_wilcoxon": 0.1488047304974033,
+      "reject_iut": false,
+      "p_holm": 0.1488047304974033,
+      "reject_holm": false
+    },
+    {
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 150,
+      "mean_contrast": -0.009140739882469084,
+      "median_contrast": -0.00863741515926525,
+      "ci_low": -0.022885549351862603,
+      "ci_high": 0.00451946340406934,
+      "p_wilcoxon": 0.02279717937309173,
+      "reject_iut": true,
+      "p_holm": 0.04559435874618346,
+      "reject_holm": true
+    }
+  ],
+  "family_contrasts_by_level": [
+    {
+      "target_coverage": 0.75,
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.04219835331251495,
+      "median_contrast": -0.03580903906794106,
+      "ci_low": -0.06737605821427595,
+      "ci_high": -0.01779037034759686,
+      "p_wilcoxon": 0.002560090273618698,
+      "reject_iut": true,
+      "p_holm": 0.007680270820856094,
+      "reject_holm": true
+    },
+    {
+      "target_coverage": 0.75,
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.01838811866885726,
+      "median_contrast": 0.005145568779843372,
+      "ci_low": -0.0498606620934228,
+      "ci_high": 0.012293091179102128,
+      "p_wilcoxon": 0.5698575973510742,
+      "reject_iut": false,
+      "p_holm": 0.9542129635810852,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.75,
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.015394226906612121,
+      "median_contrast": -0.0015131823129124339,
+      "ci_low": -0.061635251205823166,
+      "ci_high": 0.032368576058543555,
+      "p_wilcoxon": 0.4771064817905426,
+      "reject_iut": false,
+      "p_holm": 0.9542129635810852,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.82,
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.015521047435916301,
+      "median_contrast": -0.01975102558879212,
+      "ci_low": -0.028847324503497824,
+      "ci_high": -0.002836483602938678,
+      "p_wilcoxon": 0.04048972204327583,
+      "reject_iut": true,
+      "p_holm": 0.1214691661298275,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.82,
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.0009373301618126037,
+      "median_contrast": 0.00787107203495125,
+      "ci_low": -0.02071504498933956,
+      "ci_high": 0.01828113816249171,
+      "p_wilcoxon": 0.7303419969975948,
+      "reject_iut": false,
+      "p_holm": 1.0,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.82,
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": 0.008426211674089431,
+      "median_contrast": 0.0009790861382559038,
+      "ci_low": -0.018535062967902905,
+      "ci_high": 0.0381269750801989,
+      "p_wilcoxon": 0.9838335812091827,
+      "reject_iut": false,
+      "p_holm": 1.0,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.85,
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.008203409930166935,
+      "median_contrast": -0.01888044871019017,
+      "ci_low": -0.02386080685321848,
+      "ci_high": 0.00850096909979482,
+      "p_wilcoxon": 0.2710056286305189,
+      "reject_iut": false,
+      "p_holm": 0.8130168858915567,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.85,
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.008050560720052061,
+      "median_contrast": -0.0012756851215482215,
+      "ci_low": -0.038341592648109823,
+      "ci_high": 0.024288394866953434,
+      "p_wilcoxon": 0.4898460879921913,
+      "reject_iut": false,
+      "p_holm": 0.9796921759843826,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.85,
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.003827867964822922,
+      "median_contrast": 0.005865253638802366,
+      "ci_low": -0.02518074165528743,
+      "ci_high": 0.016959757187276506,
+      "p_wilcoxon": 0.7303419969975948,
+      "reject_iut": false,
+      "p_holm": 0.9796921759843826,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.9,
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.021546653767736106,
+      "median_contrast": -0.021345293369319625,
+      "ci_low": -0.0376365722055952,
+      "ci_high": -0.004255435821196486,
+      "p_wilcoxon": 0.008705463260412216,
+      "reject_iut": true,
+      "p_holm": 0.02611638978123665,
+      "reject_holm": true
+    },
+    {
+      "target_coverage": 0.9,
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.011753871222799757,
+      "median_contrast": -0.008360298159392328,
+      "ci_low": -0.022591521181563736,
+      "ci_high": -0.001478574579740717,
+      "p_wilcoxon": 0.0803273618221283,
+      "reject_iut": false,
+      "p_holm": 0.1606547236442566,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.9,
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": 0.0002565090904604425,
+      "median_contrast": -0.0037588517434051505,
+      "ci_low": -0.013027002842554064,
+      "ci_high": 0.013834319170743377,
+      "p_wilcoxon": 1.0,
+      "reject_iut": false,
+      "p_holm": 1.0,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.95,
+      "family": "climatological",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.009138469692034568,
+      "median_contrast": -0.013079049667736875,
+      "ci_low": -0.027091487813006215,
+      "ci_high": 0.01121968398196442,
+      "p_wilcoxon": 0.17719271034002304,
+      "reject_iut": false,
+      "p_holm": 0.5315781310200691,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.95,
+      "family": "trees",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.004081292860927482,
+      "median_contrast": -0.0019891511840927495,
+      "ci_low": -0.014629949590827243,
+      "ci_high": 0.007233141810863171,
+      "p_wilcoxon": 0.46454504504799843,
+      "reject_iut": false,
+      "p_holm": 0.8799335323274136,
+      "reject_holm": false
+    },
+    {
+      "target_coverage": 0.95,
+      "family": "linear",
+      "reference": "sequence",
+      "n_units": 30,
+      "mean_contrast": -0.004070621727673165,
+      "median_contrast": -0.0047359688859772,
+      "ci_low": -0.015395315915751556,
+      "ci_high": 0.007027311149647918,
+      "p_wilcoxon": 0.4399667661637068,
+      "reject_iut": false,
+      "p_holm": 0.8799335323274136,
+      "reject_holm": false
+    }
+  ],
+  "dose_response_pooled": [
+    {
+      "family": "climatological",
+      "n_units": 30,
+      "slope_per_unit_dose": 0.24855821607917986,
+      "gap_change_per_10pp_lost": -0.024855821607917987,
+      "ci_low": -0.047154383061550835,
+      "ci_high": -0.004994878927398745,
+      "p_wilcoxon": 0.026228994131088257,
+      "p_holm": 0.052457988262176514,
+      "significant_holm": false
+    },
+    {
+      "family": "sequence",
+      "n_units": 30,
+      "slope_per_unit_dose": 0.22618563805592332,
+      "gap_change_per_10pp_lost": -0.022618563805592334,
+      "ci_low": -0.0355535592880194,
+      "ci_high": -0.010736889175492549,
+      "p_wilcoxon": 0.004031794145703316,
+      "p_holm": 0.016127176582813263,
+      "significant_holm": true
+    },
+    {
+      "family": "linear",
+      "n_units": 30,
+      "slope_per_unit_dose": 0.16008633136649114,
+      "gap_change_per_10pp_lost": -0.016008633136649113,
+      "ci_low": -0.025800622742861542,
+      "ci_high": -0.006025785816014578,
+      "p_wilcoxon": 0.00466480478644371,
+      "p_holm": 0.016127176582813263,
+      "significant_holm": true
+    },
+    {
+      "family": "trees",
+      "n_units": 30,
+      "slope_per_unit_dose": 0.052266052062157634,
+      "gap_change_per_10pp_lost": -0.005226605206215764,
+      "ci_low": -0.015076791646815952,
+      "ci_high": 0.005403270707591267,
+      "p_wilcoxon": 0.1641840822994709,
+      "p_holm": 0.1641840822994709,
+      "significant_holm": false
+    }
+  ],
+  "iut_sequence_worse_than_every_family": false,
+  "contrast_note": "The replication rule tests each family against its own null and asks whether that verdict repeats across donors. It is not a contrast between families, so it cannot support a claim that one family is affected more than another. family_contrasts_pooled differences the families within matched triples and tests that claim directly; the conjunction is an intersection-union test, so iut_sequence_worse_than_every_family is true only if every contrast rejects.",
   "replication_rule": "A family replicates only if its paired arm gap has the same sign on every donor and is significant under Holm on every donor.",
   "scope_note": "All donors are stations of the UCI Beijing Multi-Site archive (id 501): one four-year window, one regional weather regime, spatially correlated PM2.5. This is a station-robustness check, not evidence of generality across records or cities."
 }

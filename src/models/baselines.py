@@ -35,10 +35,15 @@ class ClimatologyModel:
     Attributes:
         table: Mean target keyed by ``(hour, month)``.
         global_mean: Fallback for cells unseen in training.
+        tz: IANA timezone the bins were built in. Carried on the model so that
+            :func:`predict_climatology` cannot bin in a different zone than
+            :func:`fit_climatology` did -- a mismatch that silently shifted
+            every Beijing record's hour bins by two before it was caught.
     """
 
     table: dict[tuple[int, int], float]
     global_mean: float
+    tz: str
 
     def predict(self, hour_local: np.ndarray, month_local: np.ndarray) -> np.ndarray:
         """Look up the climatological mean for each observation.
@@ -59,32 +64,44 @@ class ClimatologyModel:
         )
 
 
-def fit_climatology(train: SplitArrays, horizon: int) -> ClimatologyModel:
+def fit_climatology(train: SplitArrays, horizon: int, cfg: Config) -> ClimatologyModel:
     """Fit the climatology table on training rows only.
 
     The cell is keyed by the local hour and month **of the target time**, not of
     the feature time, since that is what is being predicted.
 
+    The timezone comes from ``features.calendar_tz`` and is stored on the model.
+    It used to be hardcoded to Asia/Dhaka, which put every Beijing record's hour
+    bins two hours out -- and Beijing is where the gap-injection experiment runs,
+    so the error reached the climatology representative of a reported family.
+
     Args:
         train: Training arrays.
         horizon: Forecast horizon in hours, used to shift the calendar key.
+        cfg: Loaded configuration (``features.calendar_tz``).
 
     Returns:
         The fitted model.
     """
+    tz = str(cfg.get("features.calendar_tz"))
     target_time = train.index + pd.Timedelta(hours=horizon)
-    # Reuse the same local timezone the calendar features were built in.
-    local = target_time.tz_convert(train.index.tz).tz_convert("Asia/Dhaka")
+    # The same local timezone the calendar features were built in.
+    local = target_time.tz_convert(tz)
     frame = pd.DataFrame({"hour": local.hour, "month": local.month, "y": train.y}).dropna()
     grouped = frame.groupby(["hour", "month"])["y"].mean()
     return ClimatologyModel(
         table={(int(h), int(m)): float(v) for (h, m), v in grouped.items()},
         global_mean=float(frame["y"].mean()),
+        tz=tz,
     )
 
 
 def predict_climatology(model: ClimatologyModel, arrays: SplitArrays, horizon: int) -> np.ndarray:
     """Predict with a fitted climatology model.
+
+    Takes no configuration: the timezone rides on the model, so predicting in a
+    different zone than the table was binned in is unrepresentable rather than
+    merely unlikely.
 
     Args:
         model: The fitted model.
@@ -94,7 +111,7 @@ def predict_climatology(model: ClimatologyModel, arrays: SplitArrays, horizon: i
     Returns:
         Predicted values in ug/m3.
     """
-    target_time = (arrays.index + pd.Timedelta(hours=horizon)).tz_convert("Asia/Dhaka")
+    target_time = (arrays.index + pd.Timedelta(hours=horizon)).tz_convert(model.tz)
     return model.predict(target_time.hour.to_numpy(), target_time.month.to_numpy())
 
 

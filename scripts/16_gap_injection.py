@@ -338,7 +338,7 @@ def main() -> int:
             log,
             "climatology",
             test.y,
-            predict_climatology(fit_climatology(train, horizon), test, horizon),
+            predict_climatology(fit_climatology(train, horizon, cfg), test, horizon),
             persistence_rmse,
         )
 

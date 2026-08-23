@@ -7,7 +7,7 @@ station, so this script reads every ``ablation_gap_injection*.json`` under
 
 * **does each family's arm gap replicate** -- same sign, and significant under
   Holm, on every donor;
-* **does the coverage profile replicate** -- specifically whether the naive
+* **does the coverage profile replicate** -- specifically whether the climatological
   control's collapse at severe fragmentation is a general effect or one donor's
   quirk, since that is what decides whether the effect can be called specific to
   models that need contiguous windows.
@@ -37,11 +37,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from src.eval.ablation import FAMILY_ORDER, paired_arm_gaps, test_arm_gaps, tidy
+from src.eval.ablation import (
+    FAMILY_ORDER,
+    dose_response,
+    family_contrasts,
+    paired_arm_gaps,
+    test_arm_gaps,
+    tidy,
+)
 from src.eval.ablation import fmt_p as _fmt_p
 from src.utils import load_config, setup_logging
 from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
+
+#: Newline, so log format arguments need no backslash escapes.
+NL = chr(10)
 
 
 def parse_args() -> argparse.Namespace:
@@ -86,6 +96,7 @@ def main() -> int:
     per_donor: list[pd.DataFrame] = []
     per_level: list[pd.DataFrame] = []
     incomplete: list[str] = []
+    paired_by_donor: dict[str, pd.DataFrame] = {}
 
     for path in paths:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -102,6 +113,7 @@ def main() -> int:
             log.warning("%s has no matched pairs; skipped", path.name)
             continue
 
+        paired_by_donor[donor] = paired
         tests = test_arm_gaps(paired)
         tests.insert(0, "donor", donor)
         per_donor.append(tests)
@@ -164,6 +176,32 @@ def main() -> int:
             }
         )
     verdict = pd.DataFrame(verdict_rows)
+
+    # ---- what the replication rule does NOT test ---------------------------
+    # Replicating means a family cleared its own null on every donor. It does
+    # not mean the family differs from any OTHER family, which is what "the
+    # tier fragmentation hurts most" asserts. Pool the matched triples across
+    # donors and contrast the families directly; the unit is already matched
+    # across families, since at one (coverage, seed, donor) every family was
+    # fitted on the same two degraded copies of the same record.
+    pooled = pd.concat(
+        [g.assign(donor=d) for d, g in paired_by_donor.items() if not g.empty],
+        ignore_index=True,
+    )
+    contrasts = family_contrasts(pooled) if not pooled.empty else pd.DataFrame()
+    contrasts_by_level = (
+        family_contrasts(pooled, by="target_coverage") if not pooled.empty else pd.DataFrame()
+    )
+    doses = (
+        dose_response(pooled, unit=("injection_seed", "donor"))
+        if not pooled.empty
+        else pd.DataFrame()
+    )
+    iut_rejects = bool(
+        not contrasts.empty
+        and contrasts["reject_iut"].all()
+        and (contrasts["mean_contrast"] < 0).all()
+    )
 
     # ---- tables ------------------------------------------------------------
     wide = tests_all.pivot_table(
@@ -264,6 +302,64 @@ def main() -> int:
     # Its own file, alongside ablation_gap_injection*.json, for the same reason
     # those exist: the experiment spans several donor configs and so has no one
     # city's results.json to live in. Written by code, never by hand.
+    if not contrasts.empty:
+        disp = contrasts.assign(
+            **{
+                "Family": contrasts["family"],
+                "Triples": contrasts["n_units"],
+                "Mean contrast": contrasts["mean_contrast"].round(4),
+                "Median": contrasts["median_contrast"].round(4),
+                "95% CI": [
+                    f"[{lo:+.4f}, {hi:+.4f}]"
+                    for lo, hi in zip(contrasts["ci_low"], contrasts["ci_high"], strict=False)
+                ],
+                "p (Wilcoxon)": contrasts["p_wilcoxon"].map(_fmt_p),
+                "p (Holm)": contrasts["p_holm"].map(_fmt_p),
+            }
+        )[["Family", "Triples", "Mean contrast", "Median", "95% CI", "p (Wilcoxon)", "p (Holm)"]]
+        write_table(
+            cfg,
+            disp,
+            "donor_family_contrasts",
+            caption=(
+                "Sequence-family arm gap MINUS each other family's, differenced within "
+                "the same (coverage level, injection seed, donor) triple and pooled "
+                "across donors. The replication rule above asks whether a family clears "
+                "its OWN null on every donor; it cannot show that one family is affected "
+                "more than another, which is the comparison the headline claim makes. "
+                "Rejection of that claim requires every row to reject "
+                "(intersection-union), so a single non-rejecting row withholds it."
+            ),
+        )
+        log.info("pooled family contrasts:%s%s", NL, disp.to_string(index=False))
+
+    if not doses.empty:
+        disp = doses.assign(
+            **{
+                "Family": doses["family"],
+                "Units": doses["n_units"],
+                "Gap per 10pp lost": doses["gap_change_per_10pp_lost"].round(4),
+                "95% CI": [
+                    f"[{lo:+.4f}, {hi:+.4f}]"
+                    for lo, hi in zip(doses["ci_low"], doses["ci_high"], strict=False)
+                ],
+                "p (Wilcoxon)": doses["p_wilcoxon"].map(_fmt_p),
+                "p (Holm)": doses["p_holm"].map(_fmt_p),
+            }
+        )[["Family", "Units", "Gap per 10pp lost", "95% CI", "p (Wilcoxon)", "p (Holm)"]]
+        write_table(
+            cfg,
+            disp,
+            "donor_dose_response",
+            caption=(
+                "Change in the arm gap per 10 percentage points of coverage lost, one "
+                "slope per (injection seed, donor). The pooled signed-rank test averages "
+                "the arm-by-coverage interaction away; this estimates it. A gap flat in "
+                "coverage is a fixed cost, one that steepens is a mechanism."
+            ),
+        )
+        log.info("pooled dose-response:%s%s", NL, disp.to_string(index=False))
+
     out = results_dir / "donor_replication.json"
     out.write_text(
         json.dumps(
@@ -274,6 +370,20 @@ def main() -> int:
                 "per_donor_tests": tests_all.to_dict(orient="records"),
                 "per_level_gaps": levels_all.to_dict(orient="records"),
                 "verdict": verdict.to_dict(orient="records"),
+                "family_contrasts_pooled": contrasts.to_dict(orient="records"),
+                "family_contrasts_by_level": contrasts_by_level.to_dict(orient="records"),
+                "dose_response_pooled": doses.to_dict(orient="records"),
+                "iut_sequence_worse_than_every_family": iut_rejects,
+                "contrast_note": (
+                    "The replication rule tests each family against its own null and "
+                    "asks whether that verdict repeats across donors. It is not a "
+                    "contrast between families, so it cannot support a claim that one "
+                    "family is affected more than another. family_contrasts_pooled "
+                    "differences the families within matched triples and tests that "
+                    "claim directly; the conjunction is an intersection-union test, so "
+                    "iut_sequence_worse_than_every_family is true only if every "
+                    "contrast rejects."
+                ),
                 "replication_rule": (
                     "A family replicates only if its paired arm gap has the same sign "
                     "on every donor and is significant under Holm on every donor."
@@ -314,6 +424,16 @@ def main() -> int:
         )
     if incomplete:
         print(f"\nPROVISIONAL: incomplete grid(s) for {', '.join(incomplete)}")
+    if not contrasts.empty:
+        print(f"{NL}between-family contrast (sequence minus family, pooled triples)")
+        for r in contrasts.itertuples():
+            mark = "*" if r.reject_iut else " "
+            print(
+                f"  vs {r.family:<15} {r.mean_contrast:+.4f} "
+                f"[{r.ci_low:+.4f}, {r.ci_high:+.4f}]  p={_fmt_p(r.p_wilcoxon)}{mark}"
+            )
+        print(f"  IUT -- sequence worse than EVERY other family: {'YES' if iut_rejects else 'NO'}")
+    print()
     print(f"\nwrote {out}")
     return 0
 

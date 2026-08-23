@@ -33,8 +33,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from src.eval.ablation import (
+    dose_response,
+    family_contrasts,
+    paired_arm_gaps,
+    test_arm_gaps,
+    tidy,
+)
 from src.eval.ablation import fmt_p as _fmt_p
-from src.eval.ablation import paired_arm_gaps, test_arm_gaps, tidy
 from src.utils import load_config, setup_logging
 from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
@@ -148,7 +154,7 @@ def main() -> int:
     # ---- the key figure ----------------------------------------------------
     palette = setup_style(cfg)
     fig, (ax_skill, ax_rows) = plt.subplots(1, 2, figsize=(COL_DOUBLE, 3.0))
-    order = ["sequence", "trees", "linear", "naive"]
+    order = ["sequence", "trees", "linear", "climatological"]
     colours = dict(zip(order, palette, strict=False))
 
     for family in order:
@@ -299,8 +305,12 @@ def main() -> int:
                 "effect of fragmentation with volume held constant. The representative "
                 "model per family is fixed on the undegraded record, never re-chosen "
                 "per arm. Wilcoxon signed-rank, Holm-corrected across families. The "
-                "naive family is the control: it never reads the training record, so "
-                "its gap should not differ from zero."
+                "climatological family is the weakest model that DOES read the record "
+                "-- hour-of-day and month means, insensitive to how the observed hours "
+                "are arranged but fitted on them. It is not a no-training-data control: "
+                "because the test period is never degraded, any model reading nothing "
+                "from training has an arm gap of exactly zero here by construction, so "
+                "it cannot vary. That invariance is checked by equality instead."
             ),
         )
         log.info("paired arm-gap tests:\n%s", display.to_string(index=False))
@@ -309,8 +319,100 @@ def main() -> int:
         print("=" * 78)
         print(display.to_string(index=False))
 
+    # ---- between-family contrast (the claim is a comparison, so test one) ---
+    contrasts = family_contrasts(paired) if not paired.empty else pd.DataFrame()
+    contrasts_by_level = (
+        family_contrasts(paired, by="target_coverage") if not paired.empty else pd.DataFrame()
+    )
+    if not contrasts.empty:
+        disp = contrasts.assign(
+            **{
+                "Family": contrasts["family"],
+                "Units": contrasts["n_units"],
+                "Mean contrast": contrasts["mean_contrast"].round(4),
+                "Median": contrasts["median_contrast"].round(4),
+                "95% CI": [
+                    f"[{lo:+.4f}, {hi:+.4f}]"
+                    for lo, hi in zip(contrasts["ci_low"], contrasts["ci_high"], strict=False)
+                ],
+                "p (Wilcoxon)": contrasts["p_wilcoxon"].map(_fmt_p),
+                "p (Holm)": contrasts["p_holm"].map(_fmt_p),
+            }
+        )[["Family", "Units", "Mean contrast", "Median", "95% CI", "p (Wilcoxon)", "p (Holm)"]]
+        write_table(
+            cfg,
+            disp,
+            "ablation_family_contrasts",
+            caption=(
+                "Arm gap of the sequence family MINUS each other family's, differenced "
+                "within the same (coverage level, injection seed). Testing each family "
+                "against its own null and then requiring the verdict to repeat is not a "
+                "contrast: a family can clear its own null everywhere while remaining "
+                "indistinguishable from the family it is compared against. Because the "
+                "claim is a conjunction -- worse than every other family -- rejection "
+                "requires all rows to reject, each at the unadjusted level "
+                "(intersection-union); Holm is reported as the conservative alternative."
+            ),
+        )
+        log.info("family contrasts:%s%s", chr(10), disp.to_string(index=False))
+
+    # ---- dose-response (the pooled test averages the interaction away) -----
+    doses = dose_response(paired) if not paired.empty else pd.DataFrame()
+    if not doses.empty:
+        disp = doses.assign(
+            **{
+                "Family": doses["family"],
+                "Units": doses["n_units"],
+                "Gap per 10pp lost": doses["gap_change_per_10pp_lost"].round(4),
+                "95% CI": [
+                    f"[{lo:+.4f}, {hi:+.4f}]"
+                    for lo, hi in zip(doses["ci_low"], doses["ci_high"], strict=False)
+                ],
+                "p (Wilcoxon)": doses["p_wilcoxon"].map(_fmt_p),
+                "p (Holm)": doses["p_holm"].map(_fmt_p),
+            }
+        )[["Family", "Units", "Gap per 10pp lost", "95% CI", "p (Wilcoxon)", "p (Holm)"]]
+        write_table(
+            cfg,
+            disp,
+            "ablation_dose_response",
+            caption=(
+                "Change in the arm gap per 10 percentage points of coverage lost. One "
+                "slope is fitted within each injection seed, which contributes the same "
+                "arrangement draw at every level, and the slopes are then tested against "
+                "zero by Wilcoxon signed-rank. Since the arm gap is already the arm "
+                "contrast, its slope in coverage is the arm-by-coverage interaction -- "
+                "the quantity the pooled test averages away. A gap flat in coverage is a "
+                "fixed cost; one that steepens is a mechanism."
+            ),
+        )
+        log.info("dose-response:%s%s", chr(10), disp.to_string(index=False))
+
+    # ---- design check: the protected test period makes persistence a constant
+    # An equality that must hold is a better control than a test that can only
+    # fail to reject. Persistence reads nothing from training and the test period
+    # is never degraded, so its RMSE must be identical in every cell.
+    pers = frame[frame["model"] == "persistence"]["rmse"].to_numpy(dtype=float)
+    pers_spread = float(pers.max() - pers.min()) if pers.size else float("nan")
+    pers_invariant = bool(pers.size and pers_spread < 1e-9)
+    if not pers_invariant and pers.size:
+        log.error(
+            "persistence test RMSE varies across cells by %.3e; the test period was "
+            "supposed to be protected, so this is a design violation, not noise",
+            pers_spread,
+        )
+    else:
+        log.info("persistence RMSE invariant across %d cells (spread %.2e)", pers.size, pers_spread)
+
     payload["analysis"] = {
         "by_family": best.to_dict(orient="records"),
+        "family_contrasts": contrasts.to_dict(orient="records") if not contrasts.empty else [],
+        "family_contrasts_by_level": (
+            contrasts_by_level.to_dict(orient="records") if not contrasts_by_level.empty else []
+        ),
+        "dose_response": doses.to_dict(orient="records") if not doses.empty else [],
+        "persistence_rmse_invariant": pers_invariant,
+        "persistence_rmse_spread": pers_spread,
         "family_ranks": json.loads(pivot.to_json()),
         "paired_gaps": paired.to_dict(orient="records") if not paired.empty else [],
         "paired_tests": tests.to_dict(orient="records") if not tests.empty else [],

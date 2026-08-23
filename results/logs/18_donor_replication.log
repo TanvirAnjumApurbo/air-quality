@@ -25,3 +25,33 @@
 02:30:05 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
 02:30:05 | INFO    | 18_donor_replication | Dongsi: 101 cells, 50 matched pairs per family
 02:30:06 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+12:00:37 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
+12:00:38 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
+12:00:38 | INFO    | 18_donor_replication | Dongsi: 101 cells, 50 matched pairs per family
+12:00:40 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+12:00:40 | INFO    | 18_donor_replication | pooled family contrasts:
+        Family  Triples  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+        linear      150        -0.0116 -0.0082 [-0.0202, -0.0036]       0.0110   0.0331
+         trees      150        -0.0102 -0.0030 [-0.0189, -0.0016]       0.1488   0.1488
+climatological      150        -0.0091 -0.0086 [-0.0229, +0.0045]       0.0228   0.0456
+12:00:40 | INFO    | 18_donor_replication | pooled dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+climatological     30            -0.0249 [-0.0472, -0.0050]       0.0262   0.0525
+      sequence     30            -0.0226 [-0.0356, -0.0107]       0.0040   0.0161
+        linear     30            -0.0160 [-0.0258, -0.0060]       0.0047   0.0161
+         trees     30            -0.0052 [-0.0151, +0.0054]       0.1642   0.1642
+12:00:57 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
+12:00:57 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
+12:00:57 | INFO    | 18_donor_replication | Dongsi: 101 cells, 50 matched pairs per family
+12:01:00 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+12:01:00 | INFO    | 18_donor_replication | pooled family contrasts:
+        Family  Triples  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+        linear      150        -0.0116 -0.0082 [-0.0202, -0.0036]       0.0110   0.0331
+         trees      150        -0.0102 -0.0030 [-0.0189, -0.0016]       0.1488   0.1488
+climatological      150        -0.0091 -0.0086 [-0.0229, +0.0045]       0.0228   0.0456
+12:01:00 | INFO    | 18_donor_replication | pooled dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+climatological     30            -0.0249 [-0.0472, -0.0050]       0.0262   0.0525
+      sequence     30            -0.0226 [-0.0356, -0.0107]       0.0040   0.0161
+        linear     30            -0.0160 [-0.0258, -0.0060]       0.0047   0.0161
+         trees     30            -0.0052 [-0.0151, +0.0054]       0.1642   0.1642

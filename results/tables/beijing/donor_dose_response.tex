@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\caption{Change in the arm gap per 10 percentage points of coverage lost, one slope per (injection seed, donor). The pooled signed-rank test averages the arm-by-coverage interaction away; this estimates it. A gap flat in coverage is a fixed cost, one that steepens is a mechanism. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:donor_dose_response}
+\begin{tabular}{lrrrrr}
+\toprule
+Family & Units & Gap per 10pp lost & 95\% CI & p (Wilcoxon) & p (Holm) \\
+\midrule
+climatological & 30 & -0.025 & [-0.0472, -0.0050] & 0.0262 & 0.0525 \\
+sequence & 30 & -0.023 & [-0.0356, -0.0107] & 0.0040 & 0.0161 \\
+linear & 30 & -0.016 & [-0.0258, -0.0060] & 0.0047 & 0.0161 \\
+trees & 30 & -0.005 & [-0.0151, +0.0054] & 0.1642 & 0.1642 \\
+\bottomrule
+\end{tabular}
+\end{table}
