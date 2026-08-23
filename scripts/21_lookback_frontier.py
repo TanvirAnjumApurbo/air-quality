@@ -332,14 +332,22 @@ def main() -> int:
         for spec_cfg in seq_specs:
             for window in args.windows:
                 radius = effective_floor(floor, window) + horizon
-                spec = ModelSpec(
-                    name=str(spec_cfg["name"]),
-                    arch=str(spec_cfg["arch"]) if "arch" in spec_cfg else str(spec_cfg["name"]),
-                    hidden_size=int(spec_cfg.get("hidden_size", 64)),
-                    num_layers=int(spec_cfg.get("num_layers", 1)),
-                    window_h=int(window),
-                    horizon_h=horizon,
-                )
+
+                # ModelSpec carries the seed, and `name` is a derived property --
+                # so a spec is built per seed inside the loop below, and this one
+                # exists only to name the cache entry.
+                def _spec(seed: int, entry: dict = spec_cfg, w: int = window) -> ModelSpec:
+                    return ModelSpec(
+                        arch=str(entry["arch"]),
+                        hidden_size=int(entry.get("hidden_size", 0)),
+                        num_layers=int(entry.get("num_layers", 1)),
+                        window=int(w),
+                        horizon=horizon,
+                        seed=int(seed),
+                        kernel_size=25 if entry["arch"] == "dlinear" else None,
+                    )
+
+                spec = _spec(int(model_seeds[0]))
                 cache_key = f"{spec.name}|w{window}|R{radius}"
                 if cache_key in radius_cache and not args.force:
                     predictions[f"{spec.name}|{arm.label}"] = radius_cache[cache_key]["pred"]
@@ -357,7 +365,7 @@ def main() -> int:
                 for seed in model_seeds:
                     set_seed(int(seed), cfg)
                     model, _ = train_one(
-                        spec,
+                        _spec(int(seed)),
                         train_idx,
                         val_idx,
                         vcfg,

@@ -26262,3 +26262,332 @@
 16:34:36 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024: resumed from epoch 55 (best val 0.37972)
 16:34:36 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024: 40961 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
 16:34:36 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  56/165  train 0.06293  val 0.70150  lr 2.30e-03  0.2s
+16:34:36 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  57/165  train 0.05928  val 0.72262  lr 2.28e-03  0.2s
+16:34:36 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  58/165  train 0.06205  val 0.69837  lr 2.25e-03  0.2s
+16:34:37 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  59/165  train 0.05966  val 0.72249  lr 2.23e-03  0.2s
+16:34:37 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  60/165  train 0.05976  val 0.68943  lr 2.20e-03  0.2s
+16:34:37 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  61/165  train 0.06027  val 0.70645  lr 2.18e-03  0.2s
+16:34:37 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  62/165  train 0.05736  val 0.64570  lr 2.15e-03  0.2s
+16:34:37 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  63/165  train 0.05778  val 0.73519  lr 2.12e-03  0.2s
+16:34:38 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  64/165  train 0.05714  val 0.70466  lr 2.10e-03  0.2s
+16:34:38 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  65/165  train 0.05546  val 0.67650  lr 2.07e-03  0.2s
+16:34:38 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  66/165  train 0.05611  val 0.69329  lr 2.04e-03  0.2s
+16:34:38 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  67/165  train 0.05273  val 0.67761  lr 2.02e-03  0.2s
+16:34:39 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  68/165  train 0.05487  val 0.70840  lr 1.99e-03  0.2s
+16:34:39 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  69/165  train 0.05366  val 0.68175  lr 1.96e-03  0.2s
+16:34:39 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  70/165  train 0.05236  val 0.69441  lr 1.93e-03  0.2s
+16:34:39 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  71/165  train 0.05206  val 0.70754  lr 1.91e-03  0.3s
+16:34:39 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  72/165  train 0.05266  val 0.69798  lr 1.88e-03  0.2s
+16:34:40 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  73/165  train 0.05194  val 0.67965  lr 1.85e-03  0.2s
+16:34:40 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  74/165  train 0.04980  val 0.69246  lr 1.82e-03  0.2s
+16:34:40 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  75/165  train 0.05111  val 0.72555  lr 1.79e-03  0.2s
+16:34:40 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  76/165  train 0.04994  val 0.67491  lr 1.76e-03  0.2s
+16:34:41 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  77/165  train 0.05059  val 0.67565  lr 1.74e-03  0.2s
+16:34:41 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  78/165  train 0.05079  val 0.68228  lr 1.71e-03  0.2s
+16:34:41 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  79/165  train 0.04903  val 0.68393  lr 1.68e-03  0.2s
+16:34:41 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  80/165  train 0.04859  val 0.68917  lr 1.65e-03  0.2s
+16:34:41 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  81/165  train 0.04803  val 0.71641  lr 1.62e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  82/165  train 0.04656  val 0.68599  lr 1.59e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  83/165  train 0.04787  val 0.68592  lr 1.56e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  84/165  train 0.04697  val 0.72995  lr 1.53e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  85/165  train 0.04530  val 0.72132  lr 1.51e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  86/165  train 0.04553  val 0.74333  lr 1.48e-03  0.2s
+16:34:42 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  87/165  train 0.04630  val 0.72247  lr 1.45e-03  0.2s
+16:34:43 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  88/165  train 0.04569  val 0.69276  lr 1.42e-03  0.2s
+16:34:43 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  89/165  train 0.04527  val 0.72796  lr 1.39e-03  0.2s
+16:34:43 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  90/165  train 0.04496  val 0.68550  lr 1.36e-03  0.2s
+16:34:43 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  91/165  train 0.04389  val 0.70752  lr 1.33e-03  0.2s
+16:34:43 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  92/165  train 0.04345  val 0.70838  lr 1.30e-03  0.2s
+16:34:44 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  93/165  train 0.04512  val 0.71897  lr 1.27e-03  0.2s
+16:34:44 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  94/165  train 0.04395  val 0.70822  lr 1.25e-03  0.2s
+16:34:44 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  95/165  train 0.04224  val 0.69520  lr 1.22e-03  0.2s
+16:34:44 | INFO    | 16_gap_injection | gru_h64_l2_w48_H24_s2024 epoch  96/165  train 0.04422  val 0.68807  lr 1.19e-03  0.2s
+16:34:44 | INFO    | 16_gap_injection |     gru_h64_l2       RMSE  101.76  skill +0.0739  (3 seeds)
+16:34:44 | INFO    | 16_gap_injection |     lstm_h64_l1: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:34:44 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42: resumed from epoch 55 (best val 0.37995)
+16:34:44 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42: 21313 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  56/165  train 0.12373  val 0.58544  lr 2.30e-03  0.2s
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  57/165  train 0.12043  val 0.57870  lr 2.28e-03  0.2s
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  58/165  train 0.11696  val 0.58115  lr 2.25e-03  0.1s
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  59/165  train 0.11715  val 0.60060  lr 2.23e-03  0.2s
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  60/165  train 0.11428  val 0.57878  lr 2.20e-03  0.1s
+16:34:45 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  61/165  train 0.11121  val 0.58379  lr 2.18e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  62/165  train 0.10610  val 0.63350  lr 2.15e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  63/165  train 0.10981  val 0.57273  lr 2.12e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  64/165  train 0.10816  val 0.57554  lr 2.10e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  65/165  train 0.10954  val 0.54642  lr 2.07e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  66/165  train 0.10757  val 0.54771  lr 2.04e-03  0.2s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  67/165  train 0.10907  val 0.58682  lr 2.02e-03  0.1s
+16:34:46 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  68/165  train 0.10315  val 0.58022  lr 1.99e-03  0.2s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  69/165  train 0.10414  val 0.58189  lr 1.96e-03  0.2s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  70/165  train 0.10186  val 0.60861  lr 1.93e-03  0.2s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  71/165  train 0.10093  val 0.59478  lr 1.91e-03  0.2s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  72/165  train 0.10073  val 0.61056  lr 1.88e-03  0.2s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  73/165  train 0.10047  val 0.61539  lr 1.85e-03  0.1s
+16:34:47 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  74/165  train 0.09872  val 0.58291  lr 1.82e-03  0.2s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  75/165  train 0.09795  val 0.59301  lr 1.79e-03  0.2s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  76/165  train 0.09782  val 0.60903  lr 1.76e-03  0.1s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  77/165  train 0.09605  val 0.62141  lr 1.74e-03  0.2s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  78/165  train 0.09424  val 0.59277  lr 1.71e-03  0.2s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  79/165  train 0.09118  val 0.57937  lr 1.68e-03  0.2s
+16:34:48 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  80/165  train 0.09111  val 0.60363  lr 1.65e-03  0.2s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  81/165  train 0.09268  val 0.59997  lr 1.62e-03  0.2s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  82/165  train 0.09590  val 0.57922  lr 1.59e-03  0.2s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  83/165  train 0.09004  val 0.60055  lr 1.56e-03  0.2s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  84/165  train 0.08880  val 0.62504  lr 1.53e-03  0.2s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  85/165  train 0.08759  val 0.61271  lr 1.51e-03  0.1s
+16:34:49 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  86/165  train 0.08688  val 0.60903  lr 1.48e-03  0.2s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  87/165  train 0.08588  val 0.61588  lr 1.45e-03  0.1s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  88/165  train 0.08261  val 0.58233  lr 1.42e-03  0.1s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  89/165  train 0.08582  val 0.62513  lr 1.39e-03  0.2s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  90/165  train 0.08376  val 0.61361  lr 1.36e-03  0.2s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  91/165  train 0.08322  val 0.63523  lr 1.33e-03  0.2s
+16:34:50 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  92/165  train 0.08228  val 0.59530  lr 1.30e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  93/165  train 0.08233  val 0.59224  lr 1.27e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  94/165  train 0.08100  val 0.62393  lr 1.25e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  95/165  train 0.08017  val 0.60448  lr 1.22e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s42 epoch  96/165  train 0.07875  val 0.58282  lr 1.19e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection |     lstm_h64_l1: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337: resumed from epoch 55 (best val 0.36599)
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337: 21313 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  56/165  train 0.10349  val 0.61726  lr 2.30e-03  0.2s
+16:34:51 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  57/165  train 0.10351  val 0.56207  lr 2.28e-03  0.2s
+16:34:52 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  58/165  train 0.10263  val 0.62765  lr 2.25e-03  0.2s
+16:34:52 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  59/165  train 0.09956  val 0.59301  lr 2.23e-03  0.2s
+16:34:52 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  60/165  train 0.09667  val 0.63932  lr 2.20e-03  0.2s
+16:34:52 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  61/165  train 0.09640  val 0.61702  lr 2.18e-03  0.2s
+16:34:52 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  62/165  train 0.09431  val 0.64293  lr 2.15e-03  0.2s
+16:34:53 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  63/165  train 0.09172  val 0.68185  lr 2.12e-03  0.2s
+16:34:53 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  64/165  train 0.08802  val 0.66300  lr 2.10e-03  0.2s
+16:34:53 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  65/165  train 0.08910  val 0.68619  lr 2.07e-03  0.2s
+16:34:53 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  66/165  train 0.09148  val 0.61696  lr 2.04e-03  0.2s
+16:34:53 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  67/165  train 0.09193  val 0.65525  lr 2.02e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  68/165  train 0.08836  val 0.69616  lr 1.99e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  69/165  train 0.08793  val 0.67696  lr 1.96e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  70/165  train 0.08317  val 0.65714  lr 1.93e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  71/165  train 0.08494  val 0.64516  lr 1.91e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  72/165  train 0.08250  val 0.67532  lr 1.88e-03  0.2s
+16:34:54 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  73/165  train 0.08070  val 0.69770  lr 1.85e-03  0.2s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  74/165  train 0.08133  val 0.66535  lr 1.82e-03  0.1s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  75/165  train 0.07953  val 0.69871  lr 1.79e-03  0.2s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  76/165  train 0.07810  val 0.73445  lr 1.76e-03  0.2s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  77/165  train 0.07892  val 0.69724  lr 1.74e-03  0.2s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  78/165  train 0.07674  val 0.68589  lr 1.71e-03  0.2s
+16:34:55 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  79/165  train 0.07669  val 0.69824  lr 1.68e-03  0.2s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  80/165  train 0.07822  val 0.67140  lr 1.65e-03  0.2s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  81/165  train 0.07620  val 0.68063  lr 1.62e-03  0.2s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  82/165  train 0.07538  val 0.73338  lr 1.59e-03  0.2s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  83/165  train 0.07315  val 0.68308  lr 1.56e-03  0.1s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  84/165  train 0.07252  val 0.71850  lr 1.53e-03  0.1s
+16:34:56 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  85/165  train 0.07415  val 0.67530  lr 1.51e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  86/165  train 0.07111  val 0.70191  lr 1.48e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  87/165  train 0.07541  val 0.69101  lr 1.45e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  88/165  train 0.07242  val 0.69715  lr 1.42e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  89/165  train 0.07074  val 0.68586  lr 1.39e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  90/165  train 0.06973  val 0.69660  lr 1.36e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  91/165  train 0.06788  val 0.73721  lr 1.33e-03  0.1s
+16:34:57 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  92/165  train 0.06890  val 0.71462  lr 1.30e-03  0.1s
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  93/165  train 0.06817  val 0.67888  lr 1.27e-03  0.1s
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  94/165  train 0.06771  val 0.69647  lr 1.25e-03  0.1s
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  95/165  train 0.06594  val 0.70182  lr 1.22e-03  0.1s
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s1337 epoch  96/165  train 0.06519  val 0.70308  lr 1.19e-03  0.1s
+16:34:58 | INFO    | 16_gap_injection |     lstm_h64_l1: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024: resumed from epoch 55 (best val 0.37476)
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024: 21313 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  56/165  train 0.10745  val 0.83722  lr 2.30e-03  0.2s
+16:34:58 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  57/165  train 0.09896  val 0.80106  lr 2.28e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  58/165  train 0.10183  val 0.76510  lr 2.25e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  59/165  train 0.10147  val 0.81938  lr 2.23e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  60/165  train 0.09657  val 0.82011  lr 2.20e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  61/165  train 0.10020  val 0.84734  lr 2.18e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  62/165  train 0.09803  val 0.79393  lr 2.15e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  63/165  train 0.09539  val 0.83885  lr 2.12e-03  0.1s
+16:34:59 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  64/165  train 0.09550  val 0.77338  lr 2.10e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  65/165  train 0.09114  val 0.83039  lr 2.07e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  66/165  train 0.09058  val 0.83387  lr 2.04e-03  0.2s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  67/165  train 0.08860  val 0.83662  lr 2.02e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  68/165  train 0.09163  val 0.82445  lr 1.99e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  69/165  train 0.08539  val 0.80874  lr 1.96e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  70/165  train 0.08581  val 0.78491  lr 1.93e-03  0.1s
+16:35:00 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  71/165  train 0.08365  val 0.80903  lr 1.91e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  72/165  train 0.08339  val 0.85937  lr 1.88e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  73/165  train 0.08166  val 0.78529  lr 1.85e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  74/165  train 0.08184  val 0.76159  lr 1.82e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  75/165  train 0.08549  val 0.85849  lr 1.79e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  76/165  train 0.08289  val 0.77969  lr 1.76e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  77/165  train 0.08110  val 0.79951  lr 1.74e-03  0.1s
+16:35:01 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  78/165  train 0.07982  val 0.79658  lr 1.71e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  79/165  train 0.07860  val 0.82020  lr 1.68e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  80/165  train 0.07937  val 0.77512  lr 1.65e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  81/165  train 0.07550  val 0.82405  lr 1.62e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  82/165  train 0.07395  val 0.82580  lr 1.59e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  83/165  train 0.07962  val 0.81354  lr 1.56e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  84/165  train 0.07729  val 0.81676  lr 1.53e-03  0.1s
+16:35:02 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  85/165  train 0.07345  val 0.78869  lr 1.51e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  86/165  train 0.07507  val 0.88212  lr 1.48e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  87/165  train 0.07305  val 0.84722  lr 1.45e-03  0.2s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  88/165  train 0.07100  val 0.80367  lr 1.42e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  89/165  train 0.07089  val 0.85024  lr 1.39e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  90/165  train 0.07187  val 0.82515  lr 1.36e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  91/165  train 0.06973  val 0.85214  lr 1.33e-03  0.1s
+16:35:03 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  92/165  train 0.06818  val 0.85721  lr 1.30e-03  0.2s
+16:35:04 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  93/165  train 0.06890  val 0.85687  lr 1.27e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  94/165  train 0.06839  val 0.81838  lr 1.25e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  95/165  train 0.07117  val 0.84176  lr 1.22e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection | lstm_h64_l1_w48_H24_s2024 epoch  96/165  train 0.06976  val 0.80968  lr 1.19e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection |     lstm_h64_l1      RMSE  100.24  skill +0.0877  (3 seeds)
+16:35:04 | INFO    | 16_gap_injection |     dlinear: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:35:04 | INFO    | 16_gap_injection | dlinear_w48_H24_s42: resumed from epoch 65 (best val 0.39603)
+16:35:04 | INFO    | 16_gap_injection | dlinear_w48_H24_s42: 1634 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:35:04 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  66/165  train 0.37349  val 0.43877  lr 2.04e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  67/165  train 0.37158  val 0.48068  lr 2.02e-03  0.1s
+16:35:04 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  68/165  train 0.37248  val 0.43210  lr 1.99e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  69/165  train 0.37269  val 0.42854  lr 1.96e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  70/165  train 0.37383  val 0.42906  lr 1.93e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  71/165  train 0.37059  val 0.45752  lr 1.91e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  72/165  train 0.36905  val 0.44836  lr 1.88e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  73/165  train 0.36914  val 0.43842  lr 1.85e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  74/165  train 0.36810  val 0.44003  lr 1.82e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  75/165  train 0.36939  val 0.45054  lr 1.79e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  76/165  train 0.37135  val 0.42547  lr 1.76e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  77/165  train 0.37285  val 0.42885  lr 1.74e-03  0.1s
+16:35:05 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  78/165  train 0.36917  val 0.44060  lr 1.71e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  79/165  train 0.37098  val 0.43428  lr 1.68e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  80/165  train 0.36804  val 0.42299  lr 1.65e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  81/165  train 0.37184  val 0.43833  lr 1.62e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  82/165  train 0.36794  val 0.41542  lr 1.59e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  83/165  train 0.36584  val 0.44575  lr 1.56e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  84/165  train 0.36989  val 0.45088  lr 1.53e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  85/165  train 0.36647  val 0.45063  lr 1.51e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  86/165  train 0.36946  val 0.41420  lr 1.48e-03  0.1s
+16:35:06 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  87/165  train 0.36491  val 0.41953  lr 1.45e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  88/165  train 0.36868  val 0.42309  lr 1.42e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  89/165  train 0.36597  val 0.46690  lr 1.39e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  90/165  train 0.36348  val 0.44860  lr 1.36e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  91/165  train 0.36430  val 0.46839  lr 1.33e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  92/165  train 0.36454  val 0.46668  lr 1.30e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  93/165  train 0.36381  val 0.41872  lr 1.27e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  94/165  train 0.36593  val 0.45259  lr 1.25e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  95/165  train 0.36437  val 0.47903  lr 1.22e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  96/165  train 0.36624  val 0.42408  lr 1.19e-03  0.1s
+16:35:07 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  97/165  train 0.36174  val 0.42190  lr 1.16e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  98/165  train 0.36271  val 0.44224  lr 1.13e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch  99/165  train 0.36207  val 0.43982  lr 1.10e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 100/165  train 0.36090  val 0.40684  lr 1.08e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 101/165  train 0.36107  val 0.42779  lr 1.05e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 102/165  train 0.36112  val 0.42405  lr 1.02e-03  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 103/165  train 0.35992  val 0.42696  lr 9.94e-04  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 104/165  train 0.35813  val 0.43772  lr 9.67e-04  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 105/165  train 0.36093  val 0.41797  lr 9.40e-04  0.1s
+16:35:08 | INFO    | 16_gap_injection | dlinear_w48_H24_s42 epoch 106/165  train 0.36021  val 0.43305  lr 9.13e-04  0.1s
+16:35:08 | INFO    | 16_gap_injection |     dlinear: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337: resumed from epoch 67 (best val 0.38514)
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337: 1634 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  68/165  train 0.37282  val 0.39631  lr 1.99e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  69/165  train 0.36761  val 0.41587  lr 1.96e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  70/165  train 0.37275  val 0.42025  lr 1.93e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  71/165  train 0.37431  val 0.42133  lr 1.91e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  72/165  train 0.36849  val 0.40593  lr 1.88e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  73/165  train 0.37258  val 0.43895  lr 1.85e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  74/165  train 0.37236  val 0.42698  lr 1.82e-03  0.1s
+16:35:09 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  75/165  train 0.36970  val 0.44331  lr 1.79e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  76/165  train 0.36608  val 0.43790  lr 1.76e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  77/165  train 0.36945  val 0.42152  lr 1.74e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  78/165  train 0.37221  val 0.48662  lr 1.71e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  79/165  train 0.37128  val 0.46528  lr 1.68e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  80/165  train 0.37027  val 0.45563  lr 1.65e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  81/165  train 0.36668  val 0.41681  lr 1.62e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  82/165  train 0.36933  val 0.43890  lr 1.59e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  83/165  train 0.36777  val 0.40300  lr 1.56e-03  0.1s
+16:35:10 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  84/165  train 0.36478  val 0.42286  lr 1.53e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  85/165  train 0.36840  val 0.45671  lr 1.51e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  86/165  train 0.36836  val 0.42583  lr 1.48e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  87/165  train 0.36633  val 0.40704  lr 1.45e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  88/165  train 0.36644  val 0.42744  lr 1.42e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  89/165  train 0.36650  val 0.40861  lr 1.39e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  90/165  train 0.36943  val 0.44867  lr 1.36e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  91/165  train 0.36180  val 0.42440  lr 1.33e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  92/165  train 0.36533  val 0.42463  lr 1.30e-03  0.1s
+16:35:11 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  93/165  train 0.36853  val 0.42510  lr 1.27e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  94/165  train 0.36669  val 0.45758  lr 1.25e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  95/165  train 0.36634  val 0.45793  lr 1.22e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  96/165  train 0.36473  val 0.43276  lr 1.19e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  97/165  train 0.36308  val 0.41200  lr 1.16e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  98/165  train 0.36152  val 0.43001  lr 1.13e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch  99/165  train 0.36269  val 0.42642  lr 1.10e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 100/165  train 0.35924  val 0.42329  lr 1.08e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 101/165  train 0.36077  val 0.44614  lr 1.05e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 102/165  train 0.36588  val 0.43097  lr 1.02e-03  0.1s
+16:35:12 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 103/165  train 0.36508  val 0.44491  lr 9.94e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 104/165  train 0.36223  val 0.42891  lr 9.67e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 105/165  train 0.35855  val 0.43205  lr 9.40e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 106/165  train 0.35958  val 0.41678  lr 9.13e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 107/165  train 0.35868  val 0.43008  lr 8.86e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s1337 epoch 108/165  train 0.36057  val 0.43366  lr 8.60e-04  0.1s
+16:35:13 | INFO    | 16_gap_injection |     dlinear: 7815 windows, 31 steps/epoch -> 165 epochs (~5115 optimizer steps)
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024: resumed from epoch 70 (best val 0.37268)
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024: 1634 params | train 7815 windows, val 558 | 31 steps/epoch | matrix 2.3 MB on device
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  71/165  train 0.36979  val 0.43425  lr 1.91e-03  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  72/165  train 0.37111  val 0.44175  lr 1.88e-03  0.1s
+16:35:13 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  73/165  train 0.36531  val 0.42792  lr 1.85e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  74/165  train 0.36802  val 0.42093  lr 1.82e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  75/165  train 0.37052  val 0.44893  lr 1.79e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  76/165  train 0.37049  val 0.47288  lr 1.76e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  77/165  train 0.37017  val 0.44354  lr 1.74e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  78/165  train 0.37261  val 0.40766  lr 1.71e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  79/165  train 0.36614  val 0.43240  lr 1.68e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  80/165  train 0.36878  val 0.43408  lr 1.65e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  81/165  train 0.36963  val 0.42159  lr 1.62e-03  0.1s
+16:35:14 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  82/165  train 0.37015  val 0.42848  lr 1.59e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  83/165  train 0.36844  val 0.42038  lr 1.56e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  84/165  train 0.36849  val 0.44482  lr 1.53e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  85/165  train 0.36873  val 0.41654  lr 1.51e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  86/165  train 0.36906  val 0.42702  lr 1.48e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  87/165  train 0.36720  val 0.43075  lr 1.45e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  88/165  train 0.36909  val 0.43482  lr 1.42e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  89/165  train 0.36417  val 0.41304  lr 1.39e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  90/165  train 0.36236  val 0.46587  lr 1.36e-03  0.1s
+16:35:15 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  91/165  train 0.36464  val 0.43962  lr 1.33e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  92/165  train 0.36619  val 0.45842  lr 1.30e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  93/165  train 0.36418  val 0.42805  lr 1.27e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  94/165  train 0.36417  val 0.47498  lr 1.25e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  95/165  train 0.36681  val 0.43235  lr 1.22e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  96/165  train 0.36513  val 0.45893  lr 1.19e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  97/165  train 0.36159  val 0.41398  lr 1.16e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  98/165  train 0.36316  val 0.42386  lr 1.13e-03  0.1s
+16:35:16 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch  99/165  train 0.36311  val 0.42931  lr 1.10e-03  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 100/165  train 0.36184  val 0.42405  lr 1.08e-03  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 101/165  train 0.36142  val 0.47461  lr 1.05e-03  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 102/165  train 0.36258  val 0.41983  lr 1.02e-03  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 103/165  train 0.36555  val 0.42220  lr 9.94e-04  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 104/165  train 0.36005  val 0.43732  lr 9.67e-04  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 105/165  train 0.36163  val 0.41493  lr 9.40e-04  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 106/165  train 0.36368  val 0.43723  lr 9.13e-04  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 107/165  train 0.35983  val 0.42751  lr 8.86e-04  0.1s
+16:35:17 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 108/165  train 0.36149  val 0.42337  lr 8.60e-04  0.1s
+16:35:18 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 109/165  train 0.36008  val 0.41924  lr 8.34e-04  0.1s
+16:35:18 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 110/165  train 0.36030  val 0.42913  lr 8.08e-04  0.1s
+16:35:18 | INFO    | 16_gap_injection | dlinear_w48_H24_s2024 epoch 111/165  train 0.35629  val 0.43906  lr 7.83e-04  0.1s
+16:35:18 | INFO    | 16_gap_injection |     dlinear          RMSE  115.11  skill -0.0477  (3 seeds)
+16:35:18 | INFO    | 16_gap_injection | ==============================================================================
+16:35:18 | INFO    | 16_gap_injection | [85/101] cell fragmented_cov0.75_s7
+16:35:18 | INFO    | 16_gap_injection |   removed 6756 h -> coverage 0.7500, 1120 gaps (longest 998 h)
+16:35:18 | INFO    | 16_gap_injection | contiguity: 191 runs after 3h ffill, longest 1988 h
+16:35:18 | INFO    | 16_gap_injection | h=  1:   9812 valid rows  (rejected: no-run 5799, short-history 18823, target-past-run-end 56, target-imputed 574)
+16:35:18 | INFO    | 16_gap_injection | h=  3:   9704 valid rows  (rejected: no-run 5799, short-history 18823, target-past-run-end 168, target-imputed 570)
+16:35:18 | INFO    | 16_gap_injection | h=  6:   9542 valid rows  (rejected: no-run 5799, short-history 18823, target-past-run-end 336, target-imputed 564)
+16:35:18 | INFO    | 16_gap_injection | h= 12:   9229 valid rows  (rejected: no-run 5799, short-history 18823, target-past-run-end 669, target-imputed 544)
+16:35:18 | INFO    | 16_gap_injection | h= 24:   8626 valid rows  (rejected: no-run 5799, short-history 18823, target-past-run-end 1310, target-imputed 506)
+16:35:18 | INFO    | 16_gap_injection | built 96 predictor columns (max backward dependency 168 h)
+16:35:18 | INFO    | 16_gap_injection | split: train 2013-02-28 to 2015-12-18, val to 2016-07-24, test to 2017-02-28 (chronological, no shuffling)
+16:35:18 | INFO    | 16_gap_injection | h=  1: boundary purge removed 82 rows (9812 -> 9730)
+16:35:18 | INFO    | 16_gap_injection | h=  3: boundary purge removed 80 rows (9704 -> 9624)
+16:35:18 | INFO    | 16_gap_injection | h=  6: boundary purge removed 78 rows (9542 -> 9464)
+16:35:18 | INFO    | 16_gap_injection | h= 12: boundary purge removed 72 rows (9229 -> 9157)
+16:35:18 | INFO    | 16_gap_injection | h= 24: boundary purge removed 62 rows (8626 -> 8564)
+16:35:18 | INFO    | 16_gap_injection | scaler fitted on 24545 training rows over 96 predictors
+16:35:18 | INFO    | 16_gap_injection | wrote F:\BUP\data\interim\donors\dongsi\ablation\fragmented_cov0.75_s7\processed\features.parquet (35064 rows, 158 cols)
+16:35:18 | INFO    | 16_gap_injection |   usable rows h=24: train 4753, val 431, test 3380
+16:35:18 | INFO    | 16_gap_injection |     persistence      RMSE  109.87  skill +0.0000
+16:35:18 | INFO    | 16_gap_injection |     climatology      RMSE  111.69  skill -0.0165
+16:35:18 | INFO    | 16_gap_injection |     ridge            RMSE  104.28  skill +0.0509

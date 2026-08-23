@@ -1654,3 +1654,27 @@ def test_cells_for_run_does_not_mutate_the_payload():
     cells, _ = cells_for_run(payload, force=False, filtered=False)
     cells["b"] = {}
     assert set(payload["cells"]) == {"a"}
+
+
+@pytest.mark.leakage
+def test_modelspec_field_names_are_what_callers_construct():
+    """Pin the constructor, because two scripts build it positionally by keyword.
+
+    ``16_gap_injection.py`` and ``21_lookback_frontier.py`` both build a
+    ``ModelSpec`` from a config entry. A rename here -- ``window`` to
+    ``window_h``, or promoting the derived ``name`` to a field -- fails at the
+    first sequence spec, hours into a sweep, and only on the path that trains.
+    That is exactly the bug this test was written after.
+    """
+    import dataclasses
+
+    from src.models.sequence import ModelSpec
+
+    fields = {f.name for f in dataclasses.fields(ModelSpec)}
+    assert {"arch", "hidden_size", "num_layers", "window", "horizon", "seed"} <= fields
+    assert "name" not in fields, "name is a derived property, not a field"
+    assert "window_h" not in fields and "horizon_h" not in fields
+
+    spec = ModelSpec(arch="gru", hidden_size=64, num_layers=2, window=48, horizon=24, seed=42)
+    assert spec.name == "gru_h64_l2"
+    assert spec.run_id == "gru_h64_l2_w48_H24_s42"
