@@ -473,19 +473,106 @@ All donors are stations of the UCI Beijing Multi-Site archive (id 501): one four
 |:---------------|:---------|:-----------|:---------|:-------------|
 | sequence       | -0.0394* | -0.0200*   | -0.0273* | **yes**      |
 | trees          | -0.0263* | -0.0120    | -0.0179* | no           |
-| linear         | -0.0016  | -0.0298*   | -0.0205* | no           |
-| climatological | -0.0358* | -0.0024    | -0.0211* | no           |
+| linear         | -0.0016  | -0.0356*   | -0.0225* | no           |
+| climatological | -0.0357* | -0.0017    | -0.0206* | no           |
 
 `*` marks Holm significance within that donor. **Replicates** is the
 strict rule: A family replicates only if its paired arm gap has the same sign on every donor and is significant under Holm on every donor.
+
+#### Is the sequence tier affected *more* than the others?
+
+The rule above is not a contrast. Differencing the families within
+each matched (coverage level, injection seed, donor) triple asks the
+question the claim actually makes; the triples are already matched,
+because at one draw every family was fitted on the same two degraded
+copies of the same record.
+
+| Contrast | Mean | 95% CI | p | p (Holm) |
+|---|---:|---|---:|---:|
+| sequence − trees | -0.0102 | [-0.0189, -0.0016] | 0.1488 | 0.1610 |
+| sequence − climatological | -0.0096 | [-0.0233, +0.0040] | 0.0211 | 0.0632 |
+| sequence − linear | -0.0090 | [-0.0174, -0.0007] | 0.0805 | 0.1610 |
+
+**The claim does not survive as a contrast.** Its point estimate is the largest gap of any family on every donor, but it is not separable from `trees` (-0.0102, p = 0.149), and the conjunction it would need — worse than *every* other family — therefore fails. Because the claim is a conjunction the correct procedure is an intersection-union test, in which each contrast is tested unadjusted and a single non-rejection withholds the claim.
+
+What survives is narrower and is what this report states: the
+sequence tier's gap is the only one that is Holm-significant against
+zero on every donor, and it is the largest in mean. That is a
+statement about reliability across records, not about being worse
+than another family on any one of them.
+
+#### Does the gap steepen as the record degrades?
+
+The paired test pools every coverage level, which answers whether the
+gap is nonzero and cannot answer whether it grows. A gap flat in
+coverage is a fixed cost; one that steepens is a mechanism. One slope
+is fitted per (injection seed, donor) and the slopes are tested.
+
+| Family | Gap per 10 pp coverage lost | 95% CI | p (Holm) |
+|---|---:|---|---:|
+| climatological | -0.0247 | [-0.0470, -0.0048] | 0.0620 |
+| **sequence** | -0.0226 | [-0.0356, -0.0107] | 0.0161 |
+| **linear** | -0.0173 | [-0.0272, -0.0072] | 0.0186 |
+| trees | -0.0052 | [-0.0151, +0.0054] | 0.1642 |
+
+The gap steepens significantly for `sequence` and `linear`. Where it does, fragmentation is not a fixed toll but a cost that accelerates as the record breaks up — which is the shape the sterilisation-radius account predicts, and the one the pooled test averages away.
+
 
 The sequence family's gap is the only one Holm-significant on every
 donor.
 
 Every family's point estimate is negative on every donor, so this is not a finding that fragmentation costs the others nothing. What separates the sequence tier is that its gap is the one that appears *reliably* rather than on some records and not others, and it is the largest mean gap across donors (-0.0289).
 
-**The climatological row at the severest level (75% coverage):** Wanliu -0.0958, Dingling -0.0038, Dongsi -0.0373. 
+**The climatological row at the severest level (75% coverage):** Wanliu -0.0956, Dingling -0.0035, Dongsi -0.0361. 
 These disagree by more than their own average, so the collapse visible on the largest-gap donor is a property of that record rather than of fragmentation. Read on one donor alone it would have argued that fragmentation degrades anything estimated from the record, windowed or not; it does not survive the other donors, and that is the specific thing a second and third record were run to test.
+
+### 8c. Is the backward reach *why* it costs skill?
+
+The section above measures a penalty and the law below explains what should
+cause it: a gap sterilises the hours behind it, so scattering removals
+destroys far more supervision than clustering them. That is a mediation
+claim, and it predicts something falsifiable — shorten the reach and the
+penalty should shrink.
+
+The reach is set by configuration rather than inferred from a regression, so
+this is a stronger design than a regression-based mediation and needs no
+sequential-ignorability assumption. `inject_gaps` is deterministic in
+(arm, coverage, seed) and runs before any feature is built, so the same
+degraded series appears at every reach and each draw is a repeated measure.
+
+**The mediator moves first.** Usable training rows the fragmented arm
+loses relative to the contiguous arm, at the same removed-hour count:
+
+| Sterilisation radius (h) | Row deficit |
+|---:|---:|
+| 192 | -8,056 |
+| 72 | -4,415 |
+| 48 | -3,220 |
+
+**And the penalty follows it.** Arm gap at R = 192 h against R = 48 h,
+differenced within the same injection draw:
+
+| Family | R = 192 | R = 48 | Change | 95% CI | Mediated | p (Holm) |
+|---|---:|---:|---:|---|---:|---:|
+| sequence | -0.0394 | -0.0012 | +0.0383 | [+0.0228, +0.0540] | 97% | <0.0001 |
+| trees | -0.0263 | -0.0072 | +0.0191 | [+0.0078, +0.0301] | 73% | 0.0017 |
+| linear | -0.0016 | +0.0021 | +0.0037 | [-0.0021, +0.0097] | — | 0.2605 |
+| climatological | -0.0357 | -0.0005 | +0.0351 | [+0.0140, +0.0589] | 99% | 0.0097 |
+
+One-sided and pre-declared: the mechanism predicts the gap becomes less
+negative, and spending power on the other direction would be spending it on
+something the account does not claim.
+
+**The confound, bounded rather than argued.** A shorter reach scores more test hours — 3,813 at R = 192 against 4,806 at R = 48 — so the two gaps are not measured on the same rows. If those extra hours carried no arm difference whatever, the gap would still shrink to 80% of itself by arithmetic alone: the between-arm error is averaged over more rows and the persistence denominator moves. Anything beyond that is mediated.
+
+For the sequence tier that leaves dilution explaining 0.0079 of the 0.0383 change and the reach explaining 0.0303 — 79% of the effect.
+
+**The falsification control holds.** `linear` had little or no gap to mediate at the deepest reach, and shows no mediation. A design in which every family moved regardless of whether it had a penalty would be measuring something other than the mechanism.
+
+**Scope.** One donor and one horizon. This establishes the mechanism on the
+record where the penalty was measured; it does not establish that the same
+mechanism carries the effect on the other donor stations, whose grids were
+run at the configured reach only.
 
 ## 9. What a gap costs, and how often a model can answer
 
