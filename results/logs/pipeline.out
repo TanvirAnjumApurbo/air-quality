@@ -1,0 +1,5 @@
+13:35:24 pipeline: start
+13:35:24   disk: C: 15G  F: 10G
+13:35:24 [1/8] finish the Wanliu grid (resume)
+13:35:25   disk: C: 15G  F: 10G
+13:35:25   attempt 1: resume (keeps cells already computed)

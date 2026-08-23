@@ -45,3 +45,6 @@ Thumbs.db
 
 # --- scratch notebooks (exploration only, not the pipeline) ---
 notebooks/scratch/
+
+# Claude session scratch, kept on the project drive rather than C:
+/.scratch/
