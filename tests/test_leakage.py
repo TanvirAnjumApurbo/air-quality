@@ -1678,3 +1678,45 @@ def test_modelspec_field_names_are_what_callers_construct():
     spec = ModelSpec(arch="gru", hidden_size=64, num_layers=2, window=48, horizon=24, seed=42)
     assert spec.name == "gru_h64_l2"
     assert spec.run_id == "gru_h64_l2_w48_H24_s42"
+
+
+@pytest.mark.leakage
+def test_donor_comparison_keeps_only_grids_at_one_reach():
+    """A donor comparison must hold the backward reach constant."""
+    from src.eval.ablation import same_radius_grids
+
+    kept, skipped = same_radius_grids(
+        {"wanliu.json": 192, "dingling.json": 192, "legacy.json": None}, 192
+    )
+    assert set(kept) == {"wanliu.json", "dingling.json", "legacy.json"}
+    assert skipped == []
+
+
+@pytest.mark.leakage
+def test_control_a_mediation_grid_is_not_mistaken_for_a_donor():
+    """Negative control: the same station at a different reach is not a donor.
+
+    The mediation grids sit beside the donor grids, match the same filename
+    pattern, and carry the SAME donor label. Swept in, one would appear as a
+    fourth donor whose arm gap came from a different design -- and the
+    replication rule would then be counting a reach as a record.
+    """
+    from src.eval.ablation import same_radius_grids
+
+    kept, skipped = same_radius_grids(
+        {
+            "ablation_gap_injection.json": 192,
+            "ablation_gap_injection_dingling.json": 192,
+            "ablation_gap_injection_wanliu_R72.json": 72,
+            "ablation_gap_injection_wanliu_R48.json": 48,
+        },
+        192,
+    )
+    assert set(kept) == {
+        "ablation_gap_injection.json",
+        "ablation_gap_injection_dingling.json",
+    }
+    assert sorted(skipped) == [
+        ("ablation_gap_injection_wanliu_R48.json", 48),
+        ("ablation_gap_injection_wanliu_R72.json", 72),
+    ]

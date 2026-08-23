@@ -1,0 +1,53 @@
+16:53:30 | INFO    | 18_donor_replication | Wanliu: 101 cells, 50 matched pairs per family
+16:53:31 | INFO    | 18_donor_replication | Dingling: 101 cells, 50 matched pairs per family
+16:53:31 | INFO    | 18_donor_replication | Dongsi: 101 cells, 50 matched pairs per family
+16:53:33 | INFO    | 18_donor_replication | wrote fig12_donor_replication.png, fig12_donor_replication.pdf
+16:53:33 | INFO    | 18_donor_replication | pooled family contrasts:
+        Family  Triples  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+         trees      150        -0.0102 -0.0030 [-0.0189, -0.0016]       0.1488   0.1610
+climatological      150        -0.0096 -0.0082 [-0.0233, +0.0040]       0.0211   0.0632
+        linear      150        -0.0090 -0.0066 [-0.0174, -0.0007]       0.0805   0.1610
+16:53:33 | INFO    | 18_donor_replication | pooled dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+climatological     30            -0.0247 [-0.0470, -0.0048]       0.0310   0.0620
+      sequence     30            -0.0226 [-0.0356, -0.0107]       0.0040   0.0161
+        linear     30            -0.0173 [-0.0272, -0.0072]       0.0062   0.0186
+         trees     30            -0.0052 [-0.0151, +0.0054]       0.1642   0.1642
+
+==============================================================================
+DONOR REPLICATION — 3 donors: Wanliu, Dingling, Dongsi
+==============================================================================
+
+Wanliu
+  sequence  -0.0394* [-0.0565, -0.0236]  Holm <0.0001
+  climatological -0.0357* [-0.0609, -0.0138]  Holm 0.0115
+  trees     -0.0263* [-0.0393, -0.0125]  Holm 0.0003
+  linear    -0.0016  [-0.0081, +0.0047]  Holm 0.9542
+
+Dingling
+  linear    -0.0356* [-0.0488, -0.0237]  Holm <0.0001
+  sequence  -0.0200* [-0.0300, -0.0108]  Holm 0.0003
+  trees     -0.0120  [-0.0205, -0.0040]  Holm 0.0580
+  climatological -0.0017  [-0.0262, +0.0220]  Holm 0.1781
+
+Dongsi
+  sequence  -0.0273* [-0.0412, -0.0139]  Holm 0.0020
+  linear    -0.0225* [-0.0350, -0.0101]  Holm 0.0034
+  climatological -0.0206* [-0.0328, -0.0099]  Holm 0.0021
+  trees     -0.0179* [-0.0326, -0.0026]  Holm 0.0045
+
+------------------------------------------------------------------------------
+REPLICATES (same sign and Holm-significant on every donor):
+  sequence  YES  gap -0.0394 to -0.0200, significant on 3/3
+  trees     no   gap -0.0263 to -0.0120, significant on 2/3
+  linear    no   gap -0.0356 to -0.0016, significant on 2/3
+  climatological no   gap -0.0357 to -0.0017, significant on 2/3
+
+between-family contrast (sequence minus family, pooled triples)
+  vs trees           -0.0102 [-0.0189, -0.0016]  p=0.1488 
+  vs climatological  -0.0096 [-0.0233, +0.0040]  p=0.0211*
+  vs linear          -0.0090 [-0.0174, -0.0007]  p=0.0805 
+  IUT -- sequence worse than EVERY other family: NO
+
+
+wrote results\donor_replication.json

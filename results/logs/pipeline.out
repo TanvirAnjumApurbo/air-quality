@@ -20,3 +20,15 @@
 15:19:05 [4/8] T2 grid: dongsi
 15:19:05   disk: C: 12G  F: 10G
 15:19:05   attempt 1: --force (clears the grid, then rebuilds)
+16:53:09   attempt 1: FAILED rc=127
+16:53:10   disk: C: 11G  F: 9G
+16:53:10   attempt 2: resume (keeps cells already computed)
+16:53:22   attempt 2: ok
+16:53:28   17 rc=0
+16:53:28 [5/8] 18 cross-donor replication
+16:53:33   18 rc=0
+16:53:33 [6/8] 20 amplification law on the corrected grids
+16:53:37   20 rc=0
+16:53:37 [7/8] T3 grid: wanliu_R72
+16:53:37   disk: C: 11G  F: 9G
+16:53:37   attempt 1: resume (keeps cells already computed)

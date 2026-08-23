@@ -508,3 +508,34 @@ def cells_for_run(
         f"--force over the full grid: discarding {len(cells)} existing cells so a "
         f"partial run leaves no stale mixture (restart without --force to resume)"
     )
+
+
+def same_radius_grids(
+    grids: dict[str, int | None], expected_radius_h: int
+) -> tuple[list[str], list[tuple[str, int]]]:
+    """Split grid files into those at one backward reach and those at another.
+
+    The mediation grids live beside the donor grids, match the same filename
+    pattern, and carry the SAME donor label -- they are the same station at a
+    different reach. Swept into a donor comparison one would appear as an extra
+    donor whose arm gap came from a different design, which is the confusion the
+    radius stamp exists to prevent. A donor comparison holds the reach constant.
+
+    A grid with no recorded radius predates the stamp and is kept: those all ran
+    at the configured reach, so absence is not disagreement.
+
+    Args:
+        grids: File label to its recorded sterilisation radius, or None.
+        expected_radius_h: The reach this comparison is being made at.
+
+    Returns:
+        ``(kept, skipped)`` where ``skipped`` pairs each label with its radius.
+    """
+    kept: list[str] = []
+    skipped: list[tuple[str, int]] = []
+    for label, radius in grids.items():
+        if radius is None or int(radius) == int(expected_radius_h):
+            kept.append(label)
+        else:
+            skipped.append((label, int(radius)))
+    return kept, skipped

@@ -1,0 +1,43 @@
+16:53:34 | INFO    | 20_missingness_law | loaded 303 cells from 3 donor grid(s)
+16:53:37 | INFO    | 20_missingness_law | wrote fig14_missingness_amplification.png, fig14_missingness_amplification.pdf
+16:53:37 | INFO    | 20_missingness_law | wrote F:\BUP\results\missingness_law.json
+
+==============================================================================
+MISSINGNESS AMPLIFICATION — radius 192 h (floor 168 + horizon 24)
+==============================================================================
+
+law: usable = O * exp(-0.1596 - 0.1555 * 192 * k / O)
+  fitted on wanliu (101 cells)
+  in-sample  R2 = 0.9875  median APE   3.4%
+  HELD OUT   R2 = 0.9767  median APE   5.2%   (202 cells)
+
+  alpha fitted    0.1555
+  alpha predicted 0.1418  (gaps longer than 3 h)
+  agreement       9% apart
+
+amplification by record
+          Record  Missing hours  Missing (%)  Runs  Amplification
+           Dhaka          10766        13.59   295           2.28
+  Beijing Wanliu            117         0.33    27          34.24
+Beijing Dingling            424         1.21    43          14.04
+  Beijing Dongsi            509         1.45    39          10.44
+
+forecast availability at the headline horizon
+          Record  Lookback (h)  Served  Availability (grid)
+           Dhaka           168    9083               0.7644
+           Dhaka            48   10363               0.8721
+           Dhaka            24   10619               0.8936
+           Dhaka            12   10750               0.9047
+  Beijing Wanliu           168    3813               0.7249
+  Beijing Wanliu            48    4497               0.8549
+  Beijing Wanliu            24    4665               0.8869
+  Beijing Wanliu            12    4749               0.9029
+Beijing Dingling           168    3388               0.6441
+Beijing Dingling            48    4255               0.8089
+Beijing Dingling            24    4447               0.8454
+Beijing Dingling            12    4540               0.8631
+  Beijing Dongsi           168    3380               0.6426
+  Beijing Dongsi            48    4269               0.8116
+  Beijing Dongsi            24    4485               0.8527
+  Beijing Dongsi            12    4593               0.8732
+

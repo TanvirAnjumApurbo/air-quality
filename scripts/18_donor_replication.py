@@ -42,10 +42,12 @@ from src.eval.ablation import (
     dose_response,
     family_contrasts,
     paired_arm_gaps,
+    same_radius_grids,
     test_arm_gaps,
     tidy,
 )
 from src.eval.ablation import fmt_p as _fmt_p
+from src.features.build_features import max_backward_dependency
 from src.utils import load_config, setup_logging
 from src.viz.figures import COL_DOUBLE, panel_label, save_figure, setup_style
 from src.viz.tables import write_table
@@ -89,6 +91,36 @@ def main() -> int:
 
     results_dir = Path(cfg.get("paths.results"))
     paths = sorted(results_dir.glob(args.glob))
+
+    # The mediation grids sit beside the donor grids and match the same pattern,
+    # and they carry the SAME donor label -- they are the same station at a
+    # different backward reach. Swept in unhandled, one would appear as an extra
+    # "donor" whose arm gap was produced under a different design, which is
+    # exactly the confusion the radius stamp exists to prevent. A donor
+    # comparison has to hold the reach constant, so anything not at this config's
+    # reach is dropped and said so.
+    expected_radius = max(
+        max_backward_dependency(cfg),
+        max(int(s.get("window_h", 0)) for s in cfg.get("ablation.gap_injection.sequence_models"))
+        - 1,
+    ) + int(cfg.get("ablation.gap_injection.horizon_h"))
+    radii: dict[str, int | None] = {}
+    for path in paths:
+        try:
+            radii[path.name] = json.loads(path.read_text(encoding="utf-8")).get(
+                "sterilisation_radius_h"
+            )
+        except (OSError, json.JSONDecodeError):
+            continue
+    keep_names, skipped = same_radius_grids(radii, expected_radius)
+    for name, radius in skipped:
+        log.info(
+            "skipping %s: sterilisation radius %d h, not this comparison's %d h",
+            name,
+            radius,
+            expected_radius,
+        )
+    paths = [p for p in paths if p.name in set(keep_names)]
     if not paths:
         log.error("no donor grids matching %s under %s", args.glob, results_dir)
         return 1
