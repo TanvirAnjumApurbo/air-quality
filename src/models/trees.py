@@ -382,6 +382,74 @@ def fit_lightgbm(
     )
 
 
+def fit_at_fixed_params(
+    name: str,
+    params: dict[str, Any],
+    cfg: Config,
+    train: SplitArrays,
+    val: SplitArrays,
+    seed: int,
+) -> Any:
+    """Fit one tier-2 model at fixed hyperparameters.
+
+    The randomised search is deliberately bypassed. Re-tuning inside every cell
+    would let hyperparameter search compensate for the degradation, which is a
+    second uncontrolled variable and would blunt exactly the effect being
+    measured. Fixing them at the undegraded record's choices is also what a
+    practitioner deploying a tuned pipeline onto a worse record actually does.
+
+    It lives here rather than in either caller because the gap-injection grid
+    and the lookback frontier both need it, and two copies would be two
+    definitions of what a fixed-hyperparameter fit is.
+
+    Args:
+        name: Model name.
+        params: Hyperparameters from the undegraded run.
+        cfg: Loaded configuration, with paths pointing at this cell.
+        train: Training arrays.
+        val: Validation arrays.
+        seed: RNG seed.
+
+    Returns:
+        The fitted estimator, or None if the library is unavailable.
+    """
+    x = np.vstack([train.x, val.x])
+    y = np.concatenate([train.y_transformed, val.y_transformed])
+
+    if name == "ridge":
+        from sklearn.linear_model import Ridge
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        alpha = float(params.get("ridge__alpha", params.get("alpha", 1.0)))
+        model = Pipeline(
+            [
+                ("log_history", LogScaleTargetHistory(cfg, list(train.feature_names))),
+                ("rescale", StandardScaler()),
+                ("ridge", Ridge(alpha=alpha, random_state=seed)),
+            ]
+        )
+    elif name == "random_forest":
+        from sklearn.ensemble import RandomForestRegressor
+
+        model = RandomForestRegressor(random_state=seed, n_jobs=-1, **params)
+    elif name == "xgboost":
+        from xgboost import XGBRegressor
+
+        model = XGBRegressor(random_state=seed, tree_method="hist", verbosity=0, **params)
+    elif name == "lightgbm":
+        try:
+            from lightgbm import LGBMRegressor
+        except Exception:
+            return None
+        model = LGBMRegressor(random_state=seed, verbose=-1, n_jobs=-1, **params)
+    else:
+        raise ValueError(f"unknown tabular model {name!r}")
+
+    model.fit(x, y)
+    return model
+
+
 def permutation_importance_scores(
     model: TunedModel, arrays: SplitArrays, seed: int, n_repeats: int = 5
 ) -> dict[str, float]:

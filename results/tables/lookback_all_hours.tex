@@ -1,0 +1,46 @@
+\begin{table}[htbp]
+\caption{Skill over the whole evaluation universe rather than each arm's own servable subset. Under the single policy an arm answers where it can and persistence answers the rest; under the cascade a shorter-reach arm answers the hours a deeper one refuses. An hour with no forecast is not an hour without error. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:lookback_all_hours}
+\begin{tabular}{lrrrrrrr}
+\toprule
+model & arm & policy & availability & rmse\_served & rmse\_all\_hours & skill\_all\_hours & fallback\_share \\
+\midrule
+climatology & A24 & single & 0.9760 & 64.1822 & 64.4915 & 0.0949 & nan \\
+climatology & A48 & single & 0.9525 & 64.2607 & 64.4701 & 0.0952 & nan \\
+climatology & B24 & single & 0.8348 & 65.4315 & 64.1005 & 0.1004 & nan \\
+climatology & B48 & single & 0.8348 & 65.4315 & 64.1005 & 0.1004 & nan \\
+climatology & C & single & 0.8348 & 65.4315 & 64.1005 & 0.1004 & nan \\
+climatology & cascade & cascade & 1.0000 & 65.4315 & 64.5638 & 0.0939 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+lightgbm & A24 & single & 0.9760 & 56.9114 & 57.4441 & 0.1938 & nan \\
+lightgbm & A48 & single & 0.9525 & 57.0443 & 57.6420 & 0.1910 & nan \\
+lightgbm & B24 & single & 0.8348 & 58.5693 & 58.2967 & 0.1819 & nan \\
+lightgbm & B48 & single & 0.8348 & 58.4309 & 58.1806 & 0.1835 & nan \\
+lightgbm & C & single & 0.8348 & 59.0210 & 58.6758 & 0.1765 & nan \\
+lightgbm & cascade & cascade & 1.0000 & 59.0210 & 57.8470 & 0.1882 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+persistence & A24 & single & 0.9760 & 71.1335 & 71.2545 & 0.0000 & nan \\
+persistence & A48 & single & 0.9525 & 71.3876 & 71.2545 & 0.0000 & nan \\
+persistence & B24 & single & 0.8348 & 73.7644 & 71.2545 & 0.0000 & nan \\
+persistence & B48 & single & 0.8348 & 73.7644 & 71.2545 & 0.0000 & nan \\
+persistence & C & single & 0.8348 & 73.7644 & 71.2545 & 0.0000 & nan \\
+persistence & cascade & cascade & 1.0000 & 73.7644 & 71.2545 & 0.0000 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+random\_forest & A24 & single & 0.9760 & 56.5798 & 57.1236 & 0.1983 & nan \\
+random\_forest & A48 & single & 0.9525 & 56.8273 & 57.4375 & 0.1939 & nan \\
+random\_forest & B24 & single & 0.8348 & 58.3918 & 58.1479 & 0.1839 & nan \\
+random\_forest & B48 & single & 0.8348 & 58.3661 & 58.1263 & 0.1842 & nan \\
+random\_forest & C & single & 0.8348 & 58.4997 & 58.2383 & 0.1827 & nan \\
+random\_forest & cascade & cascade & 1.0000 & 58.4997 & 57.3522 & 0.1951 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+ridge & A24 & single & 0.9760 & 58.0187 & 58.5153 & 0.1788 & nan \\
+ridge & A48 & single & 0.9525 & 57.9498 & 58.4960 & 0.1791 & nan \\
+ridge & B24 & single & 0.8348 & 59.6047 & 59.1663 & 0.1696 & nan \\
+ridge & B48 & single & 0.8348 & 59.5439 & 59.1152 & 0.1704 & nan \\
+ridge & C & single & 0.8348 & 59.3651 & 58.9649 & 0.1725 & nan \\
+ridge & cascade & cascade & 1.0000 & 59.3651 & 58.2575 & 0.1824 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+xgboost & A24 & single & 0.9760 & 56.7067 & 57.2462 & 0.1966 & nan \\
+xgboost & A48 & single & 0.9525 & 56.9161 & 57.5212 & 0.1927 & nan \\
+xgboost & B24 & single & 0.8348 & 58.4514 & 58.1978 & 0.1832 & nan \\
+xgboost & B48 & single & 0.8348 & 58.4651 & 58.2093 & 0.1831 & nan \\
+xgboost & C & single & 0.8348 & 58.6243 & 58.3428 & 0.1812 & nan \\
+xgboost & cascade & cascade & 1.0000 & 58.6243 & 57.5067 & 0.1929 & \{"C": 0.8348, "B48": 0.0, "B24": 0.0, "A48": 0.1176, "A24": 0.0235, "persistence": 0.024\} \\
+\bottomrule
+\end{tabular}
+\end{table}

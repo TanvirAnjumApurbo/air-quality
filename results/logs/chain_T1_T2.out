@@ -1,0 +1,7 @@
+12:13:21 chain: waiting for T1 (pid 6084) to exit
+12:13:21 chain: T1 exited
+12:13:21 chain: 17 on Wanliu
+12:13:26 chain: 17 Wanliu rc=0
+12:13:26 chain: T2 16 on dingling
+12:14:05 chain: 16 dingling rc=127
+12:14:05 chain: ABORTING -- dingling grid failed; a partial grid unbalances the paired test

@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\caption{Exact decomposition of the capped arm's change in mean squared error into supervision volume (A minus B, same predictors, more rows) and feature richness (B minus C, same rows, fewer predictors). The residual is zero by construction and is printed as a check on the arithmetic, not as a finding. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\label{tab:lookback_decomposition}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+model & lookback\_h & rmse\_C & rmse\_B & rmse\_A & total\_mse\_delta & volume\_mse\_delta & richness\_mse\_delta & residual \\
+\midrule
+climatology & 24 & 65.4315 & 65.4315 & 65.4037 & -3.6400 & -3.6400 & 0.0000 & 0.0000 \\
+climatology & 48 & 65.4315 & 65.4315 & 65.3592 & -9.4495 & -9.4495 & 0.0000 & 0.0000 \\
+lightgbm & 24 & 59.0210 & 58.5693 & 58.5441 & -56.0611 & -2.9470 & -53.1140 & 0.0000 \\
+lightgbm & 48 & 59.0210 & 58.4309 & 58.6248 & -46.6097 & 22.6948 & -69.3045 & 0.0000 \\
+persistence & 24 & 73.7644 & 73.7644 & 73.7644 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+persistence & 48 & 73.7644 & 73.7644 & 73.7644 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+random\_forest & 24 & 58.4997 & 58.3918 & 58.2461 & -29.6076 & -16.9970 & -12.6106 & 0.0000 \\
+random\_forest & 48 & 58.4997 & 58.3661 & 58.4120 & -10.2602 & 5.3537 & -15.6139 & 0.0000 \\
+ridge & 24 & 59.3651 & 59.6047 & 59.6422 & 32.9796 & 4.4749 & 28.5047 & 0.0000 \\
+ridge & 48 & 59.3651 & 59.5439 & 59.4959 & 15.5449 & -5.7180 & 21.2630 & 0.0000 \\
+xgboost & 24 & 58.6243 & 58.4514 & 58.3632 & -30.5425 & -10.2949 & -20.2476 & 0.0000 \\
+xgboost & 48 & 58.6243 & 58.4651 & 58.4784 & -17.0844 & 1.5590 & -18.6435 & 0.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}

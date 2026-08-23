@@ -58,6 +58,7 @@ from src.models.sequence import (
     evaluate_sampler,
     train_one,
 )
+from src.models.trees import fit_at_fixed_params
 from src.results import main_runs
 from src.utils import check_disk_space, load_config, resolve_device, setup_logging
 
@@ -134,64 +135,6 @@ def _score(
         metrics["rmse"],
         metrics["skill_vs_persistence"],
     )
-
-
-def _fit_tabular(name: str, params: dict, cfg, train, val, seed: int):  # noqa: ANN202
-    """Fit one tier-2 model at fixed hyperparameters.
-
-    The randomised search is deliberately bypassed. Re-tuning inside every cell
-    would let hyperparameter search compensate for the degradation, which is a
-    second uncontrolled variable and would blunt exactly the effect being
-    measured. Fixing them at the undegraded record's choices is also what a
-    practitioner deploying a tuned pipeline onto a worse record actually does.
-
-    Args:
-        name: Model name.
-        params: Hyperparameters from the undegraded run.
-        cfg: Loaded configuration, with paths pointing at this cell.
-        train: Training arrays.
-        val: Validation arrays.
-        seed: RNG seed.
-
-    Returns:
-        The fitted estimator, or None if the library is unavailable.
-    """
-    x = np.vstack([train.x, val.x])
-    y = np.concatenate([train.y_transformed, val.y_transformed])
-
-    if name == "ridge":
-        from sklearn.linear_model import Ridge
-        from sklearn.pipeline import Pipeline
-        from sklearn.preprocessing import StandardScaler
-        from src.models.trees import LogScaleTargetHistory
-
-        alpha = float(params.get("ridge__alpha", params.get("alpha", 1.0)))
-        model = Pipeline(
-            [
-                ("log_history", LogScaleTargetHistory(cfg, list(train.feature_names))),
-                ("rescale", StandardScaler()),
-                ("ridge", Ridge(alpha=alpha, random_state=seed)),
-            ]
-        )
-    elif name == "random_forest":
-        from sklearn.ensemble import RandomForestRegressor
-
-        model = RandomForestRegressor(random_state=seed, n_jobs=-1, **params)
-    elif name == "xgboost":
-        from xgboost import XGBRegressor
-
-        model = XGBRegressor(random_state=seed, tree_method="hist", verbosity=0, **params)
-    elif name == "lightgbm":
-        try:
-            from lightgbm import LGBMRegressor
-        except Exception:
-            return None
-        model = LGBMRegressor(random_state=seed, verbose=-1, n_jobs=-1, **params)
-    else:
-        raise ValueError(f"unknown tabular model {name!r}")
-
-    model.fit(x, y)
-    return model
 
 
 def main() -> int:
@@ -346,7 +289,7 @@ def main() -> int:
         for name in tabular:
             params = _tuned_params(tuned, name, horizon)
             try:
-                model = _fit_tabular(name, params, cfg, train, val, model_seeds[0])
+                model = fit_at_fixed_params(name, params, cfg, train, val, model_seeds[0])
             except Exception as exc:
                 log.warning("    %s failed: %s", name, exc)
                 continue

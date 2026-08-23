@@ -1,0 +1,8 @@
+12:50:38 | INFO    | 22_availability_frontier | universe 10880 hours, persistence RMSE 71.2545
+12:50:38 | INFO    | 22_availability_frontier | common subset: 9083 of 10880 universe hours
+12:50:39 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
+12:50:40 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf
+12:51:53 | INFO    | 22_availability_frontier | universe 10880 hours, persistence RMSE 71.2545
+12:51:53 | INFO    | 22_availability_frontier | common subset: 9083 of 10880 universe hours
+12:51:54 | INFO    | 22_availability_frontier | decomposition residual max |.| = 0.000e+00 (must be ~0 by construction)
+12:51:55 | INFO    | 22_availability_frontier | wrote fig15_availability_frontier.png, fig15_availability_frontier.pdf

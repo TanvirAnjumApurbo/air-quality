@@ -1,0 +1,37 @@
+model,arm,policy,availability,rmse_served,rmse_all_hours,skill_all_hours,fallback_share
+climatology,A24,single,0.9760,64.1822,64.4915,0.0949,
+climatology,A48,single,0.9525,64.2607,64.4701,0.0952,
+climatology,B24,single,0.8348,65.4315,64.1005,0.1004,
+climatology,B48,single,0.8348,65.4315,64.1005,0.1004,
+climatology,C,single,0.8348,65.4315,64.1005,0.1004,
+climatology,cascade,cascade,1.0000,65.4315,64.5638,0.0939,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
+lightgbm,A24,single,0.9760,56.9114,57.4441,0.1938,
+lightgbm,A48,single,0.9525,57.0443,57.6420,0.1910,
+lightgbm,B24,single,0.8348,58.5693,58.2967,0.1819,
+lightgbm,B48,single,0.8348,58.4309,58.1806,0.1835,
+lightgbm,C,single,0.8348,59.0210,58.6758,0.1765,
+lightgbm,cascade,cascade,1.0000,59.0210,57.8470,0.1882,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
+persistence,A24,single,0.9760,71.1335,71.2545,0.0000,
+persistence,A48,single,0.9525,71.3876,71.2545,0.0000,
+persistence,B24,single,0.8348,73.7644,71.2545,0.0000,
+persistence,B48,single,0.8348,73.7644,71.2545,0.0000,
+persistence,C,single,0.8348,73.7644,71.2545,0.0000,
+persistence,cascade,cascade,1.0000,73.7644,71.2545,0.0000,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
+random_forest,A24,single,0.9760,56.5798,57.1236,0.1983,
+random_forest,A48,single,0.9525,56.8273,57.4375,0.1939,
+random_forest,B24,single,0.8348,58.3918,58.1479,0.1839,
+random_forest,B48,single,0.8348,58.3661,58.1263,0.1842,
+random_forest,C,single,0.8348,58.4997,58.2383,0.1827,
+random_forest,cascade,cascade,1.0000,58.4997,57.3522,0.1951,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
+ridge,A24,single,0.9760,58.0187,58.5153,0.1788,
+ridge,A48,single,0.9525,57.9498,58.4960,0.1791,
+ridge,B24,single,0.8348,59.6047,59.1663,0.1696,
+ridge,B48,single,0.8348,59.5439,59.1152,0.1704,
+ridge,C,single,0.8348,59.3651,58.9649,0.1725,
+ridge,cascade,cascade,1.0000,59.3651,58.2575,0.1824,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
+xgboost,A24,single,0.9760,56.7067,57.2462,0.1966,
+xgboost,A48,single,0.9525,56.9161,57.5212,0.1927,
+xgboost,B24,single,0.8348,58.4514,58.1978,0.1832,
+xgboost,B48,single,0.8348,58.4651,58.2093,0.1831,
+xgboost,C,single,0.8348,58.6243,58.3428,0.1812,
+xgboost,cascade,cascade,1.0000,58.6243,57.5067,0.1929,"{""C"": 0.8348, ""B48"": 0.0, ""B24"": 0.0, ""A48"": 0.1176, ""A24"": 0.0235, ""persistence"": 0.024}"
