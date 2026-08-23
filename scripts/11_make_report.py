@@ -728,6 +728,40 @@ def main() -> int:
                 a("nothing about fragmentation in either direction.")
             a("")
 
+            # The coverage contrast that frames this whole section is not the
+            # quantity the models experience. Reported here rather than only in
+            # the availability section, because it is this comparison it
+            # qualifies -- and it is read from the generated file, not asserted.
+            law_here = Path(str(cfg.get("paths.results"))) / "missingness_law.json"
+            if law_here.exists():
+                avail_rows = pd.DataFrame(
+                    json.loads(law_here.read_text(encoding="utf-8")).get("availability", [])
+                )
+                deep = (
+                    avail_rows[avail_rows["Lookback (h)"] == avail_rows["Lookback (h)"].max()]
+                    if not avail_rows.empty
+                    else pd.DataFrame()
+                )
+                if len(deep) >= 2:
+                    spread = ", ".join(
+                        f"{r['Record']} {float(r['Availability (grid)']) * 100:.1f}%"
+                        for _, r in deep.iterrows()
+                    )
+                    cov_spread = ", ".join(
+                        f"{c} {coverage[c]:.1f}%" for c in sorted(coverage, key=coverage.get)
+                    )
+                    a("**Coverage is not the quantity that reaches the model.** Hourly")
+                    a(f"coverage runs {cov_spread}, but forecast availability — the share of")
+                    a("test hours any model here can answer at all — runs")
+                    a(f"{spread}. A row needs an unbroken history behind it, so a scattered")
+                    a("outage costs far more than its own length, and a near-complete record")
+                    a("with many small gaps can be less available than a broken one with few")
+                    a("large ones. The fragmentation gradient this section reads its ordering")
+                    a("against is therefore much weaker than the coverage figures suggest,")
+                    a("and on these records it does not run the way coverage does. See the")
+                    a("availability section below.")
+                    a("")
+
         # Strength of evidence is read from each city's own Model Confidence
         # Set, not asserted. A rank order can be printed for any pair of cities;
         # whether either ordering is separable from noise is a different
@@ -1113,6 +1147,205 @@ def main() -> int:
                             f"{', '.join(rep['incomplete_donors'])}: rep_grid incomplete."
                         )
                         a("")
+
+    # ---- forecast availability and the lookback frontier -------------------
+    # Its own section rather than a subsection of the ablation, because it is a
+    # property of the RECORD and the feature set, not of the gap-injection
+    # experiment: every number in sections 1-8 is conditional on it. Read from
+    # generated files only; nothing here is transcribed.
+    results_dir = Path(str(cfg.get("paths.results")))
+    law_path = results_dir / "missingness_law.json"
+    frontier_path = results_dir / "availability_frontier.json"
+    if law_path.exists():
+        law = json.loads(law_path.read_text(encoding="utf-8"))
+        a(f"## {next_section}. What a gap costs, and how often a model can answer")
+        next_section += 1
+        a("")
+        a("Every accuracy figure above is conditional on the model being able to produce a")
+        a("forecast at all, and that condition has not so far been reported. A row is")
+        a("scored only if it carries")
+        a(f"`pos_in_run >= {law['radius_h'] - law['horizon_h']}` hours of unbroken history and")
+        a(f"a target {law['horizon_h']} hours further on inside the same run, so a gap does not")
+        a("cost the hours it removes: it costs those hours **plus the")
+        a(f"{law['radius_h']} behind it** that no longer reach back far enough.")
+        a("")
+        a("The consequence is that the cost of missingness is governed by the *number* of")
+        a("gaps rather than their total length. That is the gap-injection experiment's arm")
+        a("contrast in closed form: at an identical hour count, scattering the removals")
+        a("sterilises many radii where clustering them sterilises few — which is the")
+        a("mechanism that experiment measures without explaining.")
+        a("")
+
+        amp = pd.DataFrame(law.get("amplification_by_record", []))
+        if not amp.empty:
+            a(
+                "| Record | Missing hours | Missing (%) | Runs | Usable hours destroyed | Amplification |"
+            )
+            a("|---|---:|---:|---:|---:|---:|")
+            for _, r in amp.iterrows():
+                a(
+                    f"| {r['Record']} | {int(r['Missing hours']):,} | "
+                    f"{float(r['Missing (%)']):.2f} | {int(r['Runs']):,} | "
+                    f"{int(r['Hours lost to short history']):,} | "
+                    f"{float(r['Amplification']):.1f}x |"
+                )
+            a("")
+            worst = amp.loc[amp["Amplification"].idxmax()]
+            best = amp.loc[amp["Amplification"].idxmin()]
+            a(
+                f"**A near-complete record is not a well-supervised one.** {worst['Record']} loses "
+                f"{worst['Amplification']:.1f} usable hours for every hour missing, against "
+                f"{best['Record']}'s {best['Amplification']:.1f}, because amplification follows the "
+                f"number of runs and not the number of absent hours."
+            )
+            a("")
+
+        fit = law.get("fit", {})
+        held = law.get("held_out", {})
+        if fit and held:
+            a("The relationship is close enough to state as a law. Writing $O$ for observed")
+            a("hours, $k$ for distinct gaps and $R$ for the sterilisation radius,")
+            a("")
+            a(
+                f"$$\\text{{usable}} \\approx O\\exp(\\beta_0 - \\alpha R k / O),"
+                f"\\quad \\alpha = {fit['alpha']:.4f},\\ \\beta_0 = {fit['beta0']:.4f}$$"
+            )
+            a("")
+            a(
+                f"fitted on {fit.get('source', 'one donor grid')} alone, it predicts "
+                f"{held['n']} held-out cells from the other donor records at "
+                f"$R^2 = {held['r2']:.3f}$ (median absolute error {held['median_ape_pct']:.1f}%)."
+            )
+            pred_alpha = law.get("alpha_predicted_from_ffill")
+            if pred_alpha:
+                a(
+                    f" $\\alpha$ is not a free constant: it should equal the share of gaps "
+                    f"outliving the {law['max_ffill_hours']}-hour forward-fill, which is "
+                    f"{pred_alpha:.4f} — agreeing with the fitted value to "
+                    f"{100 * abs(fit['alpha'] - pred_alpha) / fit['alpha']:.0f}%."
+                )
+            a("")
+
+        avail = pd.DataFrame(law.get("availability", []))
+        if not avail.empty:
+            a("### Coverage is not what reaches the model")
+            a("")
+            base = avail[avail["Lookback (h)"] == 168]
+            a("| Record | Lookback 168 h | 48 h | 24 h |")
+            a("|---|---:|---:|---:|")
+            for record in base["Record"]:
+                sub = avail[avail["Record"] == record].set_index("Lookback (h)")
+                cells = " | ".join(
+                    f"{float(sub.loc[lb, 'Availability (grid)']) * 100:.1f}%"
+                    for lb in (168, 48, 24)
+                    if lb in sub.index
+                )
+                a(f"| {record} | {cells} |")
+            a("")
+            a("Forecast availability is the share of test hours a model can answer at all.")
+            a("It does not rank these records the way coverage does: the primary record is")
+            a("the least complete of the four and yet among the most available, because its")
+            a("absences are clustered into a few long outages while the near-complete")
+            a("stations' are scattered. **Coverage is what a data custodian reports;")
+            a("availability is what a forecaster gets, and the two can order a set of")
+            a("records in opposite directions.**")
+            a("")
+
+    if frontier_path.exists():
+        fr = json.loads(frontier_path.read_text(encoding="utf-8"))
+        a("### Does a shorter reach cost accuracy?")
+        a("")
+        a(
+            f"Shortening the reach recovers those hours. It also removes real signal — the "
+            f"weekly lag and the 168-hour rolling statistics — so the trade is measured "
+            f"rather than assumed, on the {fr['n_common']:,} hours every arm can serve, "
+            f"which is the only comparison that is not confounded by how often each arm "
+            f"declines to answer."
+        )
+        a("")
+        # Persistence and climatology read no engineered features, so a cap cannot
+        # move them; they belong in the fallback, not in a table about the reach.
+        tier1 = ("persistence", "climatology")
+        dm = pd.DataFrame(fr.get("dm_tests", []))
+        allh = pd.DataFrame(fr.get("all_hours", []))
+        if not dm.empty:
+            dm = dm[~dm["model"].isin(tier1)]
+        if not allh.empty:
+            allh = allh[~allh["model"].isin(tier1)]
+        if not dm.empty:
+            any_sig = bool(dm["significant"].any())
+            a(
+                f"**{'At least one capped arm differs' if any_sig else 'No capped arm differs'} "
+                f"from the status quo** on the common subset under Holm-corrected "
+                f"Diebold-Mariano across {int(dm['p_holm'].notna().sum())} tests."
+            )
+            if not any_sig:
+                a("")
+                a("The shorter reach is not better at forecasting. It is better at answering.")
+            a("")
+        if not allh.empty:
+            single = allh[allh["policy"] == "single"]
+            sq = single[single["arm"] == "C"].set_index("model")["skill_all_hours"]
+            best_idx = single.groupby("model")["skill_all_hours"].idxmax()
+            best = single.loc[best_idx]
+            a("| Model | Status quo | Best arm | Availability | All-hours skill | Change |")
+            a("|---|---:|---|---:|---:|---:|")
+            for r in best.itertuples():
+                if r.arm == "C" or r.model not in sq.index:
+                    continue
+                a(
+                    f"| `{r.model}` | {float(sq[r.model]):+.4f} | {r.arm} | "
+                    f"{r.availability * 100:.1f}% | {r.skill_all_hours:+.4f} | "
+                    f"{r.skill_all_hours - float(sq[r.model]):+.4f} |"
+                )
+            a("")
+            a("Scored over the whole evaluation universe, an hour with no forecast is not an")
+            a("hour without error: it is an hour that must fall back on persistence. That is")
+            a("where the recovered availability turns into recovered skill.")
+            a("")
+        decomp = pd.DataFrame(fr.get("decomposition", []))
+        if not decomp.empty:
+            decomp = decomp[~decomp["model"].isin(tier1)]
+        if not decomp.empty:
+            a(
+                "The three arms separate the two effects exactly. Holding the row set at the "
+                "status quo and capping only the features isolates feature richness; holding "
+                "the features and lowering the floor isolates supervision volume; in mean "
+                "squared error the two sum to the total by construction "
+                f"(largest residual {decomp['residual'].abs().max():.2e})."
+            )
+            a("")
+            a("| Model | Cap (h) | Total ΔMSE | Supervision volume | Feature richness |")
+            a("|---|---:|---:|---:|---:|")
+            for r in decomp.itertuples():
+                a(
+                    f"| `{r.model}` | {int(r.lookback_h)} | {r.total_mse_delta:+.1f} | "
+                    f"{r.volume_mse_delta:+.1f} | {r.richness_mse_delta:+.1f} |"
+                )
+            a("")
+            vol = float(decomp["volume_mse_delta"].abs().sum())
+            rich = float(decomp["richness_mse_delta"].abs().sum())
+            leader = "feature richness" if rich > vol else "supervision volume"
+            a(
+                f"On these identical rows the larger term is **{leader}** "
+                f"({rich:.0f} against {vol:.0f} in summed absolute MSE). That is the right "
+                f"way round: the common subset holds the evaluation hours fixed, so extra "
+                f"training rows can only help through better-fitted parameters, and the "
+                f"availability they buy — which is where the gain of the previous table "
+                f"comes from — is by construction invisible here. Capping the reach removes "
+                f"the weekly lag and its rolling statistics and mostly *improves* the fit, "
+                f"so on this record the deepest features were paying for themselves only in "
+                f"the rows they made impossible."
+            )
+            a("")
+
+    if law_path.exists() or frontier_path.exists():
+        a("**Scope.** One horizon and one record family. The frontier is measured at the")
+        a("headline horizon only, and the arms cap the feature set rather than replacing it,")
+        a("so this bounds what the configured reach costs — not what an optimally chosen")
+        a("reach would buy. Below the sequence window the cap buys a recurrent model")
+        a("nothing, because `max(lookback, window - 1)` is the binding floor.")
+        a("")
 
     # Site-specific limitations are read from this city's own audit and QC
     # ledger. They were previously hardcoded to Dhaka's numbers, which the

@@ -16,18 +16,59 @@ fragmentation, rather than model class, decide which method wins?**
    tier loses −0.0394 skill to arrangement alone (50 matched pairs, Wilcoxon,
    Holm p < 0.0001), and it is the only model family whose gap is significant on
    **all three** donor records.
-2. **A corrected benchmark protocol.** Non-degenerate sequence inputs, modern
+
+   Two qualifications are reported with it rather than left for a referee.
+   Significance against a family's *own* null on every donor is not a contrast
+   between families, and when the families are differenced within matched
+   (coverage, seed, donor) triples the sequence tier separates from the linear
+   and climatological families but **not from the tree ensembles**
+   (−0.0102, p = 0.15); the conjunction it would need — worse than every other
+   family — does not hold pooled or on any donor alone. What does hold is a
+   dose–response: the sequence gap steepens by −0.0226 per 10 percentage points
+   of coverage lost (Holm p = 0.016) where the tree gap is flat.
+
+2. **A mechanism for that result, and a law** (`RESULTS.md` §8/§9). A row is
+   scored only if it carries the feature set's full backward reach of unbroken
+   history, so a gap costs the hours it removes **plus the reach behind it**.
+   The cost therefore follows the *number* of gaps, not their length — which is
+   the arm contrast in closed form. Written as
+   `usable ≈ O·exp(β₀ − αRk/O)` and fitted on one donor's 101 cells, it predicts
+   **202 held-out cells from two other stations at R² = 0.977** (median error
+   5.2%), and its α matches the share of gaps outliving the forward-fill limit
+   to 9% — so the constant is the imputation policy, not a free parameter.
+3. **A corrected benchmark protocol.** Non-degenerate sequence inputs, modern
    linear baselines (DLinear/NLinear, Zeng et al. 2023), block-bootstrap CIs,
-   Holm–Bonferroni across the full Diebold–Mariano matrix, and a Model Confidence
-   Set — so the paper states which models are *indistinguishable* from the best
-   rather than over-reading a rank order.
-3. **Multi-horizon forecasting benchmarked against the baselines air-quality papers
+   Holm–Bonferroni across the Diebold–Mariano family (one test per horizon, best
+   sequence against best classical — five tests, not a full pairwise matrix), and
+   a Model Confidence Set — so the paper states which models are
+   *indistinguishable* from the best rather than over-reading a rank order.
+
+   The horizon matters and is stated rather than selected: the sequence tier wins
+   significantly at h = 24, but **lightgbm beats it significantly at h = 1 and
+   h = 12**. Any single-horizon headline is a choice, and this one is reported
+   next to the four horizons that do not support it.
+4. **Multi-horizon forecasting benchmarked against the baselines air-quality papers
    usually omit** — persistence, seasonal-naïve, climatology, SARIMAX — with a
    skill score vs persistence as a headline column.
-4. **A cross-city rank-transfer check** (`RESULTS.md` §7) reporting that the ranking
+5. **Forecast availability as a reported quantity, and what the lookback costs**
+   (`RESULTS.md` §8/§9). Every accuracy number in this study — and in the
+   air-quality forecasting literature it sits in — is conditional on the model
+   being able to forecast at all, and that condition is not usually reported.
+   Here it is 76.4% of test hours on the primary record and 64–73% on the
+   near-complete comparison stations, so **coverage and availability order these
+   records in opposite directions**. Capping the backward reach at 24 h costs
+   nothing measurable in accuracy on the hours both can serve (no
+   Holm-corrected Diebold–Mariano test rejects) while raising availability to
+   97.6%, which over all hours is worth +0.016 skill. The configured 168-hour
+   reach buys no accuracy and costs fourteen points of availability.
+
+6. **A cross-city rank-transfer check** (`RESULTS.md` §7) reporting that the ranking
    does *not* transfer between Dhaka and Beijing (Spearman +0.20), together with the
    evidence that the comparison city cannot support a ranking at all — its 95% Model
-   Confidence Set retains 9 of 9 candidates, persistence included.
+   Confidence Set retains 9 of 9 candidates, persistence included. The coverage
+   contrast that motivates the comparison is shown there to be the wrong summary
+   statistic: the two records are far closer in availability than in coverage, and
+   ordered the other way.
 
 A green-AI efficiency analysis (accuracy vs parameters vs estimated training CO₂e)
 and a secondary AQI-category classification task are built from the same pipeline
@@ -314,8 +355,13 @@ Two cities that differ in coverage, span, climate and instrument at once cannot
 establish what causes a ranking to change. This experiment makes fragmentation the
 manipulated variable on a single record.
 
-> **Read the observational contrast carefully — it runs the other way.** The
-> sequence tier ranks **1** on the *more fragmented* record (Dhaka, 82.3% coverage)
+> **Read the observational contrast carefully — it runs the other way, and the
+> gradient it runs along is weaker than it looks.** Forecast availability, not
+> coverage, is what reaches the model: 76.4% here against 72.5% on the comparison
+> station, a four-point gap where coverage shows sixteen — and pointing the other
+> way. See `RESULTS.md` §8.
+>
+> The sequence tier ranks **1** on the *more fragmented* record (Dhaka, 82.3% coverage)
 > and **3** on the near-complete one (Beijing, 98.9%). That is the opposite of what
 > a fragmentation account predicts, and `RESULTS.md` §7 reports it rather than
 > setting it aside. The two-city contrast confounds fragmentation with a harder
