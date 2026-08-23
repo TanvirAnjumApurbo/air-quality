@@ -428,6 +428,17 @@ state-space projection now lives in
 - **Windows file locks.** Antivirus intermittently holds checkpoint handles and
   killed one sweep at run 191/675. `sequence.py::_atomic_save` retries with backoff.
   Always use `--resume auto`.
+- **`16_gap_injection.py` exits non-zero after a grid that trained, and the grid is
+  fine.** Measured on three grids: the script logs `gap-injection grid complete in
+  N min`, prints its closing lines, writes the payload — and then returns 127 with
+  no traceback, during interpreter shutdown. A no-op run that skips every cell
+  exits 0, so it correlates with having trained, not with the result. Neither CUDA
+  teardown, nor `n_jobs=-1` sklearn, nor LightGBM, nor XGBoost reproduces it alone.
+  **Verify a grid by its contents, never by the exit code**: cell count, and
+  whether the cells differ from the previous run where they should. Any driver
+  script should retry rather than abort — a second invocation finds the cells
+  already recorded and returns 0 in seconds.
+
 - **CUDA.** Blackwell (sm_120) needs the cu128 build. `torch.cuda.is_available()`
   returning `True` is not evidence training will run — `resolve_device` and
   `00_check_env.py` launch a real kernel.

@@ -403,3 +403,59 @@ climatological     10            -0.0514 [-0.0942, -0.0166]       0.0098   0.039
          trees     10            -0.0169 [-0.0323, +0.0034]       0.0840   0.1680
         linear     10            -0.0009 [-0.0092, +0.0075]       0.9219   0.9219
 13:30:50 | INFO    | 17_ablation_analysis | persistence RMSE invariant across 102 cells (spread 0.00e+00)
+13:48:53 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+13:48:53 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+climatological         4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        1.0  1.0  1.0  2.0  2.0  2.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        2.0  2.0  2.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        3.0  3.0  3.0  3.0  3.0  3.0
+13:48:53 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'sequence': -0.0287, 'trees': -0.0109, 'climatological': -0.0056, 'linear': -0.0048}
+13:48:53 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+        Family  Pairs  Mean gap             95% CI p (Wilcoxon) p (Holm)
+      sequence     50   -0.0394 [-0.0565, -0.0236]      <0.0001  <0.0001
+climatological     50   -0.0357 [-0.0609, -0.0138]       0.0058   0.0115
+         trees     50   -0.0263 [-0.0393, -0.0125]       0.0001   0.0003
+        linear     50   -0.0016 [-0.0081, +0.0047]       0.9542   0.9542
+13:48:54 | INFO    | 17_ablation_analysis | family contrasts:
+        Family  Units  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+        linear     50        -0.0379 -0.0321 [-0.0538, -0.0232]      <0.0001  <0.0001
+         trees     50        -0.0131 -0.0016 [-0.0320, +0.0045]       0.4490   0.4490
+climatological     50        -0.0038 -0.0188 [-0.0276, +0.0216]       0.1305   0.2609
+13:48:54 | INFO    | 17_ablation_analysis | dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+climatological     10            -0.0517 [-0.0945, -0.0167]       0.0098   0.0391
+      sequence     10            -0.0397 [-0.0662, -0.0145]       0.0488   0.1465
+         trees     10            -0.0169 [-0.0323, +0.0034]       0.0840   0.1680
+        linear     10            -0.0009 [-0.0092, +0.0075]       0.9219   0.9219
+13:48:54 | INFO    | 17_ablation_analysis | persistence RMSE invariant across 102 cells (spread 0.00e+00)
+15:19:03 | INFO    | 17_ablation_analysis | wrote fig11_gap_injection.png, fig11_gap_injection.pdf
+15:19:03 | INFO    | 17_ablation_analysis | family ranks by arm and coverage:
+arm             contiguous                          fragmented                         
+target_coverage       0.75 0.82 0.85 0.90 0.95 1.00       0.75 0.82 0.85 0.90 0.95 1.00
+family                                                                                 
+climatological         4.0  4.0  4.0  4.0  4.0  4.0        4.0  4.0  4.0  4.0  4.0  4.0
+linear                 2.0  2.0  2.0  2.0  2.0  2.0        2.0  2.0  2.0  2.0  2.0  2.0
+sequence               1.0  1.0  1.0  1.0  1.0  1.0        1.0  1.0  1.0  1.0  1.0  1.0
+trees                  3.0  3.0  3.0  3.0  3.0  3.0        3.0  3.0  3.0  3.0  3.0  3.0
+15:19:03 | INFO    | 17_ablation_analysis | mean arm gap by family (degraded cells only): {'linear': -0.0238, 'sequence': -0.0187, 'trees': -0.012, 'climatological': 0.0023}
+15:19:03 | INFO    | 17_ablation_analysis | paired arm-gap tests:
+        Family  Pairs  Mean gap             95% CI p (Wilcoxon) p (Holm)
+        linear     50   -0.0356 [-0.0488, -0.0237]      <0.0001  <0.0001
+      sequence     50   -0.0200 [-0.0300, -0.0108]       0.0001   0.0003
+         trees     50   -0.0120 [-0.0205, -0.0040]       0.0290   0.0580
+climatological     50   -0.0017 [-0.0262, +0.0220]       0.1781   0.1781
+15:19:04 | INFO    | 17_ablation_analysis | family contrasts:
+        Family  Units  Mean contrast  Median             95% CI p (Wilcoxon) p (Holm)
+climatological     50        -0.0183 -0.0216 [-0.0468, +0.0107]       0.1232   0.2463
+         trees     50        -0.0080 -0.0030 [-0.0174, +0.0007]       0.2571   0.2571
+        linear     50         0.0156  0.0138 [+0.0052, +0.0276]       0.0081   0.0243
+15:19:05 | INFO    | 17_ablation_analysis | dose-response:
+        Family  Units  Gap per 10pp lost             95% CI p (Wilcoxon) p (Holm)
+        linear     10            -0.0415 [-0.0560, -0.0268]       0.0039   0.0156
+      sequence     10            -0.0153 [-0.0319, +0.0010]       0.1602   0.4805
+climatological     10            -0.0073 [-0.0515, +0.0289]       1.0000   1.0000
+         trees     10            -0.0063 [-0.0160, +0.0026]       0.4316   0.8633
+15:19:05 | INFO    | 17_ablation_analysis | persistence RMSE invariant across 102 cells (spread 0.00e+00)

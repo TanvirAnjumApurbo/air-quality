@@ -1,5 +1,7 @@
 {
   "donor": "Beijing Wanliu (UCI Multi-Site, id 501)",
+  "sterilisation_radius_h": 192,
+  "lookback_h": null,
   "gap_profile_source": "US Embassy Dhaka (OpenAQ 2445+8415)",
   "gap_profile": {
     "n_gaps": 2074,
@@ -12068,6 +12070,4689 @@
           "epochs": 268
         }
       }
+    },
+    "fragmented_cov0.75_s8191": {
+      "arm": "fragmented",
+      "target_coverage": 0.75,
+      "injection_seed": 8191,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 1564,
+        "longest_gap_after": 653,
+        "seed": 8191,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 2447,
+        "val": 210,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 100.4368870996653,
+          "mae": 73.22344616937269,
+          "r2": -0.10873733704155275,
+          "smape": 87.4208228788651,
+          "bias": -1.5952543625784958,
+          "n": 3813,
+          "skill_vs_persistence": -0.032326683773881815
+        },
+        "ridge": {
+          "rmse": 97.05453930935839,
+          "mae": 62.56669405931815,
+          "r2": -0.0353182984038658,
+          "smape": 80.40541545549952,
+          "bias": -32.8944457598649,
+          "n": 3813,
+          "skill_vs_persistence": 0.0024383112251425976,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 98.15774520956076,
+          "mae": 63.35883965125463,
+          "r2": -0.05898871517666615,
+          "smape": 82.21037082242694,
+          "bias": -34.65795431675921,
+          "n": 3813,
+          "skill_vs_persistence": -0.008900838377787323,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 102.60550040895521,
+          "mae": 66.34395336731792,
+          "r2": -0.15713350945825577,
+          "smape": 84.00186980429032,
+          "bias": -31.75004981672679,
+          "n": 3813,
+          "skill_vs_persistence": -0.05461647640500589,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 100.19988566916899,
+          "mae": 65.6604177481141,
+          "r2": -0.10351092451725474,
+          "smape": 83.41604436489114,
+          "bias": -30.10180964840514,
+          "n": 3813,
+          "skill_vs_persistence": -0.029890697276698575,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 100.55655627653402,
+          "mae": 65.8239340319411,
+          "r2": -0.11188563805822382,
+          "smape": 83.86526737238653,
+          "skill_vs_persistence": -0.03355668689399308,
+          "rmse_std": 2.1427334017719226,
+          "n_seeds": 3,
+          "epochs": 480
+        },
+        "lstm_h64_l1": {
+          "rmse": 102.67801338686733,
+          "mae": 66.99829569018281,
+          "r2": -0.16083626859850395,
+          "smape": 85.04653111204703,
+          "skill_vs_persistence": -0.05536179104169222,
+          "rmse_std": 4.336231714728212,
+          "n_seeds": 3,
+          "epochs": 480
+        },
+        "dlinear": {
+          "rmse": 104.81552003221891,
+          "mae": 67.860061928517,
+          "r2": -0.2075620983498517,
+          "smape": 88.12139977617699,
+          "skill_vs_persistence": -0.07733185812024268,
+          "rmse_std": 0.6382236806987706,
+          "n_seeds": 3,
+          "epochs": 480
+        }
+      }
+    },
+    "fragmented_cov0.75_s60613": {
+      "arm": "fragmented",
+      "target_coverage": 0.75,
+      "injection_seed": 60613,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 1224,
+        "longest_gap_after": 957,
+        "seed": 60613,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 3596,
+        "val": 582,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 94.83096894504462,
+          "mae": 72.93841419609934,
+          "r2": 0.011577640889892882,
+          "smape": 86.4659956031549,
+          "bias": 7.755696007422451,
+          "n": 3813,
+          "skill_vs_persistence": 0.025292972362261468
+        },
+        "ridge": {
+          "rmse": 88.61913680751003,
+          "mae": 59.52811063815154,
+          "r2": 0.1368282546430185,
+          "smape": 77.54068929142366,
+          "bias": -22.812784420788024,
+          "n": 3813,
+          "skill_vs_persistence": 0.0891404317557184,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 89.51868636933787,
+          "mae": 60.075337076117336,
+          "r2": 0.11921565665647604,
+          "smape": 77.14203238771012,
+          "bias": -22.264060491013893,
+          "n": 3813,
+          "skill_vs_persistence": 0.0798945357222175,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 88.92050014395288,
+          "mae": 59.273535709903115,
+          "r2": 0.13094756949636888,
+          "smape": 75.8441797959309,
+          "bias": -19.609619769513557,
+          "n": 3813,
+          "skill_vs_persistence": 0.08604291029019995,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 91.25395640610554,
+          "mae": 60.52092584557444,
+          "r2": 0.08473766502394575,
+          "smape": 76.58428505183544,
+          "bias": -20.420459772406343,
+          "n": 3813,
+          "skill_vs_persistence": 0.06205880211638648,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 86.30541518892443,
+          "mae": 60.67338888145741,
+          "r2": 0.18131055883587743,
+          "smape": 77.36566697861464,
+          "skill_vs_persistence": 0.1129217001190066,
+          "rmse_std": 0.12506419827301063,
+          "n_seeds": 3,
+          "epochs": 340
+        },
+        "lstm_h64_l1": {
+          "rmse": 86.7922842730967,
+          "mae": 59.894206597684246,
+          "r2": 0.17202832214178146,
+          "smape": 77.26765941115906,
+          "skill_vs_persistence": 0.10791748342522511,
+          "rmse_std": 0.4379756995111158,
+          "n_seeds": 3,
+          "epochs": 340
+        },
+        "dlinear": {
+          "rmse": 94.61464054958854,
+          "mae": 65.34845930997487,
+          "r2": 0.015165252551123554,
+          "smape": 84.1090176818101,
+          "skill_vs_persistence": 0.02751647392166053,
+          "rmse_std": 2.888162178706123,
+          "n_seeds": 3,
+          "epochs": 340
+        }
+      }
+    },
+    "fragmented_cov0.75_s4096": {
+      "arm": "fragmented",
+      "target_coverage": 0.75,
+      "injection_seed": 4096,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 1115,
+        "longest_gap_after": 3205,
+        "seed": 4096,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 5100,
+        "val": 837,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 96.57544856519081,
+          "mae": 71.01539705465356,
+          "r2": -0.02512223367769817,
+          "smape": 86.06319007583748,
+          "bias": -1.3642292007769845,
+          "n": 3813,
+          "skill_vs_persistence": 0.0073625793245959414
+        },
+        "ridge": {
+          "rmse": 92.39197420290508,
+          "mae": 59.86429690823819,
+          "r2": 0.06176705398073712,
+          "smape": 76.81308167891505,
+          "bias": -26.853680888944034,
+          "n": 3813,
+          "skill_vs_persistence": 0.050361843238320714,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 98.51034991792265,
+          "mae": 63.52948860375351,
+          "r2": -0.06661063197195993,
+          "smape": 81.30061096678803,
+          "bias": -30.71066952232412,
+          "n": 3813,
+          "skill_vs_persistence": -0.012525037213271917,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 96.59801234524174,
+          "mae": 62.58327404560316,
+          "r2": -0.02560130646601677,
+          "smape": 79.90261742999007,
+          "bias": -27.59872707637184,
+          "n": 3813,
+          "skill_vs_persistence": 0.0071306606251416715,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 97.98040178149125,
+          "mae": 63.819326101857555,
+          "r2": -0.05516558265626337,
+          "smape": 80.63311251596843,
+          "bias": -26.200769272048987,
+          "n": 3813,
+          "skill_vs_persistence": -0.007078038425749611,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 87.50064001557696,
+          "mae": 58.761113830051606,
+          "r2": 0.15825885670865825,
+          "smape": 75.35456003534402,
+          "skill_vs_persistence": 0.10063674667916096,
+          "rmse_std": 1.4171990198690667,
+          "n_seeds": 3,
+          "epochs": 255
+        },
+        "lstm_h64_l1": {
+          "rmse": 86.18026587746014,
+          "mae": 59.20481865690302,
+          "r2": 0.18326449320604454,
+          "smape": 76.51883094061834,
+          "skill_vs_persistence": 0.11420803004630035,
+          "rmse_std": 1.9556901554549642,
+          "n_seeds": 3,
+          "epochs": 255
+        },
+        "dlinear": {
+          "rmse": 85.93849354538389,
+          "mae": 58.64468127479492,
+          "r2": 0.1882555402289375,
+          "smape": 76.14020655826744,
+          "skill_vs_persistence": 0.11669305359698912,
+          "rmse_std": 0.16878865125117812,
+          "n_seeds": 3,
+          "epochs": 255
+        }
+      }
+    },
+    "contiguous_cov0.75_s42": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 42,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 159,
+        "longest_gap_after": 910,
+        "seed": 42,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 14727,
+        "val": 3526,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 97.33208024442852,
+          "mae": 75.6142463914661,
+          "r2": -0.04124803769455765,
+          "smape": 86.60542656157067,
+          "bias": 15.050675052527072,
+          "n": 3813,
+          "skill_vs_persistence": -0.0004143549753554687
+        },
+        "ridge": {
+          "rmse": 90.47265036028949,
+          "mae": 59.95962424341628,
+          "r2": 0.10034331591856105,
+          "smape": 77.91693989610764,
+          "bias": -30.90939648934961,
+          "n": 3813,
+          "skill_vs_persistence": 0.07008934848815329,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 92.2880324672579,
+          "mae": 60.663886677954984,
+          "r2": 0.0638769061710368,
+          "smape": 78.68696901290605,
+          "bias": -29.119402575839747,
+          "n": 3813,
+          "skill_vs_persistence": 0.05143019402422133,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 93.53497822885211,
+          "mae": 61.42296424955503,
+          "r2": 0.03840923460262324,
+          "smape": 79.24538262935172,
+          "bias": -28.80704886253522,
+          "n": 3813,
+          "skill_vs_persistence": 0.03861363409206142,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 93.39782281765125,
+          "mae": 60.704613007209716,
+          "r2": 0.04122723237252646,
+          "smape": 78.02542297185595,
+          "bias": -26.396044775164505,
+          "n": 3813,
+          "skill_vs_persistence": 0.040023367058656945,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 85.0414407371257,
+          "mae": 58.75914933972274,
+          "r2": 0.2051130444925048,
+          "smape": 74.90833641237639,
+          "skill_vs_persistence": 0.12591328709347627,
+          "rmse_std": 0.18096874328528587,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "lstm_h64_l1": {
+          "rmse": 88.11757015470664,
+          "mae": 59.75212702216165,
+          "r2": 0.14427330311480932,
+          "smape": 76.24370591379873,
+          "skill_vs_persistence": 0.09429571538041177,
+          "rmse_std": 4.572563203177914,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "dlinear": {
+          "rmse": 91.58382439671364,
+          "mae": 63.370739342954984,
+          "r2": 0.07712260429297664,
+          "smape": 81.88674629628346,
+          "skill_vs_persistence": 0.058668299496669817,
+          "rmse_std": 2.995227334601501,
+          "n_seeds": 3,
+          "epochs": 88
+        }
+      }
+    },
+    "contiguous_cov0.75_s1337": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 1337,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 156,
+        "longest_gap_after": 906,
+        "seed": 1337,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 14492,
+        "val": 3401,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 100.83292172176077,
+          "mae": 76.01981308867309,
+          "r2": -0.11749834295489148,
+          "smape": 87.54284278624112,
+          "bias": 6.904731556838675,
+          "n": 3813,
+          "skill_vs_persistence": -0.036397270984353414
+        },
+        "ridge": {
+          "rmse": 93.22176085872518,
+          "mae": 61.049941282907014,
+          "r2": 0.04483854370608176,
+          "smape": 79.13583515284064,
+          "bias": -33.34224939016606,
+          "n": 3813,
+          "skill_vs_persistence": 0.04183299560694642,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 94.56047618971388,
+          "mae": 60.950735897309784,
+          "r2": 0.017208286327857758,
+          "smape": 79.237268495168,
+          "bias": -33.15464447301861,
+          "n": 3813,
+          "skill_vs_persistence": 0.028073194819956182,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 94.66261911016667,
+          "mae": 60.58769427169932,
+          "r2": 0.015083943531790323,
+          "smape": 78.73784038052261,
+          "bias": -33.576267443978324,
+          "n": 3813,
+          "skill_vs_persistence": 0.027023332907794573,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 96.00113950176662,
+          "mae": 61.208614190739056,
+          "r2": -0.012966215439201845,
+          "smape": 79.62460565659399,
+          "bias": -33.325693224436286,
+          "n": 3813,
+          "skill_vs_persistence": 0.013265535778410165,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 88.49623482439857,
+          "mae": 59.61483816541929,
+          "r2": 0.13802978282907583,
+          "smape": 76.417251529098,
+          "skill_vs_persistence": 0.09040366282866863,
+          "rmse_std": 3.291812248602958,
+          "n_seeds": 3,
+          "epochs": 89
+        },
+        "lstm_h64_l1": {
+          "rmse": 89.00483261638571,
+          "mae": 59.947533200774245,
+          "r2": 0.12865149321009073,
+          "smape": 76.78202913437583,
+          "skill_vs_persistence": 0.08517611061017154,
+          "rmse_std": 2.4259823565865464,
+          "n_seeds": 3,
+          "epochs": 89
+        },
+        "dlinear": {
+          "rmse": 92.21030988428747,
+          "mae": 63.78945672928637,
+          "r2": 0.06404661430074247,
+          "smape": 83.20346219525915,
+          "skill_vs_persistence": 0.05222905486757479,
+          "rmse_std": 3.5770995110343407,
+          "n_seeds": 3,
+          "epochs": 89
+        }
+      }
+    },
+    "contiguous_cov0.75_s2024": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 2024,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 151,
+        "longest_gap_after": 908,
+        "seed": 2024,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 15685,
+        "val": 2467,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 94.13377299671754,
+          "mae": 69.55917486774199,
+          "r2": 0.026057949515611578,
+          "smape": 84.54150456425918,
+          "bias": 0.07406401742023369,
+          "n": 3813,
+          "skill_vs_persistence": 0.03245900470417262
+        },
+        "ridge": {
+          "rmse": 90.37050210836635,
+          "mae": 59.70207753767145,
+          "r2": 0.10237368594242902,
+          "smape": 77.5735878501988,
+          "bias": -30.95475654711959,
+          "n": 3813,
+          "skill_vs_persistence": 0.07113926519909708,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 92.34184226955703,
+          "mae": 60.81031421358531,
+          "r2": 0.06278494912142729,
+          "smape": 79.31328594715578,
+          "bias": -29.934650198195108,
+          "n": 3813,
+          "skill_vs_persistence": 0.05087711739703693,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 91.43090794025476,
+          "mae": 60.15759840949055,
+          "r2": 0.08118463330751113,
+          "smape": 78.5309398233922,
+          "bias": -30.29537074337461,
+          "n": 3813,
+          "skill_vs_persistence": 0.06024003019192725,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 92.1278808022217,
+          "mae": 60.408150646986066,
+          "r2": 0.06712308197880612,
+          "smape": 78.61437625661124,
+          "bias": -28.632776629042652,
+          "n": 3813,
+          "skill_vs_persistence": 0.053076290812382854,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 87.3194770794576,
+          "mae": 57.74548036694671,
+          "r2": 0.16177116606037775,
+          "smape": 74.22904420306664,
+          "skill_vs_persistence": 0.10249880491759751,
+          "rmse_std": 1.3128267086142005,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "lstm_h64_l1": {
+          "rmse": 87.18482243668927,
+          "mae": 59.00945743143877,
+          "r2": 0.16419893561937146,
+          "smape": 76.6577510936439,
+          "skill_vs_persistence": 0.10388283408096492,
+          "rmse_std": 1.769993301566818,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "dlinear": {
+          "rmse": 87.71858918021991,
+          "mae": 61.10920621038158,
+          "r2": 0.154006046334813,
+          "smape": 79.06412844355673,
+          "skill_vs_persistence": 0.0983965862673406,
+          "rmse_std": 1.5851485300084978,
+          "n_seeds": 3,
+          "epochs": 82
+        }
+      }
+    },
+    "contiguous_cov0.75_s7": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 7,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 157,
+        "longest_gap_after": 912,
+        "seed": 7,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 15781,
+        "val": 2448,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 99.30764089635841,
+          "mae": 76.58715742512742,
+          "r2": -0.0839456709078934,
+          "smape": 86.56786948586387,
+          "bias": 14.87897757738719,
+          "n": 3813,
+          "skill_vs_persistence": -0.020719882509051324
+        },
+        "ridge": {
+          "rmse": 89.39948401764413,
+          "mae": 59.39352730299993,
+          "r2": 0.1215597853822572,
+          "smape": 77.26790633286802,
+          "bias": -29.73953414024374,
+          "n": 3813,
+          "skill_vs_persistence": 0.08111974064418936,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 91.91063620276758,
+          "mae": 60.21415508447868,
+          "r2": 0.07151748514571843,
+          "smape": 77.98462723713233,
+          "bias": -28.631883752517627,
+          "n": 3813,
+          "skill_vs_persistence": 0.05530920944813977,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 94.37574842799029,
+          "mae": 60.752589470062446,
+          "r2": 0.021044383378078235,
+          "smape": 78.15386550255452,
+          "bias": -28.785255115577456,
+          "n": 3813,
+          "skill_vs_persistence": 0.029971893626420165,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 97.21302752658835,
+          "mae": 61.88688623839114,
+          "r2": -0.0387023694015578,
+          "smape": 79.23888246842411,
+          "bias": -30.365562453413837,
+          "n": 3813,
+          "skill_vs_persistence": 0.0008093119557019968,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 86.01605898899145,
+          "mae": 58.504856185818745,
+          "r2": 0.18678383965816872,
+          "smape": 74.69997946739096,
+          "skill_vs_persistence": 0.11589580788889227,
+          "rmse_std": 0.28400106381217516,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "lstm_h64_l1": {
+          "rmse": 85.4779850690433,
+          "mae": 59.076078915132456,
+          "r2": 0.19686804959329066,
+          "smape": 77.06435139564012,
+          "skill_vs_persistence": 0.12142632642093391,
+          "rmse_std": 0.7800492851550384,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "dlinear": {
+          "rmse": 90.69177628669904,
+          "mae": 62.276351344262764,
+          "r2": 0.095932350115759,
+          "smape": 81.35217682944291,
+          "skill_vs_persistence": 0.06783709289290807,
+          "rmse_std": 0.6589704649435275,
+          "n_seeds": 3,
+          "epochs": 82
+        }
+      }
+    },
+    "contiguous_cov0.75_s31415": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 31415,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 156,
+        "longest_gap_after": 903,
+        "seed": 31415,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 15722,
+        "val": 2427,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 94.12389280015232,
+          "mae": 70.69772690212162,
+          "r2": 0.026262386958169737,
+          "smape": 84.89362831150044,
+          "bias": 3.464421277715022,
+          "n": 3813,
+          "skill_vs_persistence": 0.03256055694110216
+        },
+        "ridge": {
+          "rmse": 92.38998874683354,
+          "mae": 60.863188682049675,
+          "r2": 0.06180737783569823,
+          "smape": 78.78013006598756,
+          "bias": -30.843392493499007,
+          "n": 3813,
+          "skill_vs_persistence": 0.05038225047455924,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 94.7945444342449,
+          "mae": 61.589431633392294,
+          "r2": 0.012336799780049423,
+          "smape": 79.56630522817191,
+          "bias": -30.810968867865636,
+          "n": 3813,
+          "skill_vs_persistence": 0.02566735666993769,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 96.8089268652731,
+          "mae": 62.446208273339046,
+          "r2": -0.03008484303098058,
+          "smape": 79.97449133077511,
+          "bias": -30.094261391001275,
+          "n": 3813,
+          "skill_vs_persistence": 0.004962804837181367,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 96.70865741564076,
+          "mae": 61.666416253614415,
+          "r2": -0.027952135757356222,
+          "smape": 79.80877011969906,
+          "bias": -30.38683205618894,
+          "n": 3813,
+          "skill_vs_persistence": 0.0059934105380536895,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 91.92976598173466,
+          "mae": 61.43213608953545,
+          "r2": 0.06838684024863913,
+          "smape": 79.4586893808335,
+          "skill_vs_persistence": 0.055112586654934126,
+          "rmse_std": 4.996654913611479,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "lstm_h64_l1": {
+          "rmse": 88.76251278377225,
+          "mae": 60.88815850537827,
+          "r2": 0.13395413430817435,
+          "smape": 79.41162435436598,
+          "skill_vs_persistence": 0.0876667615695772,
+          "rmse_std": 0.8468737094324501,
+          "n_seeds": 3,
+          "epochs": 82
+        },
+        "dlinear": {
+          "rmse": 88.93240136570279,
+          "mae": 62.675339488933325,
+          "r2": 0.13019471434164764,
+          "smape": 80.77074163578656,
+          "skill_vs_persistence": 0.08592058522481083,
+          "rmse_std": 2.175545169853764,
+          "n_seeds": 3,
+          "epochs": 82
+        }
+      }
+    },
+    "contiguous_cov0.75_s101": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 101,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 154,
+        "longest_gap_after": 905,
+        "seed": 101,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 14794,
+        "val": 3362,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 95.87716833622281,
+          "mae": 72.37181531024848,
+          "r2": -0.010351714819517355,
+          "smape": 85.97539778741266,
+          "bias": 3.6482712409118214,
+          "n": 3813,
+          "skill_vs_persistence": 0.014539756295444128
+        },
+        "ridge": {
+          "rmse": 92.31323379009694,
+          "mae": 60.29384111271652,
+          "r2": 0.06336557743698124,
+          "smape": 78.19043663577934,
+          "bias": -32.94500218996329,
+          "n": 3813,
+          "skill_vs_persistence": 0.051171165705200194,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 94.7178749910828,
+          "mae": 61.112957403835274,
+          "r2": 0.013933789682348707,
+          "smape": 78.87562381993385,
+          "bias": -31.505040848228788,
+          "n": 3813,
+          "skill_vs_persistence": 0.026455392961104107,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 94.66567511301301,
+          "mae": 60.16126968539672,
+          "r2": 0.015020350217242129,
+          "smape": 77.95356434778836,
+          "bias": -32.91785127367686,
+          "n": 3813,
+          "skill_vs_persistence": 0.026991922204266605,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 96.10877065059627,
+          "mae": 60.685507969634195,
+          "r2": -0.015238851689384436,
+          "smape": 78.12071517933427,
+          "bias": -30.640906049185826,
+          "n": 3813,
+          "skill_vs_persistence": 0.012159263868251946,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 94.45479309021368,
+          "mae": 61.065973499630154,
+          "r2": 0.015646346070162354,
+          "smape": 79.18300145331307,
+          "skill_vs_persistence": 0.029159443973912163,
+          "rmse_std": 5.846934306839851,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "lstm_h64_l1": {
+          "rmse": 93.4272293258062,
+          "mae": 61.82547417370725,
+          "r2": 0.03634549627656258,
+          "smape": 79.91791437213745,
+          "skill_vs_persistence": 0.03972111632268138,
+          "rmse_std": 6.238700008152363,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "dlinear": {
+          "rmse": 91.20184275643733,
+          "mae": 62.504787325739606,
+          "r2": 0.08551478049086521,
+          "smape": 82.16803959335495,
+          "skill_vs_persistence": 0.06259444507282282,
+          "rmse_std": 1.5614248724118858,
+          "n_seeds": 3,
+          "epochs": 88
+        }
+      }
+    },
+    "contiguous_cov0.75_s2718": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 2718,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 154,
+        "longest_gap_after": 912,
+        "seed": 2718,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 14731,
+        "val": 3362,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 99.67677808474141,
+          "mae": 76.07888623074278,
+          "r2": -0.09201893308402176,
+          "smape": 86.76555699907372,
+          "bias": 11.261583269223797,
+          "n": 3813,
+          "skill_vs_persistence": -0.024514008158952105
+        },
+        "ridge": {
+          "rmse": 93.06656631447498,
+          "mae": 60.933735422078115,
+          "r2": 0.04801618066211055,
+          "smape": 78.81466197011402,
+          "bias": -32.19902665943333,
+          "n": 3813,
+          "skill_vs_persistence": 0.04342814131319095,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 94.5860977257086,
+          "mae": 60.96241520667243,
+          "r2": 0.016675631551186343,
+          "smape": 78.85342659789585,
+          "bias": -31.636578799237416,
+          "n": 3813,
+          "skill_vs_persistence": 0.02780984739800385,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 95.3120479437847,
+          "mae": 61.71966588829111,
+          "r2": 0.0015236389729140765,
+          "smape": 79.27716343547195,
+          "bias": -30.47166785016813,
+          "n": 3813,
+          "skill_vs_persistence": 0.02034826826256353,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 96.35127559783223,
+          "mae": 61.44524077392527,
+          "r2": -0.020368686421335935,
+          "smape": 79.80926735931955,
+          "bias": -31.380428876925286,
+          "n": 3813,
+          "skill_vs_persistence": 0.009666710233744769,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 89.60363465980915,
+          "mae": 60.19704455683323,
+          "r2": 0.11644115134698989,
+          "smape": 77.74519428019404,
+          "skill_vs_persistence": 0.07902140644146376,
+          "rmse_std": 3.166544647773259,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "lstm_h64_l1": {
+          "rmse": 96.16947487245437,
+          "mae": 63.01002440289049,
+          "r2": -0.017294868220794363,
+          "smape": 81.39531257098163,
+          "skill_vs_persistence": 0.011535323901059824,
+          "rmse_std": 2.652178148621463,
+          "n_seeds": 3,
+          "epochs": 88
+        },
+        "dlinear": {
+          "rmse": 92.04777325731811,
+          "mae": 63.95675489046349,
+          "r2": 0.06794699288715578,
+          "smape": 81.92207549144648,
+          "skill_vs_persistence": 0.05389966515784143,
+          "rmse_std": 2.694014279379625,
+          "n_seeds": 3,
+          "epochs": 88
+        }
+      }
+    },
+    "contiguous_cov0.75_s8191": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 8191,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 158,
+        "longest_gap_after": 908,
+        "seed": 8191,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 15020,
+        "val": 3479,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 95.73504408850955,
+          "mae": 73.37928829255851,
+          "r2": -0.007358529894222254,
+          "smape": 86.08431446146596,
+          "bias": 9.822270639920706,
+          "n": 3813,
+          "skill_vs_persistence": 0.01600056076243339
+        },
+        "ridge": {
+          "rmse": 91.3636789236255,
+          "mae": 60.1667942881027,
+          "r2": 0.08253534380298144,
+          "smape": 77.90560163823592,
+          "bias": -31.0929224462646,
+          "n": 3813,
+          "skill_vs_persistence": 0.06093103436175362,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 94.31916228882292,
+          "mae": 61.2351502450428,
+          "r2": 0.022217962663528712,
+          "smape": 79.19349916997261,
+          "bias": -31.196189445408752,
+          "n": 3813,
+          "skill_vs_persistence": 0.03055350644897059,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 94.98808845952603,
+          "mae": 61.56944920802861,
+          "r2": 0.008299616913132524,
+          "smape": 78.98386125137155,
+          "bias": -29.884193613447433,
+          "n": 3813,
+          "skill_vs_persistence": 0.023678041115141046,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 95.33255554524895,
+          "mae": 61.45056451811166,
+          "r2": 0.0010939229275751527,
+          "smape": 78.85698468926695,
+          "bias": -28.362441428814627,
+          "n": 3813,
+          "skill_vs_persistence": 0.020137483710960136,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 87.54987787208229,
+          "mae": 59.15732837703029,
+          "r2": 0.1566354472583317,
+          "smape": 75.8420148499644,
+          "skill_vs_persistence": 0.10013066216588984,
+          "rmse_std": 2.8564880666985606,
+          "n_seeds": 3,
+          "epochs": 86
+        },
+        "lstm_h64_l1": {
+          "rmse": 87.21405027270298,
+          "mae": 59.52106070795091,
+          "r2": 0.16364701307379323,
+          "smape": 76.88927022783838,
+          "skill_vs_persistence": 0.10358241980193635,
+          "rmse_std": 1.7484574186287742,
+          "n_seeds": 3,
+          "epochs": 86
+        },
+        "dlinear": {
+          "rmse": 91.1128169922345,
+          "mae": 63.848834883665496,
+          "r2": 0.08726434104675022,
+          "smape": 82.00581350635508,
+          "skill_vs_persistence": 0.06350948410463564,
+          "rmse_std": 1.6585572303455836,
+          "n_seeds": 3,
+          "epochs": 86
+        }
+      }
+    },
+    "contiguous_cov0.75_s60613": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 60613,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 150,
+        "longest_gap_after": 917,
+        "seed": 60613,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 15556,
+        "val": 2935,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 94.72533497055164,
+          "mae": 70.19462753698954,
+          "r2": 0.013778458423804651,
+          "smape": 85.07895165931653,
+          "bias": -0.9854658059318253,
+          "n": 3813,
+          "skill_vs_persistence": 0.026378716591609952
+        },
+        "ridge": {
+          "rmse": 92.12450848097808,
+          "mae": 60.561289466909024,
+          "r2": 0.0671913762463463,
+          "smape": 78.20852656850883,
+          "bias": -32.288843852719246,
+          "n": 3813,
+          "skill_vs_persistence": 0.05311095275090538,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 96.60210720834135,
+          "mae": 62.268206361941914,
+          "r2": -0.025688260345438474,
+          "smape": 80.26972384149337,
+          "bias": -34.32732428525773,
+          "n": 3813,
+          "skill_vs_persistence": 0.007088572139863025,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 100.3752773832326,
+          "mae": 63.41015493657549,
+          "r2": -0.10737751708000176,
+          "smape": 80.97262027449958,
+          "bias": -37.45746413552958,
+          "n": 3813,
+          "skill_vs_persistence": -0.031693436805662945,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 100.93564617887579,
+          "mae": 63.308479828268766,
+          "r2": -0.1197764259970433,
+          "smape": 80.76276044043964,
+          "bias": -36.77158457696103,
+          "n": 3813,
+          "skill_vs_persistence": -0.037453110140845514,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 87.15346906015888,
+          "mae": 58.38468053186258,
+          "r2": 0.16481888277937196,
+          "smape": 75.15891153223905,
+          "skill_vs_persistence": 0.10420509543486989,
+          "rmse_std": 1.7200397668352674,
+          "n_seeds": 3,
+          "epochs": 84
+        },
+        "lstm_h64_l1": {
+          "rmse": 89.69715771349077,
+          "mae": 59.43084957990174,
+          "r2": 0.1118421355329043,
+          "smape": 76.05616754806046,
+          "skill_vs_persistence": 0.07806014264036891,
+          "rmse_std": 5.924629784646605,
+          "n_seeds": 3,
+          "epochs": 84
+        },
+        "dlinear": {
+          "rmse": 88.38087113630309,
+          "mae": 61.24088173893392,
+          "r2": 0.14138743335384438,
+          "smape": 79.65763715076055,
+          "skill_vs_persistence": 0.091589412576581,
+          "rmse_std": 0.8321555560126302,
+          "n_seeds": 3,
+          "epochs": 84
+        }
+      }
+    },
+    "contiguous_cov0.75_s4096": {
+      "arm": "contiguous",
+      "target_coverage": 0.75,
+      "injection_seed": 4096,
+      "horizon_h": 24,
+      "injection": {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "achieved_coverage": 0.75,
+        "coverage_before": 0.9893638437793585,
+        "hours_removed": 7134,
+        "hours_available": 29487,
+        "slots_in_region": 29804,
+        "n_gaps_before": 180,
+        "n_gaps_after": 150,
+        "longest_gap_after": 924,
+        "seed": 4096,
+        "region": "before 2016-07-24 (test intact)"
+      },
+      "usable_rows": {
+        "train": 14945,
+        "val": 3431,
+        "test": 3813
+      },
+      "test_rows": 3813,
+      "models": {
+        "persistence": {
+          "rmse": 97.29176691674544,
+          "mae": 67.28140571728298,
+          "r2": -0.04038568110418428,
+          "smape": 85.88920245493287,
+          "bias": 0.9205350118017309,
+          "n": 3813,
+          "skill_vs_persistence": 0.0
+        },
+        "climatology": {
+          "rmse": 94.33285115619739,
+          "mae": 70.13887221915698,
+          "r2": 0.02193412426650576,
+          "smape": 84.6939393134125,
+          "bias": -1.5371428243655627,
+          "n": 3813,
+          "skill_vs_persistence": 0.0304128073147244
+        },
+        "ridge": {
+          "rmse": 93.39347884395957,
+          "mae": 61.156733833909364,
+          "r2": 0.041316416182126114,
+          "smape": 79.49817272543201,
+          "bias": -36.01449772043692,
+          "n": 3813,
+          "skill_vs_persistence": 0.04006801599277887,
+          "params": {
+            "ridge__alpha": 100.0
+          }
+        },
+        "random_forest": {
+          "rmse": 95.13964046756195,
+          "mae": 61.542730493445326,
+          "r2": 0.005132607599116379,
+          "smape": 80.24483514140677,
+          "bias": -35.07031558601936,
+          "n": 3813,
+          "skill_vs_persistence": 0.022120334714705314,
+          "params": {
+            "n_estimators": 200,
+            "min_samples_leaf": 20,
+            "max_features": 0.2,
+            "max_depth": 10
+          }
+        },
+        "xgboost": {
+          "rmse": 93.47702801179685,
+          "mae": 60.27518918295632,
+          "r2": 0.03960038538747146,
+          "smape": 78.43644406288044,
+          "bias": -34.43028951592466,
+          "n": 3813,
+          "skill_vs_persistence": 0.039209267400939996,
+          "params": {
+            "subsample": 1.0,
+            "n_estimators": 400,
+            "min_child_weight": 1,
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.8
+          }
+        },
+        "lightgbm": {
+          "rmse": 95.45190580454992,
+          "mae": 60.72895954993614,
+          "r2": -0.001408775680492358,
+          "smape": 79.25411645277732,
+          "bias": -35.00830131214424,
+          "n": 3813,
+          "skill_vs_persistence": 0.018910758541058503,
+          "params": {
+            "subsample": 1.0,
+            "num_leaves": 63,
+            "n_estimators": 400,
+            "min_child_samples": 30,
+            "learning_rate": 0.03,
+            "colsample_bytree": 0.6
+          }
+        },
+        "gru_h64_l2": {
+          "rmse": 92.31610812396515,
+          "mae": 61.061528690534196,
+          "r2": 0.061277516291992774,
+          "smape": 79.90013687011539,
+          "skill_vs_persistence": 0.051141622261193564,
+          "rmse_std": 4.297326344066908,
+          "n_seeds": 3,
+          "epochs": 86
+        },
+        "lstm_h64_l1": {
+          "rmse": 93.96622245179687,
+          "mae": 61.877376030691316,
+          "r2": 0.028541787320250922,
+          "smape": 81.51693745653048,
+          "skill_vs_persistence": 0.034181149858181846,
+          "rmse_std": 2.9862488323794083,
+          "n_seeds": 3,
+          "epochs": 86
+        },
+        "dlinear": {
+          "rmse": 92.16367258804046,
+          "mae": 63.2057439893377,
+          "r2": 0.06620447407555174,
+          "smape": 82.42831812551661,
+          "skill_vs_persistence": 0.0527084098811074,
+          "rmse_std": 1.3272526382058893,
+          "n_seeds": 3,
+          "epochs": 86
+        }
+      }
     }
+  },
+  "analysis": {
+    "by_family": [
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.007030588598177434,
+        "skill_std": 0.0259548031142994,
+        "rmse": 96.60774852956403,
+        "train_rows": 15145.3,
+        "n_gaps": 154.5,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "family": "linear",
+        "model": "dlinear",
+        "skill": 0.06873530355422924,
+        "skill_std": 0.017042496933414357,
+        "rmse": 90.60438778439564,
+        "train_rows": 15145.3,
+        "n_gaps": 154.5,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.0853482379660898,
+        "skill_std": 0.031187558382300206,
+        "rmse": 88.98808604179371,
+        "train_rows": 15145.3,
+        "n_gaps": 154.5,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.75,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.03253847260219388,
+        "skill_std": 0.015269429527980046,
+        "rmse": 94.12604142450589,
+        "train_rows": 15145.3,
+        "n_gaps": 154.5,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.82,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.010807431444096372,
+        "skill_std": 0.016213551142370913,
+        "rmse": 96.24029281571771,
+        "train_rows": 16719.8,
+        "n_gaps": 163.1,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.82,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.05817603607602746,
+        "skill_std": 0.01153952275475247,
+        "rmse": 91.63171757469641,
+        "train_rows": 16719.8,
+        "n_gaps": 163.1,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.82,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.08646730807508055,
+        "skill_std": 0.024745844070364238,
+        "rmse": 88.8792097335863,
+        "train_rows": 16719.8,
+        "n_gaps": 163.1,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.82,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.03304899843892042,
+        "skill_std": 0.01176210534452867,
+        "rmse": 94.07637146379412,
+        "train_rows": 16719.8,
+        "n_gaps": 163.1,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.85,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.014154324848371046,
+        "skill_std": 0.01760133484299378,
+        "rmse": 95.91466764273383,
+        "train_rows": 17399.4,
+        "n_gaps": 166.5,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.85,
+        "family": "linear",
+        "model": "dlinear",
+        "skill": 0.0637991455889366,
+        "skill_std": 0.0351940839028625,
+        "rmse": 91.08463531461912,
+        "train_rows": 17399.4,
+        "n_gaps": 166.5,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.85,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.08879265048669166,
+        "skill_std": 0.025107929898520783,
+        "rmse": 88.6529730616742,
+        "train_rows": 17399.4,
+        "n_gaps": 166.5,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.85,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.035229598042078314,
+        "skill_std": 0.01142294969914271,
+        "rmse": 93.86421707546494,
+        "train_rows": 17399.4,
+        "n_gaps": 166.5,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.9,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.018270501216108227,
+        "skill_std": 0.00978036961256107,
+        "rmse": 95.51419757097572,
+        "train_rows": 18528.1,
+        "n_gaps": 172.3,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.9,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.06207925410316736,
+        "skill_std": 0.00844721065859843,
+        "rmse": 91.25196659617467,
+        "train_rows": 18528.1,
+        "n_gaps": 172.3,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.9,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.1100081720339519,
+        "skill_std": 0.01900300820591371,
+        "rmse": 86.58887748428097,
+        "train_rows": 18528.1,
+        "n_gaps": 172.3,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.9,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.03582537584484584,
+        "skill_std": 0.006266477471633228,
+        "rmse": 93.8062528003439,
+        "train_rows": 18528.1,
+        "n_gaps": 172.3,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.95,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.018286425015265638,
+        "skill_std": 0.005972547821915363,
+        "rmse": 95.51264831641967,
+        "train_rows": 19657.8,
+        "n_gaps": 182.0,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.95,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.06309041037679054,
+        "skill_std": 0.00431863032488166,
+        "rmse": 91.15358941568492,
+        "train_rows": 19657.8,
+        "n_gaps": 182.0,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.95,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.10202590682852206,
+        "skill_std": 0.024766986217318845,
+        "rmse": 87.36548617011529,
+        "train_rows": 19657.8,
+        "n_gaps": 182.0,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 0.95,
+        "family": "trees",
+        "model": "xgboost",
+        "skill": 0.0375664962177766,
+        "skill_std": 0.010463430443146144,
+        "rmse": 93.63685612284672,
+        "train_rows": 19657.8,
+        "n_gaps": 182.0,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 1.0,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.025357789930151142,
+        "skill_std": 0.0,
+        "rmse": 94.82466272933739,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 4.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 1.0,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.060934855142093514,
+        "skill_std": 0.0,
+        "rmse": 91.36330719315524,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 2.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 1.0,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.08994696061922942,
+        "skill_std": 0.0,
+        "rmse": 88.5406681893097,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 1.0
+      },
+      {
+        "arm": "contiguous",
+        "target_coverage": 1.0,
+        "family": "trees",
+        "model": "xgboost",
+        "skill": 0.03666117907105215,
+        "skill_std": 0.0,
+        "rmse": 93.72493602767157,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "family": "climatological",
+        "model": "persistence",
+        "skill": 0.0,
+        "skill_std": 0.0,
+        "rmse": 97.29176691674544,
+        "train_rows": 3959.8,
+        "n_gaps": 1229.0,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.05217561910916475,
+        "skill_std": 0.029346338557279836,
+        "rmse": 92.2155087436397,
+        "train_rows": 3959.8,
+        "n_gaps": 1229.0,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "family": "sequence",
+        "model": "lstm_h64_l1",
+        "skill": 0.041330523067543805,
+        "skill_std": 0.05861383696176684,
+        "rmse": 93.27064729991079,
+        "train_rows": 3959.8,
+        "n_gaps": 1229.0,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.75,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.015361075106244427,
+        "skill_std": 0.03693952369420663,
+        "rmse": 95.7972607779181,
+        "train_rows": 3959.8,
+        "n_gaps": 1229.0,
+        "coverage": 0.75,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.82,
+        "family": "climatological",
+        "model": "persistence",
+        "skill": 0.0,
+        "skill_std": 0.0,
+        "rmse": 97.29176691674544,
+        "train_rows": 6763.9,
+        "n_gaps": 988.4,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.82,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.05665026213998886,
+        "skill_std": 0.034703881517975134,
+        "rmse": 91.78016281684913,
+        "train_rows": 6763.9,
+        "n_gaps": 988.4,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.82,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.049088834774460396,
+        "skill_std": 0.03364595053461171,
+        "rmse": 92.51582744565401,
+        "train_rows": 6763.9,
+        "n_gaps": 988.4,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.82,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.02104162703788054,
+        "skill_std": 0.04226783373702506,
+        "rmse": 95.24458984342688,
+        "train_rows": 6763.9,
+        "n_gaps": 988.4,
+        "coverage": 0.8199906052878807,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.85,
+        "family": "climatological",
+        "model": "persistence",
+        "skill": 0.0,
+        "skill_std": 0.0,
+        "rmse": 97.29176691674544,
+        "train_rows": 8645.6,
+        "n_gaps": 839.2,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.85,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.06133064620070779,
+        "skill_std": 0.025654841990543263,
+        "rmse": 91.32479998173281,
+        "train_rows": 8645.6,
+        "n_gaps": 839.2,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.85,
+        "family": "sequence",
+        "model": "lstm_h64_l1",
+        "skill": 0.06132465878017947,
+        "skill_std": 0.034157600320422817,
+        "rmse": 91.32538250845528,
+        "train_rows": 8645.6,
+        "n_gaps": 839.2,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.85,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.02517288236985261,
+        "skill_std": 0.025725506985192655,
+        "rmse": 94.8426527125951,
+        "train_rows": 8645.6,
+        "n_gaps": 839.2,
+        "coverage": 0.8499865789826868,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.9,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.02183043356859583,
+        "skill_std": 0.012918834709829243,
+        "rmse": 95.16784546229812,
+        "train_rows": 11603.1,
+        "n_gaps": 644.2,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.9,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.06071089739739085,
+        "skill_std": 0.01636158272880121,
+        "rmse": 91.38509643785206,
+        "train_rows": 11603.1,
+        "n_gaps": 644.2,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.9,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.08279756884909688,
+        "skill_std": 0.025777748472931416,
+        "rmse": 89.23624514700593,
+        "train_rows": 11603.1,
+        "n_gaps": 644.2,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.9,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.026263074994683267,
+        "skill_std": 0.024130308951456028,
+        "rmse": 94.73658594584572,
+        "train_rows": 11603.1,
+        "n_gaps": 644.2,
+        "coverage": 0.9000134210173132,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.95,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.018806825410039273,
+        "skill_std": 0.016695783268268812,
+        "rmse": 95.46201764250797,
+        "train_rows": 16197.2,
+        "n_gaps": 413.6,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.95,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.0609911022793305,
+        "skill_std": 0.012708494135620491,
+        "rmse": 91.35783480978944,
+        "train_rows": 16197.2,
+        "n_gaps": 413.6,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.95,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.09445937024522032,
+        "skill_std": 0.021946165676999557,
+        "rmse": 88.1016478837449,
+        "train_rows": 16197.2,
+        "n_gaps": 413.6,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 0.95,
+        "family": "trees",
+        "model": "random_forest",
+        "skill": 0.0318871510458502,
+        "skill_std": 0.01497349809318828,
+        "rmse": 94.18940964955354,
+        "train_rows": 16197.2,
+        "n_gaps": 413.6,
+        "coverage": 0.9500067105086567,
+        "n_draws": 10,
+        "rank": 3.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 1.0,
+        "family": "climatological",
+        "model": "climatology",
+        "skill": 0.025357789930151142,
+        "skill_std": 0.0,
+        "rmse": 94.82466272933739,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 4.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 1.0,
+        "family": "linear",
+        "model": "ridge",
+        "skill": 0.060934855142093514,
+        "skill_std": 0.0,
+        "rmse": 91.36330719315524,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 2.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 1.0,
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "skill": 0.08994696061922942,
+        "skill_std": 0.0,
+        "rmse": 88.5406681893097,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 1.0
+      },
+      {
+        "arm": "fragmented",
+        "target_coverage": 1.0,
+        "family": "trees",
+        "model": "xgboost",
+        "skill": 0.03666117907105215,
+        "skill_std": 0.0,
+        "rmse": 93.72493602767157,
+        "train_rows": 21732.0,
+        "n_gaps": 180.0,
+        "coverage": 0.9893638437793585,
+        "n_draws": 1,
+        "rank": 3.0
+      }
+    ],
+    "family_contrasts": [
+      {
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 50,
+        "mean_contrast": -0.03787259528934232,
+        "median_contrast": -0.0320789999121209,
+        "ci_low": -0.05379239857811632,
+        "ci_high": -0.023244155738630076,
+        "p_wilcoxon": 1.206143563692308e-06,
+        "reject_iut": true,
+        "p_holm": 3.6184306910769237e-06,
+        "reject_holm": true
+      },
+      {
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 50,
+        "mean_contrast": -0.01311953035849018,
+        "median_contrast": -0.0015795766360951098,
+        "ci_low": -0.031979470426845714,
+        "ci_high": 0.004458985863786048,
+        "p_wilcoxon": 0.4490067617286915,
+        "reject_iut": false,
+        "p_holm": 0.4490067617286915,
+        "reject_holm": false
+      },
+      {
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 50,
+        "mean_contrast": -0.0037766362087281674,
+        "median_contrast": -0.0187994173999248,
+        "ci_low": -0.027583454459271677,
+        "ci_high": 0.02159392662077153,
+        "p_wilcoxon": 0.13045894629165566,
+        "reject_iut": false,
+        "p_holm": 0.26091789258331133,
+        "reject_holm": false
+      }
+    ],
+    "family_contrasts_by_level": [
+      {
+        "target_coverage": 0.75,
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.09043570234157167,
+        "median_contrast": -0.08454791640761974,
+        "ci_low": -0.1406737451891435,
+        "ci_high": -0.039823280847369455,
+        "p_wilcoxon": 0.013671875,
+        "reject_iut": true,
+        "p_holm": 0.041015625,
+        "reject_holm": true
+      },
+      {
+        "target_coverage": 0.75,
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.0525542056942605,
+        "median_contrast": -0.06223942164060528,
+        "ci_low": -0.11283248849238207,
+        "ci_high": 0.007806115089197818,
+        "p_wilcoxon": 0.193359375,
+        "reject_iut": false,
+        "p_holm": 0.38671875,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.75,
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": 0.0009755374810458739,
+        "median_contrast": 0.005579831891777673,
+        "ci_low": -0.08257780357802207,
+        "ci_high": 0.08967026124227309,
+        "p_wilcoxon": 1.0,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.82,
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.035852699364581554,
+        "median_contrast": -0.029606127617322495,
+        "ci_low": -0.059754078105685435,
+        "ci_high": -0.015346026048500726,
+        "p_wilcoxon": 0.009765625,
+        "reject_iut": true,
+        "p_holm": 0.029296875,
+        "reject_holm": true
+      },
+      {
+        "target_coverage": 0.82,
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.005021906117921143,
+        "median_contrast": 0.00875751861929849,
+        "ci_low": -0.042176741725693155,
+        "ci_high": 0.02989077662351234,
+        "p_wilcoxon": 1.0,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.82,
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": 0.014279024536757107,
+        "median_contrast": -0.006603221901929676,
+        "ci_low": -0.029296929166022622,
+        "ci_high": 0.07765622832828957,
+        "p_wilcoxon": 0.6953125,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.85,
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.03176509977563819,
+        "median_contrast": -0.035231196105440545,
+        "ci_low": -0.05138968174973543,
+        "ci_high": -0.005759699280206662,
+        "p_wilcoxon": 0.064453125,
+        "reject_iut": false,
+        "p_holm": 0.193359375,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.85,
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.00019727592371673042,
+        "median_contrast": 0.002541146764116712,
+        "ci_low": -0.04007700821984728,
+        "ci_high": 0.03666588383507119,
+        "p_wilcoxon": 0.845703125,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.85,
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": 0.004719729453974184,
+        "median_contrast": -0.0138221201779874,
+        "ci_low": -0.042617350642192825,
+        "ci_high": 0.07006089211809302,
+        "p_wilcoxon": 0.556640625,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.9,
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.03077053553734262,
+        "median_contrast": -0.02986934706794444,
+        "ci_low": -0.05270257515857413,
+        "ci_high": -0.007156975545604757,
+        "p_wilcoxon": 0.037109375,
+        "reject_iut": true,
+        "p_holm": 0.07421875,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.9,
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.025842246479078505,
+        "median_contrast": -0.0316009571414065,
+        "ci_low": -0.042424542421740104,
+        "ci_high": -0.008577486528270865,
+        "p_wilcoxon": 0.01953125,
+        "reject_iut": true,
+        "p_holm": 0.05859375,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.9,
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.00832327517694185,
+        "median_contrast": -0.0057334383430785105,
+        "ci_low": -0.0340240357737752,
+        "ci_high": 0.016286167494146655,
+        "p_wilcoxon": 0.6953125,
+        "reject_iut": false,
+        "p_holm": 0.6953125,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.95,
+        "family": "climatological",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.008086936978075379,
+        "median_contrast": -0.01909747180944204,
+        "ci_low": -0.030779566059479384,
+        "ci_high": 0.014444191832470718,
+        "p_wilcoxon": 0.625,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.95,
+        "family": "linear",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": -0.0054672284858417065,
+        "median_contrast": -0.006750179598493201,
+        "ci_low": -0.022232336453572983,
+        "ci_high": 0.013117000912927975,
+        "p_wilcoxon": 0.322265625,
+        "reject_iut": false,
+        "p_holm": 0.966796875,
+        "reject_holm": false
+      },
+      {
+        "target_coverage": 0.95,
+        "family": "trees",
+        "reference": "sequence",
+        "n_units": 10,
+        "mean_contrast": 0.0004990111203893339,
+        "median_contrast": 0.002964549526805603,
+        "ci_low": -0.022500299722320514,
+        "ci_high": 0.024591833966453758,
+        "p_wilcoxon": 0.921875,
+        "reject_iut": false,
+        "p_holm": 1.0,
+        "reject_holm": false
+      }
+    ],
+    "dose_response": [
+      {
+        "family": "climatological",
+        "n_units": 10,
+        "slope_per_unit_dose": 0.5166843227811097,
+        "gap_change_per_10pp_lost": -0.051668432278110965,
+        "ci_low": -0.0944819397943369,
+        "ci_high": -0.016701903101242466,
+        "p_wilcoxon": 0.009765625,
+        "p_holm": 0.0390625,
+        "significant_holm": true
+      },
+      {
+        "family": "sequence",
+        "n_units": 10,
+        "slope_per_unit_dose": 0.39671810345403447,
+        "gap_change_per_10pp_lost": -0.03967181034540345,
+        "ci_low": -0.06619727783520722,
+        "ci_high": -0.014522135379358229,
+        "p_wilcoxon": 0.048828125,
+        "p_holm": 0.146484375,
+        "significant_holm": false
+      },
+      {
+        "family": "trees",
+        "n_units": 10,
+        "slope_per_unit_dose": 0.16935079156186794,
+        "gap_change_per_10pp_lost": -0.016935079156186795,
+        "ci_low": -0.032312416239959015,
+        "ci_high": 0.003422900614752934,
+        "p_wilcoxon": 0.083984375,
+        "p_holm": 0.16796875,
+        "significant_holm": false
+      },
+      {
+        "family": "linear",
+        "n_units": 10,
+        "slope_per_unit_dose": 0.009163731741198033,
+        "gap_change_per_10pp_lost": -0.0009163731741198034,
+        "ci_low": -0.009229958352863069,
+        "ci_high": 0.0074520107558159925,
+        "p_wilcoxon": 0.921875,
+        "p_holm": 0.921875,
+        "significant_holm": false
+      }
+    ],
+    "persistence_rmse_invariant": true,
+    "persistence_rmse_spread": 0.0,
+    "family_ranks": {
+      "('contiguous', 0.75)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('contiguous', 0.82)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('contiguous', 0.85)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('contiguous', 0.9)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('contiguous', 0.95)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('contiguous', 1.0)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('fragmented', 0.75)": {
+        "climatological": 4.0,
+        "linear": 1.0,
+        "sequence": 2.0,
+        "trees": 3.0
+      },
+      "('fragmented', 0.82)": {
+        "climatological": 4.0,
+        "linear": 1.0,
+        "sequence": 2.0,
+        "trees": 3.0
+      },
+      "('fragmented', 0.85)": {
+        "climatological": 4.0,
+        "linear": 1.0,
+        "sequence": 2.0,
+        "trees": 3.0
+      },
+      "('fragmented', 0.9)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('fragmented', 0.95)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      },
+      "('fragmented', 1.0)": {
+        "climatological": 4.0,
+        "linear": 2.0,
+        "sequence": 1.0,
+        "trees": 3.0
+      }
+    },
+    "paired_gaps": [
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 7,
+        "contiguous": -0.020719882509051324,
+        "fragmented": -0.34840607112714417,
+        "arm_gap": -0.32768618861809284
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": -0.0004143549753554687,
+        "fragmented": -0.09368442550612754,
+        "arm_gap": -0.09327007053077208
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 101,
+        "contiguous": 0.014539756295444128,
+        "fragmented": -0.03962642757357804,
+        "arm_gap": -0.054166183869022166
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": -0.036397270984353414,
+        "fragmented": -0.010479380506364766,
+        "arm_gap": 0.025917890477988648
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.03245900470417262,
+        "fragmented": -0.051248166340198686,
+        "arm_gap": -0.08370717104437131
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 2718,
+        "contiguous": -0.024514008158952105,
+        "fragmented": -0.048383235328073315,
+        "arm_gap": -0.02386922716912121
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 4096,
+        "contiguous": 0.0304128073147244,
+        "fragmented": 0.0073625793245959414,
+        "arm_gap": -0.023050227990128458
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 8191,
+        "contiguous": 0.01600056076243339,
+        "fragmented": -0.032326683773881815,
+        "arm_gap": -0.048327244536315206
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 31415,
+        "contiguous": 0.03256055694110216,
+        "fragmented": -0.29382439322101717,
+        "arm_gap": -0.3263849501621193
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.75,
+        "injection_seed": 60613,
+        "contiguous": 0.026378716591609952,
+        "fragmented": 0.025292972362261468,
+        "arm_gap": -0.0010857442293484842
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 7,
+        "contiguous": -0.0023758598020284794,
+        "fragmented": -0.07121153724371321,
+        "arm_gap": -0.06883567744168473
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.006277372988275021,
+        "fragmented": -0.018628597506467948,
+        "arm_gap": -0.02490597049474297
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 101,
+        "contiguous": -0.000981296685504951,
+        "fragmented": 0.006633825972461649,
+        "arm_gap": 0.0076151226579666
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": -0.016133140476914498,
+        "fragmented": -0.024390832893885994,
+        "arm_gap": -0.008257692416971496
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.013734943091050167,
+        "fragmented": 0.029801023458722153,
+        "arm_gap": 0.016066080367671987
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 2718,
+        "contiguous": 0.012396162780101805,
+        "fragmented": -0.0561540429591203,
+        "arm_gap": -0.0685502057392221
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 4096,
+        "contiguous": 0.025156188488468234,
+        "fragmented": 0.02655234268657869,
+        "arm_gap": 0.0013961541981104553
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 8191,
+        "contiguous": 0.021435865689587996,
+        "fragmented": -0.020369196235733522,
+        "arm_gap": -0.04180506192532152
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 31415,
+        "contiguous": 0.006764203995768825,
+        "fragmented": -0.28910072287882227,
+        "arm_gap": -0.2958649268745911
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.82,
+        "injection_seed": 60613,
+        "contiguous": 0.041799874372159596,
+        "fragmented": 0.008367073667171931,
+        "arm_gap": -0.033432800704987664
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 7,
+        "contiguous": 0.0022267550097218036,
+        "fragmented": -0.01624780339406029,
+        "arm_gap": -0.018474558403782093
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.014220899787449559,
+        "fragmented": -0.011359295218599685,
+        "arm_gap": -0.025580195006049244
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 101,
+        "contiguous": 0.015881988305855965,
+        "fragmented": -0.007435531674345297,
+        "arm_gap": -0.023317519980201262
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": -0.01667316591495127,
+        "fragmented": -0.01894262959515003,
+        "arm_gap": -0.0022694636801987578
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.00034301717238161,
+        "fragmented": 0.028248958649971345,
+        "arm_gap": 0.027905941477589735
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 2718,
+        "contiguous": 0.012924294833506433,
+        "fragmented": 0.02647099059324709,
+        "arm_gap": 0.013546695759740657
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 4096,
+        "contiguous": 0.028021665731309264,
+        "fragmented": 0.04065905717423424,
+        "arm_gap": 0.012637391442924972
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 8191,
+        "contiguous": 0.02325249111412253,
+        "fragmented": 0.011573848104481588,
+        "arm_gap": -0.011678643009640943
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 31415,
+        "contiguous": 0.012238751017232707,
+        "fragmented": -0.29308570959030256,
+        "arm_gap": -0.30532446060753526
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.85,
+        "injection_seed": 60613,
+        "contiguous": 0.04910655142708187,
+        "fragmented": 0.030498036208139068,
+        "arm_gap": -0.0186085152189428
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 7,
+        "contiguous": 0.0061619711578217995,
+        "fragmented": 0.01920567506996118,
+        "arm_gap": 0.013043703912139382
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.01795439052205805,
+        "fragmented": 0.017074041286817998,
+        "arm_gap": -0.0008803492352400522
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 101,
+        "contiguous": 0.030626256733327195,
+        "fragmented": 0.0016387593445506,
+        "arm_gap": -0.028987497388776595
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.0039839425805028306,
+        "fragmented": 0.031473261458995205,
+        "arm_gap": 0.027489318878492375
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.01028450958100735,
+        "fragmented": 0.02652883623355695,
+        "arm_gap": 0.0162443266525496
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 2718,
+        "contiguous": 0.013308066175046318,
+        "fragmented": 0.028459781982933974,
+        "arm_gap": 0.015151715807887656
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 4096,
+        "contiguous": 0.028260019904912004,
+        "fragmented": 0.04065905717423424,
+        "arm_gap": 0.012399037269322233
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 8191,
+        "contiguous": 0.02431522211265691,
+        "fragmented": 0.028847501458615477,
+        "arm_gap": 0.0045322793459585675
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 31415,
+        "contiguous": 0.018023967347312042,
+        "fragmented": -0.0003796070929913409,
+        "arm_gap": -0.018403574440303383
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.9,
+        "injection_seed": 60613,
+        "contiguous": 0.02978666604643776,
+        "fragmented": 0.024797028769284024,
+        "arm_gap": -0.004989637277153736
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 7,
+        "contiguous": 0.010534035251428375,
+        "fragmented": 0.020695030825651384,
+        "arm_gap": 0.010160995574223008
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.013195677865841193,
+        "fragmented": 0.02563237144947783,
+        "arm_gap": 0.012436693583636638
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 101,
+        "contiguous": 0.027732931834519525,
+        "fragmented": 0.018021328006665893,
+        "arm_gap": -0.009711603827853632
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.010147810912795485,
+        "fragmented": 0.014900440299545958,
+        "arm_gap": 0.004752629386750473
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.024010915867483495,
+        "fragmented": -0.010453804656646026,
+        "arm_gap": -0.03446472052412952
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 2718,
+        "contiguous": 0.01882966368297878,
+        "fragmented": 0.026464256522756524,
+        "arm_gap": 0.007634592839777743
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 4096,
+        "contiguous": 0.0201565209086757,
+        "fragmented": 0.026456367301683326,
+        "arm_gap": 0.006299846393007624
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 8191,
+        "contiguous": 0.023285589927849237,
+        "fragmented": 0.05188107552294019,
+        "arm_gap": 0.028595485595090953
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 31415,
+        "contiguous": 0.020376620577197135,
+        "fragmented": 0.014573283181427477,
+        "arm_gap": -0.005803337395769659
+      },
+      {
+        "family": "climatological",
+        "model": "climatology",
+        "target_coverage": 0.95,
+        "injection_seed": 60613,
+        "contiguous": 0.014594483323887464,
+        "fragmented": -0.00010209435310981618,
+        "arm_gap": -0.01469657767699728
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 7,
+        "contiguous": 0.08111974064418936,
+        "fragmented": 0.08694090411911504,
+        "arm_gap": 0.005821163474925672
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.07008934848815329,
+        "fragmented": 0.03742405775193747,
+        "arm_gap": -0.032665290736215824
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 101,
+        "contiguous": 0.051171165705200194,
+        "fragmented": 0.025507355461878767,
+        "arm_gap": -0.025663810243321428
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.04183299560694642,
+        "fragmented": 0.03959235330620814,
+        "arm_gap": -0.0022406423007382825
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.07113926519909708,
+        "fragmented": 0.08269061591676352,
+        "arm_gap": 0.011551350717666442
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 2718,
+        "contiguous": 0.04342814131319095,
+        "fragmented": 0.035459355912808355,
+        "arm_gap": -0.007968785400382594
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 4096,
+        "contiguous": 0.04006801599277887,
+        "fragmented": 0.050361843238320714,
+        "arm_gap": 0.010293827245541842
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 8191,
+        "contiguous": 0.06093103436175362,
+        "fragmented": 0.0024383112251425976,
+        "arm_gap": -0.058492723136611025
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 31415,
+        "contiguous": 0.05038225047455924,
+        "fragmented": 0.07220096240375451,
+        "arm_gap": 0.021818711929195267
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.75,
+        "injection_seed": 60613,
+        "contiguous": 0.05311095275090538,
+        "fragmented": 0.0891404317557184,
+        "arm_gap": 0.036029479004813014
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 7,
+        "contiguous": 0.07474917467675968,
+        "fragmented": 0.08322819380568713,
+        "arm_gap": 0.008479019128927456
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.07235824519921241,
+        "fragmented": 0.09841725096146003,
+        "arm_gap": 0.026059005762247622
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 101,
+        "contiguous": 0.05591688893008606,
+        "fragmented": 0.03493051679771375,
+        "arm_gap": -0.02098637213237231
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.044686064119308755,
+        "fragmented": 0.06812887853511984,
+        "arm_gap": 0.023442814415811086
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.06386714800520732,
+        "fragmented": 0.09695260777883152,
+        "arm_gap": 0.033085459773624204
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 2718,
+        "contiguous": 0.04499918678488435,
+        "fragmented": 0.039736573843284106,
+        "arm_gap": -0.005262612941600242
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 4096,
+        "contiguous": 0.04703485972206645,
+        "fragmented": 0.02605185680430422,
+        "arm_gap": -0.020983002917762228
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 8191,
+        "contiguous": 0.06501602872616885,
+        "fragmented": -0.012032613879735088,
+        "arm_gap": -0.07704864260590394
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 31415,
+        "contiguous": 0.065325571985407,
+        "fragmented": 0.05994612100865593,
+        "arm_gap": -0.005379450976751077
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.82,
+        "injection_seed": 60613,
+        "contiguous": 0.04780719261117372,
+        "fragmented": 0.07114323574456716,
+        "arm_gap": 0.023336043133393436
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 7,
+        "contiguous": 0.07845242379731576,
+        "fragmented": 0.09943589167313849,
+        "arm_gap": 0.020983467875822726
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.06730629067104088,
+        "fragmented": 0.07499937492204967,
+        "arm_gap": 0.007693084251008786
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 101,
+        "contiguous": 0.059180267545895004,
+        "fragmented": 0.062404905573783864,
+        "arm_gap": 0.0032246380278888598
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.04513434995815779,
+        "fragmented": 0.07761270306961054,
+        "arm_gap": 0.03247835311145275
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.07348519635038109,
+        "fragmented": 0.08286214196547248,
+        "arm_gap": 0.009376945615091392
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 2718,
+        "contiguous": 0.04583479936496837,
+        "fragmented": 0.057232237166756184,
+        "arm_gap": 0.011397437801787813
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 4096,
+        "contiguous": 0.046417419546777916,
+        "fragmented": 0.03533509375299804,
+        "arm_gap": -0.01108232579377988
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 8191,
+        "contiguous": 0.06426900706902083,
+        "fragmented": 0.008715920005583633,
+        "arm_gap": -0.0555530870634372
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 31415,
+        "contiguous": 0.06721978735047296,
+        "fragmented": 0.05177159492846373,
+        "arm_gap": -0.015448192422009233
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.85,
+        "injection_seed": 60613,
+        "contiguous": 0.05232195528301853,
+        "fragmented": 0.06293659894922132,
+        "arm_gap": 0.010614643666202794
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 7,
+        "contiguous": 0.08012081055826814,
+        "fragmented": 0.06471559463626042,
+        "arm_gap": -0.01540521592200772
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.06396759863739576,
+        "fragmented": 0.09639901652159533,
+        "arm_gap": 0.032431417884199565
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 101,
+        "contiguous": 0.06426875874654692,
+        "fragmented": 0.05134735606767915,
+        "arm_gap": -0.012921402678867766
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.05167095719915038,
+        "fragmented": 0.05862983223464102,
+        "arm_gap": 0.0069588750354906415
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.0644875906853033,
+        "fragmented": 0.07285414650303224,
+        "arm_gap": 0.008366555817728938
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 2718,
+        "contiguous": 0.05341845318314764,
+        "fragmented": 0.06385748928368962,
+        "arm_gap": 0.010439036100541976
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 4096,
+        "contiguous": 0.05752190404643609,
+        "fragmented": 0.04508301228156464,
+        "arm_gap": -0.012438891764871451
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 8191,
+        "contiguous": 0.06655375239958172,
+        "fragmented": 0.04942090092110574,
+        "arm_gap": -0.017132851478475986
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 31415,
+        "contiguous": 0.06504637442592864,
+        "fragmented": 0.06582573274743952,
+        "arm_gap": 0.0007793583215108812
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.9,
+        "injection_seed": 60613,
+        "contiguous": 0.05373634114991499,
+        "fragmented": 0.03897589277690083,
+        "arm_gap": -0.014760448373014157
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 7,
+        "contiguous": 0.07085240018532502,
+        "fragmented": 0.06983166914240868,
+        "arm_gap": -0.001020731042916334
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.05967755609631864,
+        "fragmented": 0.06542523165245495,
+        "arm_gap": 0.005747675556136311
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 101,
+        "contiguous": 0.06280137550333442,
+        "fragmented": 0.050316819161877024,
+        "arm_gap": -0.012484556341457398
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.06203478318188138,
+        "fragmented": 0.05403508389314693,
+        "arm_gap": -0.007999699288734452
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.06543988949162505,
+        "fragmented": 0.07017518920194554,
+        "arm_gap": 0.004735299710320495
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 2718,
+        "contiguous": 0.06275948195602865,
+        "fragmented": 0.08060268403200499,
+        "arm_gap": 0.01784320207597634
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 4096,
+        "contiguous": 0.057356336421064746,
+        "fragmented": 0.056783121696554084,
+        "arm_gap": -0.0005732147245106622
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 8191,
+        "contiguous": 0.06896871962468987,
+        "fragmented": 0.038004890453674056,
+        "arm_gap": -0.03096382917101581
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 31415,
+        "contiguous": 0.06254971803923037,
+        "fragmented": 0.07171111951787079,
+        "arm_gap": 0.009161401478640419
+      },
+      {
+        "family": "linear",
+        "model": "ridge",
+        "target_coverage": 0.95,
+        "injection_seed": 60613,
+        "contiguous": 0.058463843268407256,
+        "fragmented": 0.05302521404136795,
+        "arm_gap": -0.005438629227039304
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 7,
+        "contiguous": 0.11589580788889227,
+        "fragmented": -0.0675535296221312,
+        "arm_gap": -0.18344933751102346
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.12591328709347627,
+        "fragmented": -0.10296540390883487,
+        "arm_gap": -0.22887869100231112
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 101,
+        "contiguous": 0.029159443973912163,
+        "fragmented": 0.023111833681889366,
+        "arm_gap": -0.006047610292022797
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.09040366282866863,
+        "fragmented": -0.09475766188983344,
+        "arm_gap": -0.18516132471850205
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.10249880491759751,
+        "fragmented": 0.02014894874329635,
+        "arm_gap": -0.08234985617430116
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 2718,
+        "contiguous": 0.07902140644146376,
+        "fragmented": -0.06555480212111875,
+        "arm_gap": -0.14457620856258252
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 4096,
+        "contiguous": 0.051141622261193564,
+        "fragmented": 0.10063674667916096,
+        "arm_gap": 0.0494951244179674
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 8191,
+        "contiguous": 0.10013066216588984,
+        "fragmented": -0.03355668689399308,
+        "arm_gap": -0.13368734905988292
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 31415,
+        "contiguous": 0.055112586654934126,
+        "fragmented": 0.01517749201261239,
+        "arm_gap": -0.039935094642321735
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.75,
+        "injection_seed": 60613,
+        "contiguous": 0.10420509543486989,
+        "fragmented": 0.1129217001190066,
+        "arm_gap": 0.008716604684136708
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 7,
+        "contiguous": 0.11090165012310178,
+        "fragmented": 0.07215383029215446,
+        "arm_gap": -0.03874781983094733
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.12773051389091175,
+        "fragmented": 0.03979842261858731,
+        "arm_gap": -0.08793209127232443
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 101,
+        "contiguous": 0.052419608737840274,
+        "fragmented": 0.02431674842361109,
+        "arm_gap": -0.028102860314229185
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.07946025881106356,
+        "fragmented": 0.021452216337719543,
+        "arm_gap": -0.05800804247334401
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.09675502699401022,
+        "fragmented": 0.11469284908187587,
+        "arm_gap": 0.01793782208786565
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 2718,
+        "contiguous": 0.04642866760241926,
+        "fragmented": 0.0008704612761817332,
+        "arm_gap": -0.04555820632623753
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 4096,
+        "contiguous": 0.07715950559421496,
+        "fragmented": 0.0634774742682724,
+        "arm_gap": -0.013682031325942562
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 8191,
+        "contiguous": 0.1008685177932563,
+        "fragmented": 0.022432677320216848,
+        "arm_gap": -0.07843584047303945
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 31415,
+        "contiguous": 0.08614499482971687,
+        "fragmented": 0.059344443107951284,
+        "arm_gap": -0.026800551721765584
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.82,
+        "injection_seed": 60613,
+        "contiguous": 0.08680433637427043,
+        "fragmented": 0.07234922501803338,
+        "arm_gap": -0.014455111356237046
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 7,
+        "contiguous": 0.0965737960940682,
+        "fragmented": 0.08260428079930308,
+        "arm_gap": -0.013969515294765117
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.10093459712242381,
+        "fragmented": 0.07311827233313935,
+        "arm_gap": -0.02781632478928446
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 101,
+        "contiguous": 0.07232135407383851,
+        "fragmented": 0.049986920147352655,
+        "arm_gap": -0.022334433926485854
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.09039658273127023,
+        "fragmented": 0.0507914792926721,
+        "arm_gap": -0.039605103438598126
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.1135270449245906,
+        "fragmented": 0.10799169232619699,
+        "arm_gap": -0.00553535259839362
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 2718,
+        "contiguous": 0.08566147014108998,
+        "fragmented": 0.03951830630668096,
+        "arm_gap": -0.046143163834409015
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 4096,
+        "contiguous": 0.0254980726506369,
+        "fragmented": 0.08400850980876244,
+        "arm_gap": 0.05851043715812554
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 8191,
+        "contiguous": 0.09979381243031826,
+        "fragmented": -0.017390055751060268,
+        "arm_gap": -0.11718386818137853
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 31415,
+        "contiguous": 0.10917418398421856,
+        "fragmented": 0.06330210199473703,
+        "arm_gap": -0.045872081989481533
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.85,
+        "injection_seed": 60613,
+        "contiguous": 0.09404559071446154,
+        "fragmented": 0.05002896492277916,
+        "arm_gap": -0.04401662579168238
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 7,
+        "contiguous": 0.13236864891987443,
+        "fragmented": 0.08749562897182321,
+        "arm_gap": -0.04487301994805122
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.12178381595593657,
+        "fragmented": 0.11312945600297068,
+        "arm_gap": -0.008654359952965887
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 101,
+        "contiguous": 0.07318862815869698,
+        "fragmented": 0.08796664887555923,
+        "arm_gap": 0.014778020716862253
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.09357587281207862,
+        "fragmented": 0.09712949322194626,
+        "arm_gap": 0.003553620409867647
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.11554918796956963,
+        "fragmented": 0.0885795662508837,
+        "arm_gap": -0.02696962171868593
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 2718,
+        "contiguous": 0.08861828212381646,
+        "fragmented": 0.10017078711534988,
+        "arm_gap": 0.011552504991533416
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 4096,
+        "contiguous": 0.12991444160396773,
+        "fragmented": 0.08374143958232678,
+        "arm_gap": -0.046173002021640944
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 8191,
+        "contiguous": 0.11211944998737451,
+        "fragmented": 0.01670198388951653,
+        "arm_gap": -0.09541746609785798
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 31415,
+        "contiguous": 0.11902261713534094,
+        "fragmented": 0.07991254185214736,
+        "arm_gap": -0.03911007528319359
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.9,
+        "injection_seed": 60613,
+        "contiguous": 0.11394077567286309,
+        "fragmented": 0.0731481427284452,
+        "arm_gap": -0.040792632944417886
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 7,
+        "contiguous": 0.07535561350422622,
+        "fragmented": 0.06862427512148983,
+        "arm_gap": -0.006731338382736388
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.12068079971453845,
+        "fragmented": 0.0773709363561323,
+        "arm_gap": -0.04330986335840614
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 101,
+        "contiguous": 0.09870228377415653,
+        "fragmented": 0.06768807028437822,
+        "arm_gap": -0.031014213489778314
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.13051400876304262,
+        "fragmented": 0.11228164945308894,
+        "arm_gap": -0.018232359309953677
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.10714457185623472,
+        "fragmented": 0.1070197554343539,
+        "arm_gap": -0.00012481642188082176
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 2718,
+        "contiguous": 0.08828175929890847,
+        "fragmented": 0.13476604184964333,
+        "arm_gap": 0.04648428255073486
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 4096,
+        "contiguous": 0.049580547429459575,
+        "fragmented": 0.10436695007462289,
+        "arm_gap": 0.05478640264516332
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 8191,
+        "contiguous": 0.11464419112852371,
+        "fragmented": 0.07589061010034155,
+        "arm_gap": -0.03875358102818216
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 31415,
+        "contiguous": 0.12113534883033931,
+        "fragmented": 0.09172894814351766,
+        "arm_gap": -0.029406400686821654
+      },
+      {
+        "family": "sequence",
+        "model": "gru_h64_l2",
+        "target_coverage": 0.95,
+        "injection_seed": 60613,
+        "contiguous": 0.11421994398579109,
+        "fragmented": 0.10485646563463462,
+        "arm_gap": -0.009363478351156473
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 7,
+        "contiguous": 0.029971893626420165,
+        "fragmented": -0.08439143214312872,
+        "arm_gap": -0.11436332576954888
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 42,
+        "contiguous": 0.03861363409206142,
+        "fragmented": 0.047944859432832665,
+        "arm_gap": 0.009331225340771243
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 101,
+        "contiguous": 0.026991922204266605,
+        "fragmented": -0.055797928084026616,
+        "arm_gap": -0.08278985028829322
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 1337,
+        "contiguous": 0.027023332907794573,
+        "fragmented": -0.012338681677301677,
+        "arm_gap": -0.03936201458509625
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 2024,
+        "contiguous": 0.06024003019192725,
+        "fragmented": -0.03827131275035334,
+        "arm_gap": -0.09851134294228059
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 2718,
+        "contiguous": 0.02034826826256353,
+        "fragmented": -0.017052640797387886,
+        "arm_gap": -0.037400909059951415
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 4096,
+        "contiguous": 0.039209267400939996,
+        "fragmented": 0.0071306606251416715,
+        "arm_gap": -0.032078606775798324
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 8191,
+        "contiguous": 0.023678041115141046,
+        "fragmented": -0.05461647640500589,
+        "arm_gap": -0.07829451752014693
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 31415,
+        "contiguous": 0.004962804837181367,
+        "fragmented": -0.059635886576575814,
+        "arm_gap": -0.06459869141375718
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.75,
+        "injection_seed": 60613,
+        "contiguous": -0.031693436805662945,
+        "fragmented": 0.08604291029019995,
+        "arm_gap": 0.11773634709586289
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 7,
+        "contiguous": 0.03612635760325289,
+        "fragmented": -0.018550684914826476,
+        "arm_gap": -0.054677042518079366
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 42,
+        "contiguous": 0.03948150057244393,
+        "fragmented": 0.04316766782700254,
+        "arm_gap": 0.0036861672545586144
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 101,
+        "contiguous": 0.018723614265873545,
+        "fragmented": -0.02306485116943313,
+        "arm_gap": -0.041788465435306676
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 1337,
+        "contiguous": 0.03026558592509465,
+        "fragmented": -0.01476027278610359,
+        "arm_gap": -0.04502585871119824
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 2024,
+        "contiguous": 0.04459490056030535,
+        "fragmented": 0.11683785085637421,
+        "arm_gap": 0.07224295029606886
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 2718,
+        "contiguous": 0.04260257569547932,
+        "fragmented": -0.05123765575365136,
+        "arm_gap": -0.09384023144913067
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 4096,
+        "contiguous": 0.03511167507751001,
+        "fragmented": -0.04688317291340316,
+        "arm_gap": -0.08199484799091317
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 8191,
+        "contiguous": 0.04374747539575241,
+        "fragmented": -0.038517797194806525,
+        "arm_gap": -0.08226527259055894
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 31415,
+        "contiguous": 0.03420862270211433,
+        "fragmented": -0.054931705364357875,
+        "arm_gap": -0.08914032806647221
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.82,
+        "injection_seed": 60613,
+        "contiguous": -0.011516561840467121,
+        "fragmented": 0.07772069554357464,
+        "arm_gap": 0.08923725738404176
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 7,
+        "contiguous": 0.038690065020129616,
+        "fragmented": 0.004408450992750557,
+        "arm_gap": -0.03428161402737906
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 42,
+        "contiguous": 0.03864290046097052,
+        "fragmented": -0.006117621768993553,
+        "arm_gap": -0.04476052222996407
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 101,
+        "contiguous": 0.017927304649739684,
+        "fragmented": -0.005896683293922456,
+        "arm_gap": -0.02382398794366214
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 1337,
+        "contiguous": 0.024830192472950485,
+        "fragmented": -0.007104965111195627,
+        "arm_gap": -0.03193515758414611
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 2024,
+        "contiguous": 0.07129640411311,
+        "fragmented": 0.06216831200365924,
+        "arm_gap": -0.009128092109450758
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 2718,
+        "contiguous": 0.042851947812451496,
+        "fragmented": 0.007089594697967105,
+        "arm_gap": -0.03576235311448439
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 4096,
+        "contiguous": 0.04883077966159288,
+        "fragmented": 0.0008026553896403055,
+        "arm_gap": -0.04802812427195258
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 8191,
+        "contiguous": 0.03695200069728932,
+        "fragmented": -0.01040159319600642,
+        "arm_gap": -0.04735359389329574
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 31415,
+        "contiguous": 0.03935384610530224,
+        "fragmented": -0.07074473941700488,
+        "arm_gap": -0.11009858552230711
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.85,
+        "injection_seed": 60613,
+        "contiguous": -0.008673561118313078,
+        "fragmented": 0.07450519612914308,
+        "arm_gap": 0.08317875724745616
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 7,
+        "contiguous": 0.04694059164882125,
+        "fragmented": 0.011271150614945324,
+        "arm_gap": -0.035669441033875926
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 42,
+        "contiguous": 0.02897774556233823,
+        "fragmented": 0.02589387248054631,
+        "arm_gap": -0.0030838730817919213
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 101,
+        "contiguous": 0.017082490236288828,
+        "fragmented": 0.0007326773765595762,
+        "arm_gap": -0.01634981285972925
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 1337,
+        "contiguous": 0.027782766308562912,
+        "fragmented": 0.037232776533413614,
+        "arm_gap": 0.009450010224850702
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 2024,
+        "contiguous": 0.04344422181908425,
+        "fragmented": 0.05069696502389265,
+        "arm_gap": 0.007252743204808398
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 2718,
+        "contiguous": 0.04085822791626226,
+        "fragmented": 0.014102414579745037,
+        "arm_gap": -0.02675581333651722
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 4096,
+        "contiguous": 0.044517680138333016,
+        "fragmented": -0.00936182050458556,
+        "arm_gap": -0.053879500642918576
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 8191,
+        "contiguous": 0.03156535706656305,
+        "fragmented": 0.014480366932647981,
+        "arm_gap": -0.017084990133915068
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 31415,
+        "contiguous": 0.04770682367252843,
+        "fragmented": -0.03477455324583412,
+        "arm_gap": -0.08248137691836255
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.9,
+        "injection_seed": 60613,
+        "contiguous": 0.006113327967950721,
+        "fragmented": 0.03584210246627051,
+        "arm_gap": 0.029728774498319788
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 7,
+        "contiguous": 0.04037484343892772,
+        "fragmented": 0.023065698713213623,
+        "arm_gap": -0.0173091447257141
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 42,
+        "contiguous": 0.03293055234019027,
+        "fragmented": 0.04878010305241853,
+        "arm_gap": 0.015849550712228266
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 101,
+        "contiguous": 0.03059869220807543,
+        "fragmented": -0.012727513627016407,
+        "arm_gap": -0.043326205835091836
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 1337,
+        "contiguous": 0.04212501407822378,
+        "fragmented": 0.043842262744120175,
+        "arm_gap": 0.0017172486658963981
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 2024,
+        "contiguous": 0.06073625716279285,
+        "fragmented": 0.04438607143050555,
+        "arm_gap": -0.016350185732287303
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 2718,
+        "contiguous": 0.03935093496458164,
+        "fragmented": 0.048509765456284604,
+        "arm_gap": 0.009158830491702963
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 4096,
+        "contiguous": 0.029295859965834947,
+        "fragmented": 0.006699204483420984,
+        "arm_gap": -0.022596655482413963
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 8191,
+        "contiguous": 0.03588422954220272,
+        "fragmented": 0.04223292187380434,
+        "arm_gap": 0.006348692331601624
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 31415,
+        "contiguous": 0.04261140363288518,
+        "fragmented": 0.033178567231842315,
+        "arm_gap": -0.009432836401042866
+      },
+      {
+        "family": "trees",
+        "model": "xgboost",
+        "target_coverage": 0.95,
+        "injection_seed": 60613,
+        "contiguous": 0.021757174844051486,
+        "fragmented": 0.017042403782261517,
+        "arm_gap": -0.0047147710617899685
+      }
+    ],
+    "paired_tests": [
+      {
+        "family": "sequence",
+        "n_pairs": 50,
+        "mean_arm_gap": -0.03942791812469932,
+        "median_arm_gap": -0.030210307088299984,
+        "ci_low": -0.05647977084139017,
+        "ci_high": -0.023628805420261117,
+        "p_wilcoxon": 6.725303951071737e-06,
+        "p_holm": 2.690121580428695e-05,
+        "significant_holm": true
+      },
+      {
+        "family": "climatological",
+        "n_pairs": 50,
+        "mean_arm_gap": -0.035651281915971146,
+        "median_arm_gap": -0.008984648122412564,
+        "ci_low": -0.06088797679383257,
+        "ci_high": -0.013812491877252458,
+        "p_wilcoxon": 0.005758302166270823,
+        "p_holm": 0.011516604332541647,
+        "significant_holm": true
+      },
+      {
+        "family": "trees",
+        "n_pairs": 50,
+        "mean_arm_gap": -0.02630838776620914,
+        "median_arm_gap": -0.03200688217997222,
+        "ci_low": -0.03926519756318954,
+        "ci_high": -0.012544000018695224,
+        "p_wilcoxon": 0.00010381446904439429,
+        "p_holm": 0.00031144340713318286,
+        "significant_holm": true
+      },
+      {
+        "family": "linear",
+        "n_pairs": 50,
+        "mean_arm_gap": -0.0015553228353569915,
+        "median_arm_gap": 0.0020019981746998705,
+        "ci_low": -0.008106281052064046,
+        "ci_high": 0.00468891476837844,
+        "p_wilcoxon": 0.9542249738357711,
+        "p_holm": 0.9542249738357711,
+        "significant_holm": false
+      }
+    ],
+    "grid_complete": true,
+    "missing_cells": [],
+    "n_expected_degraded_cells": 100
   }
 }

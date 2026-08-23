@@ -3,3 +3,20 @@
 13:35:24 [1/8] finish the Wanliu grid (resume)
 13:35:25   disk: C: 15G  F: 10G
 13:35:25   attempt 1: resume (keeps cells already computed)
+13:48:46   attempt 1: FAILED rc=127
+13:48:47   disk: C: 12G  F: 10G
+13:48:47   attempt 2: resume (keeps cells already computed)
+13:48:50   attempt 2: ok
+13:48:50 [2/8] 17 on Wanliu
+13:48:55   17 rc=0
+13:48:55 [3/8] T2 grid: dingling
+13:48:55   disk: C: 12G  F: 10G
+13:48:55   attempt 1: --force (clears the grid, then rebuilds)
+15:18:55   attempt 1: FAILED rc=127
+15:18:56   disk: C: 12G  F: 10G
+15:18:56   attempt 2: resume (keeps cells already computed)
+15:19:01   attempt 2: ok
+15:19:05   17 rc=0
+15:19:05 [4/8] T2 grid: dongsi
+15:19:05   disk: C: 12G  F: 10G
+15:19:05   attempt 1: --force (clears the grid, then rebuilds)
