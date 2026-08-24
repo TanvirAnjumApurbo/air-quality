@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\caption{What a backward reach costs each record, as an identity rather than a fit. Usable rows are sum(max(0, run length minus radius)), whose derivative in the radius is minus the number of runs still longer than it -- so 'Runs surviving' is exactly the rows one further hour of reach would cost. The elasticity is that marginal cost made dimensionless, and is the only column comparable across records. Beijing Wanliu (UCI Multi-Site, id 501). Chronological split, no shuffling: train to 2015-12-18, validation to 2016-07-24, test thereafter. Metrics on the held-out test period only.}
+\label{tab:decision_rule}
+\begin{tabular}{lrrrrrr}
+\toprule
+Record & Radius (h) & Observed hours & Usable rows & Yield & Runs surviving & Elasticity \\
+\midrule
+Dhaka & 36 & 68450 & 60337 & 0.8815 & 180 & 0.1074 \\
+Dhaka & 48 & 68450 & 58230 & 0.8507 & 165 & 0.1360 \\
+Dhaka & 72 & 68450 & 54598 & 0.7976 & 139 & 0.1833 \\
+Dhaka & 192 & 68450 & 41828 & 0.6111 & 81 & 0.3718 \\
+Beijing Wanliu & 36 & 34947 & 34035 & 0.9739 & 25 & 0.0264 \\
+Beijing Wanliu & 48 & 34947 & 33735 & 0.9653 & 25 & 0.0356 \\
+Beijing Wanliu & 72 & 34947 & 33139 & 0.9483 & 24 & 0.0521 \\
+Beijing Wanliu & 192 & 34947 & 30413 & 0.8703 & 22 & 0.1389 \\
+Beijing Dingling & 36 & 34640 & 33225 & 0.9592 & 37 & 0.0401 \\
+Beijing Dingling & 48 & 34640 & 32781 & 0.9463 & 37 & 0.0542 \\
+Beijing Dingling & 72 & 34640 & 31918 & 0.9214 & 35 & 0.0790 \\
+Beijing Dingling & 192 & 34640 & 27921 & 0.8060 & 31 & 0.2132 \\
+Beijing Dongsi & 36 & 34555 & 33254 & 0.9623 & 34 & 0.0368 \\
+Beijing Dongsi & 48 & 34555 & 32851 & 0.9507 & 33 & 0.0482 \\
+Beijing Dongsi & 72 & 34555 & 32077 & 0.9283 & 32 & 0.0718 \\
+Beijing Dongsi & 192 & 34555 & 28627 & 0.8284 & 25 & 0.1677 \\
+\bottomrule
+\end{tabular}
+\end{table}

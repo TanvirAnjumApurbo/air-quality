@@ -1,17 +1,17 @@
 \begin{table}[htbp]
-\caption{Amplification law $\mathrm{usable} = O\exp(\beta_0 - \alpha R\,k/O)$ for observed hours $O$, distinct gaps $k$ and sterilisation radius $R=192$ h, fitted on wanliu (101 cells) and validated on the remaining donor grids. The fitted $\alpha$ is compared against the share of gaps outliving the forward-fill, which is what it should equal if the mechanism is as stated. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
+\caption{Amplification law $\mathrm{usable} = O\exp(\beta_0 - \alpha R\,k/O)$ for observed hours $O$, distinct gaps $k$ and sterilisation radius $R=192$ h, fitted on wanliu (101 cells at R=192) and validated on the remaining donor grids. The fitted $\alpha$ is compared against the share of gaps outliving the forward-fill, which is what it should equal if the mechanism is as stated. US Embassy Dhaka (OpenAQ 2445+8415). Chronological split, no shuffling: train to 2022-07-08, validation to 2023-11-15, test thereafter. Metrics on the held-out test period only.}
 \label{tab:missingness_law}
 \begin{tabular}{lrr}
 \toprule
 Quantity & Value & Note \\
 \midrule
 alpha (fitted) & 0.156 & share of counted gaps that break a run \\
-alpha (predicted) & 0.142 & share of gaps longer than max\_ffill\_hours=3 \\
+alpha (predicted) & 0.142 & share of 2074 gaps longer than max\_ffill\_hours=3; 95\% CI [0.1274, 0.1574] \\
 beta0 & -0.160 & log-scale intercept \\
 R\textasciicircum{}2 (fitted donor) & 0.987 & 101 cells \\
 median APE (fitted donor) & 3.429 & per cent \\
-R\textasciicircum{}2 (held out) & 0.977 & 202 cells, donors not fitted on \\
-median APE (held out) & 5.218 & per cent \\
+R\textasciicircum{}2 (held out) & 0.982 & 404 cells: other stations at R=192, and the fitted station at shorter radii \\
+median APE (held out) & 3.453 & per cent \\
 \bottomrule
 \end{tabular}
 \end{table}

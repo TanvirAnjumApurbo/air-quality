@@ -1,6 +1,6 @@
 Quantity,Value,Note
 alpha (fitted),0.156,share of counted gaps that break a run
-alpha (predicted),0.142,"share of 2074 gaps longer than max_ffill_hours=3; 95% CI [0.1274, 0.1574]"
+alpha (predicted),0.111,"share of 180 gaps longer than max_ffill_hours=3; 95% CI [0.0731, 0.1654]"
 beta0,-0.160,log-scale intercept
 R^2 (fitted donor),0.987,101 cells
 median APE (fitted donor),3.429,per cent

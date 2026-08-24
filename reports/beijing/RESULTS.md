@@ -513,8 +513,26 @@ hours, $k$ for distinct gaps and $R$ for the sterilisation radius,
 
 $$\text{usable} \approx O\exp(\beta_0 - \alpha R k / O),\quad \alpha = 0.1555,\ \beta_0 = -0.1596$$
 
-fitted on wanliu (101 cells) alone, it predicts 202 held-out cells from the other donor records at $R^2 = 0.977$ (median absolute error 5.2%).
- $\alpha$ is not a free constant: it should equal the share of gaps outliving the 3-hour forward-fill, which is 0.1418 — agreeing with the fitted value to 9%.
+fitted on wanliu (101 cells at R=192) alone, it predicts 404 held-out cells at $R^2 = 0.982$ (median absolute error 3.5%).
+
+Those cells are two different extrapolations, and the distinction is the
+difference between checking a constant and checking a functional form.
+
+| Held-out grid | Radius (h) | What it tests | Cells | $R^2$ | Median APE |
+|---|---:|---|---:|---:|---:|
+| `dingling` | 192 | do the constants travel between records | 101 | 0.970 | 5.9% |
+| `dongsi` | 192 | do the constants travel between records | 101 | 0.983 | 4.0% |
+| `wanliu_R48` | 48 | is $R$ a factor, or a scale the fit absorbed | 101 | 0.964 | 2.8% |
+| `wanliu_R72` | 72 | is $R$ a factor, or a scale the fit absorbed | 101 | 0.979 | 2.7% |
+
+The second group is the stronger test. $R$ enters as a factor, so a law
+fitted at one radius makes a prediction at every other, and those grids are
+the *fitting* station rebuilt at a quarter of the fitting radius — a
+different experiment, not a different record.
+
+Score those same held-out cells at the fitted radius instead — treating $R$ as a scale the constants had absorbed — and the pooled $R^2$ falls from 0.982 to 0.461, with median error rising from 3.5% to 9.5%. That gap is what the radius term is carrying, and it is why the law is stated with $R$ in it rather than as a relationship between gaps and rows.
+
+$\alpha$ is not a free constant either: it should equal the share of gaps outliving the 3-hour forward-fill, which is 0.1111 across this record's 180 gaps (95% CI [0.0731, 0.1654]). The fitted value falls inside that interval, so the constant is the imputation policy to within what a record of this size can resolve.
 
 ### Coverage is not what reaches the model
 
@@ -532,6 +550,30 @@ absences are clustered into a few long outages while the near-complete
 stations' are scattered. **Coverage is what a data custodian reports;
 availability is what a forecaster gets, and the two can order a set of
 records in opposite directions.**
+
+### What a reach costs, before anything is fitted
+
+The law needs only an hour count and a gap count, which is what makes it
+usable on a record one does not hold. Anyone holding the record has the run
+lengths themselves, and those answer the question as an identity with no
+error term at all: a run of length $l$ supports $\max(0, l - R)$ scored
+rows, so
+
+$$U(R) = \sum_{\text{runs}}\max(0,\ l - R),\qquad -\frac{\mathrm{d}U}{\mathrm{d}R} = \#\{l > R\}.$$
+
+**One further hour of backward reach costs exactly the number of runs still
+longer than it.** No fit, no residual, and a custodian can evaluate it in a
+line. Divided through by $U/R$ it becomes an elasticity, which is the only
+form of the price comparable between records of different sizes.
+
+| Record | $R$ = 36 h | $R$ = 48 h | $R$ = 72 h | $R$ = 192 h |
+|---|---:|---:|---:|---:|
+| Dhaka | 0.107 | 0.136 | 0.183 | 0.372 |
+| Beijing Wanliu | 0.026 | 0.036 | 0.052 | 0.139 |
+| Beijing Dingling | 0.040 | 0.054 | 0.079 | 0.213 |
+| Beijing Dongsi | 0.037 | 0.048 | 0.072 | 0.168 |
+
+At the status quo's 192-hour radius Dhaka pays 0.372 against Beijing Wanliu's 0.139: a 1% deeper reach costs it 2.7 times as large a share of its supervision. Every record's price rises with the reach, because the runs that can still pay it are the ones being spent.
 
 ### Does a shorter reach cost accuracy?
 
@@ -591,6 +633,30 @@ The three arms separate the two effects exactly. Holding the row set at the stat
 | `xgboost` | 48 | -875.6 | -539.0 | -336.7 |
 
 On these identical rows the larger term is **supervision volume** (1597 against 8443 in summed absolute MSE). That is the right way round: the common subset holds the evaluation hours fixed, so extra training rows can only help through better-fitted parameters, and the availability they buy — which is where the gain of the previous table comes from — is by construction invisible here. Capping the reach removes the weekly lag and its rolling statistics and mostly *improves* the fit, so on this record the deepest features were paying for themselves only in the rows they made impossible.
+
+### Does the free price predict the payoff?
+
+The identity says what a cap recovers. Only the frontier says what it bought,
+and the two records whose arms were trained answer that question against each
+other rather than in isolation.
+
+| Record | Radius (h) | Elasticity | Rows predicted | Rows measured | Availability | Skill gain (median) | Skill gain (best) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Beijing Wanliu | 48 | 0.139 | +10.9% | +8.7% | +17.6 pp | +0.0510 | +0.0781 |
+| Beijing Wanliu | 71 | 0.139 | +9.0% | +7.2% | +14.3 pp | +0.0293 | +0.0456 |
+| Beijing Wanliu | 72 | 0.139 | +9.0% | +7.2% | +14.2 pp | +0.0513 | +0.1057 |
+| Dhaka | 48 | 0.372 | +39.2% | +48.0% | +14.1 pp | +0.0154 | +0.0204 |
+| Dhaka | 71 | 0.372 | +30.9% | +37.7% | +11.9 pp | +0.0031 | +0.0152 |
+| Dhaka | 72 | 0.372 | +30.5% | +37.3% | +11.8 pp | +0.0111 | +0.0226 |
+
+The 71-hour rows are the 48-hour-window models under the 24-hour cap. A
+recurrent model's floor is `max(lookback, window - 1)`, so below its own window
+the cap stops buying anything, and those rows are the cost of that ceiling
+rather than a second measurement of the 72-hour arm.
+
+**The price sizes the opportunity; it does not promise the payoff.** Dhaka recovers 48% of its training rows against Beijing Wanliu's 9%, and gains +0.0154 median all-hours skill against +0.0510 — the larger recovery is the smaller gain. Availability orders them the other way: +17.6 points against +14.1, matching the skill. Rows and hours served are both free to compute from the record alone and they disagree about which record had more to gain; here the hours were right. On two records that is a direction rather than a rule, and the mechanism is the one the previous table shows: the gain arrives as hours moved off the persistence fallback, not as parameters fitted on more rows.
+
+The identity is evaluated over the whole record and the frontier counts rows in the training split alone, so the two columns are one quantity on two footings and are not expected to agree exactly; the largest disagreement is 8.7 percentage points. The free calculation is a sizing instrument, and it is reported as one.
 
 **Scope.** One horizon and one record family. The frontier is measured at the
 headline horizon only, and the arms cap the feature set rather than replacing it,

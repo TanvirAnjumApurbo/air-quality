@@ -743,7 +743,9 @@ def main() -> int:
             # quantity the models experience. Reported here rather than only in
             # the availability section, because it is this comparison it
             # qualifies -- and it is read from the generated file, not asserted.
-            law_here = Path(str(cfg.get("paths.results"))) / "missingness_law.json"
+            law_here = (
+                Path(str(cfg.get("paths.results"))) / f"missingness_law{city_suffix(cfg)}.json"
+            )
             if law_here.exists():
                 avail_rows = pd.DataFrame(
                     json.loads(law_here.read_text(encoding="utf-8")).get("availability", [])
@@ -1359,9 +1361,10 @@ def main() -> int:
     # experiment: every number in sections 1-8 is conditional on it. Read from
     # generated files only; nothing here is transcribed.
     results_dir = Path(str(cfg.get("paths.results")))
-    law_path = results_dir / "missingness_law.json"
+    law_path = results_dir / f"missingness_law{city_suffix(cfg)}.json"
     # Both cities share paths.results, so this name carries a city suffix.
     frontier_path = results_dir / f"availability_frontier{city_suffix(cfg)}.json"
+    law: dict = {}
     if law_path.exists():
         law = json.loads(law_path.read_text(encoding="utf-8"))
         a(f"## {next_section}. What a gap costs, and how often a model can answer")
@@ -1419,16 +1422,60 @@ def main() -> int:
             a("")
             a(
                 f"fitted on {fit.get('source', 'one donor grid')} alone, it predicts "
-                f"{held['n']} held-out cells from the other donor records at "
-                f"$R^2 = {held['r2']:.3f}$ (median absolute error {held['median_ape_pct']:.1f}%)."
+                f"{held['n']} held-out cells at $R^2 = {held['r2']:.3f}$ "
+                f"(median absolute error {held['median_ape_pct']:.1f}%)."
             )
+            groups = pd.DataFrame(law.get("held_out_by_group", []))
+            if not groups.empty:
+                a("")
+                a("Those cells are two different extrapolations, and the distinction is the")
+                a("difference between checking a constant and checking a functional form.")
+                a("")
+                a("| Held-out grid | Radius (h) | What it tests | Cells | $R^2$ | Median APE |")
+                a("|---|---:|---|---:|---:|---:|")
+                for _, g in groups.sort_values(["group", "radius_h"]).iterrows():
+                    tests = (
+                        "do the constants travel between records"
+                        if g["group"] == "other station"
+                        else "is $R$ a factor, or a scale the fit absorbed"
+                    )
+                    a(
+                        f"| `{g['donor']}` | {int(g['radius_h'])} | {tests} | "
+                        f"{int(g['n'])} | {float(g['r2']):.3f} | "
+                        f"{float(g['median_ape_pct']):.1f}% |"
+                    )
+                a("")
+                fixed = law.get("held_out_at_fit_radius") or {}
+                a("The second group is the stronger test. $R$ enters as a factor, so a law")
+                a("fitted at one radius makes a prediction at every other, and those grids are")
+                a("the *fitting* station rebuilt at a quarter of the fitting radius — a")
+                a("different experiment, not a different record.")
+                if fixed:
+                    a("")
+                    a(
+                        f"Score those same held-out cells at the fitted radius instead — "
+                        f"treating $R$ as a scale the constants had absorbed — and the pooled "
+                        f"$R^2$ falls from {held['r2']:.3f} to {fixed['r2']:.3f}, with median "
+                        f"error rising from {held['median_ape_pct']:.1f}% to "
+                        f"{fixed['median_ape_pct']:.1f}%. That gap is what the radius term is "
+                        f"carrying, and it is why the law is stated with $R$ in it rather than "
+                        f"as a relationship between gaps and rows."
+                    )
+
             pred_alpha = law.get("alpha_predicted_from_ffill")
-            if pred_alpha:
+            ci = law.get("alpha_predicted_ci") or []
+            if pred_alpha and len(ci) == 2:
+                inside = bool(ci[0] <= fit["alpha"] <= ci[1])
+                a("")
                 a(
-                    f" $\\alpha$ is not a free constant: it should equal the share of gaps "
-                    f"outliving the {law['max_ffill_hours']}-hour forward-fill, which is "
-                    f"{pred_alpha:.4f} — agreeing with the fitted value to "
-                    f"{100 * abs(fit['alpha'] - pred_alpha) / fit['alpha']:.0f}%."
+                    f"$\\alpha$ is not a free constant either: it should equal the share of "
+                    f"gaps outliving the {law['max_ffill_hours']}-hour forward-fill, "
+                    f"which is {pred_alpha:.4f} across this record's "
+                    f"{law['n_raw_gaps']:,} gaps (95% CI "
+                    f"[{ci[0]:.4f}, {ci[1]:.4f}]). The fitted value falls "
+                    f"{'inside' if inside else 'just outside'} that interval, so the "
+                    f"constant is the imputation policy to within what a record of this "
+                    f"size can resolve."
                 )
             a("")
 
@@ -1455,6 +1502,47 @@ def main() -> int:
             a("stations' are scattered. **Coverage is what a data custodian reports;")
             a("availability is what a forecaster gets, and the two can order a set of")
             a("records in opposite directions.**")
+            a("")
+
+        dec_rule = pd.DataFrame(law.get("decision_rule", []))
+        if not dec_rule.empty:
+            a("### What a reach costs, before anything is fitted")
+            a("")
+            a("The law needs only an hour count and a gap count, which is what makes it")
+            a("usable on a record one does not hold. Anyone holding the record has the run")
+            a("lengths themselves, and those answer the question as an identity with no")
+            a("error term at all: a run of length $l$ supports $\\max(0, l - R)$ scored")
+            a("rows, so")
+            a("")
+            a(
+                "$$U(R) = \\sum_{\\text{runs}}\\max(0,\\ l - R),"
+                "\\qquad -\\frac{\\mathrm{d}U}{\\mathrm{d}R} = \\#\\{l > R\\}.$$"
+            )
+            a("")
+            a("**One further hour of backward reach costs exactly the number of runs still")
+            a("longer than it.** No fit, no residual, and a custodian can evaluate it in a")
+            a("line. Divided through by $U/R$ it becomes an elasticity, which is the only")
+            a("form of the price comparable between records of different sizes.")
+            a("")
+            radii = sorted({int(v) for v in dec_rule["Radius (h)"]})
+            a(f"| Record | {' | '.join(f'$R$ = {r} h' for r in radii)} |")
+            a("|---" + "|---:" * len(radii) + "|")
+            for record in dict.fromkeys(dec_rule["Record"]):
+                sub = dec_rule[dec_rule["Record"] == record].set_index("Radius (h)")
+                cells = " | ".join(f"{float(sub.loc[r, 'Elasticity']):.3f}" for r in radii)
+                a(f"| {record} | {cells} |")
+            a("")
+            deep = dec_rule[dec_rule["Radius (h)"] == max(radii)]
+            hi = deep.loc[deep["Elasticity"].idxmax()]
+            lo = deep.loc[deep["Elasticity"].idxmin()]
+            a(
+                f"At the status quo's {max(radii)}-hour radius {hi['Record']} pays "
+                f"{float(hi['Elasticity']):.3f} against {lo['Record']}'s "
+                f"{float(lo['Elasticity']):.3f}: a 1% deeper reach costs it "
+                f"{float(hi['Elasticity']) / float(lo['Elasticity']):.1f} times as large a "
+                f"share of its supervision. Every record's price rises with the reach, "
+                f"because the runs that can still pay it are the ones being spent."
+            )
             a("")
 
     if frontier_path.exists():
@@ -1580,6 +1668,65 @@ def main() -> int:
                 f"the rows they made impossible."
             )
             a("")
+
+    dec_out = pd.DataFrame(law.get("decision_outcomes", []))
+    if not dec_out.empty:
+        a("### Does the free price predict the payoff?")
+        a("")
+        a("The identity says what a cap recovers. Only the frontier says what it bought,")
+        a("and the two records whose arms were trained answer that question against each")
+        a("other rather than in isolation.")
+        a("")
+        a(
+            "| Record | Radius (h) | Elasticity | Rows predicted | Rows measured | "
+            "Availability | Skill gain (median) | Skill gain (best) |"
+        )
+        a("|---|---:|---:|---:|---:|---:|---:|---:|")
+        for _, r in dec_out.iterrows():
+            a(
+                f"| {r['Record']} | {int(r['Radius (h)'])} | "
+                f"{float(r['Elasticity at status quo']):.3f} | "
+                f"{float(r['Predicted rows (%)']):+.1f}% | "
+                f"{float(r['Measured rows (%)']):+.1f}% | "
+                f"{float(r['Availability gained (pp)']):+.1f} pp | "
+                f"{float(r['Skill gain (median)']):+.4f} | "
+                f"{float(r['Skill gain (best)']):+.4f} |"
+            )
+        a("")
+        a("The 71-hour rows are the 48-hour-window models under the 24-hour cap. A")
+        a("recurrent model's floor is `max(lookback, window - 1)`, so below its own window")
+        a("the cap stops buying anything, and those rows are the cost of that ceiling")
+        a("rather than a second measurement of the 72-hour arm.")
+        a("")
+        deepest = dec_out.loc[dec_out.groupby("Record")["Radius (h)"].idxmin()]
+        rich = deepest.loc[deepest["Measured rows (%)"].idxmax()]
+        poor = deepest.loc[deepest["Measured rows (%)"].idxmin()]
+        a(
+            f"**The price sizes the opportunity; it does not promise the payoff.** "
+            f"{rich['Record']} recovers {float(rich['Measured rows (%)']):.0f}% of its "
+            f"training rows against {poor['Record']}'s "
+            f"{float(poor['Measured rows (%)']):.0f}%, and gains "
+            f"{float(rich['Skill gain (median)']):+.4f} median all-hours skill against "
+            f"{float(poor['Skill gain (median)']):+.4f} — the larger recovery is the "
+            f"smaller gain. Availability orders them the other way: "
+            f"{float(poor['Availability gained (pp)']):+.1f} points against "
+            f"{float(rich['Availability gained (pp)']):+.1f}, matching the skill. Rows and "
+            f"hours served are both free to compute from the record alone and they "
+            f"disagree about which record had more to gain; here the hours were right. "
+            f"On two records that is a direction rather than a rule, and the mechanism "
+            f"is the one the previous table shows: the gain arrives as hours moved off "
+            f"the persistence fallback, not as parameters fitted on more rows."
+        )
+        a("")
+        err = dec_out["Error (pp)"].abs().max()
+        a(
+            f"The identity is evaluated over the whole record and the frontier counts rows "
+            f"in the training split alone, so the two columns are one quantity on two "
+            f"footings and are not expected to agree exactly; the largest disagreement is "
+            f"{err:.1f} percentage points. The free calculation is a sizing instrument, "
+            f"and it is reported as one."
+        )
+        a("")
 
     if law_path.exists() or frontier_path.exists():
         a("**Scope.** One horizon and one record family. The frontier is measured at the")
@@ -1923,7 +2070,7 @@ def main() -> int:
     # says any null "was not available and must not be invented".
     results_dir_facts = Path(str(cfg.get("paths.results")))
 
-    law_file = results_dir_facts / "missingness_law.json"
+    law_file = results_dir_facts / f"missingness_law{city_suffix(cfg)}.json"
     if law_file.exists():
         law_facts = json.loads(law_file.read_text(encoding="utf-8"))
         fit_facts = law_facts.get("fit", {})

@@ -32,10 +32,17 @@ fragmentation, rather than model class, decide which method wins?**
    history, so a gap costs the hours it removes **plus the reach behind it**.
    The cost therefore follows the *number* of gaps, not their length — which is
    the arm contrast in closed form. Written as
-   `usable ≈ O·exp(β₀ − αRk/O)` and fitted on one donor's 101 cells, it predicts
-   **202 held-out cells from two other stations at R² = 0.977** (median error
-   5.2%), and its α matches the share of gaps outliving the forward-fill limit
-   to 9% — so the constant is the imputation policy, not a free parameter.
+   `usable ≈ O·exp(β₀ − αRk/O)` and fitted on one donor's 101 cells at R = 192,
+   it predicts **404 held-out cells at R² = 0.982** (median error 3.5%). Those
+   cells are two different extrapolations: 202 from two other stations at the
+   same radius, which asks whether the constants travel between records, and 202
+   from the *fitting* station rebuilt at R = 72 and R = 48, which asks whether R
+   is a factor of the form or a scale the constants absorbed. It holds on both
+   (R² 0.964–0.983). Scoring that second group at the fitted radius instead
+   drops the pooled R² to 0.461, which is the difference the radius term is
+   carrying. Its α lands inside the 95% interval of the share of gaps outliving
+   the forward-fill limit on both cities — so the constant is the imputation
+   policy, not a free parameter.
 3. **A corrected benchmark protocol.** Non-degenerate sequence inputs, modern
    linear baselines (DLinear/NLinear, Zeng et al. 2023), block-bootstrap CIs,
    Holm–Bonferroni across the Diebold–Mariano family (one test per horizon, best
@@ -145,7 +152,7 @@ same targets:
 | 1 | `.\make.ps1 data` | `02_fetch_data.py` | OpenAQ + NASA POWER + UCI Beijing into `data/raw` |
 | 1 | `.\make.ps1 audit` | `03_data_audit.py` | `reports/DATA_AUDIT.md` — **hard gate before modelling** |
 | 2 | `.\make.ps1 features` | `04_build_features.py` | features + chronological splits |
-| 2 | `.\make.ps1 test` | `pytest tests` | 43 leakage + unit tests (must pass) |
+| 2 | `.\make.ps1 test` | `pytest tests` | 81 leakage + unit tests (must pass) |
 | 3 | `.\make.ps1 baselines` | `05_run_baselines.py` | Tier 1 baselines + Tier 2 classical ML |
 | 4 | `.\make.ps1 deep` | `06_train_sequence.py` | Tier 3 GRU/LSTM/DLinear/NLinear, all seeds |
 | 5 | `.\make.ps1 classify` | `07_train_classifier.py` | AQI-category classifier |
@@ -172,6 +179,21 @@ written into `results/results.json`.
 | `.\make.ps1 replication` | `18_donor_replication.py` | cross-donor comparison → §7b (needs ≥2 grids) |
 | `.\make.ps1 everything` | all of the above | every result in the paper |
 
+### Availability, the lookback frontier and the mediation test
+
+| Command | Script(s) | Deliverable |
+|---|---|---|
+| `.\make.ps1 law` | `20_missingness_law.py` | amplification law, availability audit, the decision rule → §9 (**free**, seconds) |
+| `.\make.ps1 lookback-configs` | `15_make_lookback_configs.py` | `config/lookback/*.yaml`, one per sterilisation radius |
+| `.\make.ps1 frontier` | `21_lookback_frontier.py`, `22_availability_frontier.py` | the three arms refitted and scored honestly (**TRAINS**) |
+| `.\make.ps1 frontier-analysis` | `22_availability_frontier.py` | re-score an existing frontier; no refit |
+| `.\make.ps1 mediation` | `23_mediation.py` | does the arm gap shrink with the radius (needs the radius grids) |
+
+`law` reads records and grids already on disk and trains nothing, so it can be run
+at any point. Run it **after** `frontier` if you want `fig16`'s third panel: the
+first two panels are identities the record alone supplies, the third is the
+measured outcome and is omitted rather than invented when the arms have not run.
+
 ### Run order matters
 
 - `08_green_measure.py` and `09_evaluate.py` read the sequence-model checkpoints,
@@ -182,6 +204,11 @@ written into `results/results.json`.
   rebuilds its output file on every cell and drops the `analysis` block `17` wrote
   — deliberately, because an analysis computed over a different cell set is worse
   than none, since it looks finished.
+- `20_missingness_law.py` is free but not order-free: its decision figure draws the
+  *measured* payoff from both cities' `availability_frontier*.json`, so run it after
+  `22_availability_frontier.py` on both cities to get the full figure. Re-run it for
+  each city — the payload it writes is per-city and `11_make_report.py` reads its
+  own city's copy.
 - `11_make_report.py` reads `results/results.json` and writes nothing that is not
   already in it — if a phase has not run, the corresponding section is omitted
   rather than invented.

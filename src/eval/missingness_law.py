@@ -171,21 +171,36 @@ def fit_survival_law(
     )
 
 
-def predict_usable(fit: LawFit, observed: np.ndarray, n_gaps: np.ndarray) -> np.ndarray:
+def predict_usable(
+    fit: LawFit,
+    observed: np.ndarray,
+    n_gaps: np.ndarray,
+    radius_h: np.ndarray | int | None = None,
+) -> np.ndarray:
     """Predicted usable rows under a fitted law.
+
+    The radius enters the form as a factor rather than as a fitted scale, so a
+    law fitted at one radius has a prediction at any other. That is a claim, and
+    passing ``radius_h`` is what lets it be tested: the mediation grids are the
+    fitting station at a quarter of the fitting radius, and scoring them at the
+    radius they were actually built with is the difference between validating
+    the functional form and validating one point on it.
 
     Args:
         fit: A fit from :func:`fit_survival_law`.
         observed: Observed hours per record or cell.
         n_gaps: Distinct gaps per record or cell.
+        radius_h: Radius to evaluate at, scalar or one per observation.
+            Defaults to the radius the law was fitted at.
 
     Returns:
         Predicted usable row counts.
     """
     obs = np.asarray(observed, dtype=float)
     gaps = np.asarray(n_gaps, dtype=float)
+    radius = np.asarray(fit.radius_h if radius_h is None else radius_h, dtype=float)
     safe = np.where(obs > 0, obs, 1.0)
-    ratio = np.where(obs > 0, fit.radius_h * gaps / safe, np.inf)
+    ratio = np.where(obs > 0, radius * gaps / safe, np.inf)
     return obs * np.exp(fit.beta0 - fit.alpha * ratio)
 
 
@@ -236,3 +251,98 @@ def ffill_survival_fraction(gap_lengths_h: np.ndarray, max_ffill_hours: int) -> 
     if lengths.size == 0:
         return 0.0
     return float(np.mean(lengths > max_ffill_hours))
+
+
+def ffill_survival_interval(
+    gap_lengths_h: np.ndarray, max_ffill_hours: int, z: float = 1.959963985
+) -> tuple[float, float, int]:
+    """Wilson interval for :func:`ffill_survival_fraction`.
+
+    Agreement between the fitted ``alpha`` and this share is the evidence that
+    the constant is the imputation policy rather than a free parameter. Stated
+    as a relative percentage that evidence is not comparable across records: the
+    primary record's 2,074 gaps and the comparison station's 180 put the fitted
+    value about the same distance away in standard errors while the relative
+    disagreement differs threefold. An interval says the same thing on both.
+
+    The unit of replication here is a gap, not an hour. Gaps are separated by
+    observed stretches and each either outlives the forward-fill or does not, so
+    the ordinary binomial interval applies -- unlike forecast availability, where
+    an outage makes a contiguous block unservable at once and
+    :func:`~src.eval.metrics.block_bootstrap_proportion` is required instead.
+
+    Args:
+        gap_lengths_h: One length in hours per distinct gap.
+        max_ffill_hours: The forward-fill limit from ``impute.max_ffill_hours``.
+        z: Normal quantile; the default is two-sided 95%.
+
+    Returns:
+        ``(lower, upper, n_gaps)``. The bounds are NaN when there are no gaps.
+    """
+    lengths = np.asarray(gap_lengths_h, dtype=float)
+    n = int(lengths.size)
+    if n == 0:
+        return float("nan"), float("nan"), 0
+    p = float(np.mean(lengths > max_ffill_hours))
+    denom = 1.0 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = z * float(np.sqrt(p * (1.0 - p) / n + z * z / (4 * n * n))) / denom
+    return max(0.0, centre - half), min(1.0, centre + half), n
+
+
+def surviving_runs(run_lens: np.ndarray, radius_h: int) -> int:
+    """Runs long enough to yield at least one usable row at this radius.
+
+    Args:
+        run_lens: Length in hours of every gap-free run.
+        radius_h: The sterilisation radius.
+
+    Returns:
+        The count of runs strictly longer than the radius.
+    """
+    return int((np.asarray(run_lens, dtype=np.int64) > int(radius_h)).sum())
+
+
+def decision_curve(run_lens: np.ndarray, radii_h: np.ndarray) -> pd.DataFrame:
+    """Yield, marginal price and elasticity of supervision against reach.
+
+    The survival law needs only ``(observed, n_gaps)`` and is therefore what a
+    data-availability report can support, but it is fitted on injected grids and
+    does not transfer to a raw record: on the four records here it under-predicts
+    usable rows by 12-47%, worst where the run lengths are least exponential.
+    This function is the alternative for anyone holding the record itself. It is
+    an identity, so it needs no fit and has no error term.
+
+    ``exact_usable_rows`` is ``sum(max(0, l - R))``, whose derivative in ``R`` is
+    minus the number of runs longer than ``R``. So the marginal cost of one more
+    hour of backward reach is *exactly* the number of runs that still survive it
+    -- the quantity plotted as the marginal price. Dividing by the usable rows
+    and multiplying by the radius gives the elasticity ``-dlnU/dlnR``, which is
+    dimensionless and therefore the one column comparable across records.
+
+    Args:
+        run_lens: Length in hours of every gap-free run.
+        radii_h: Sterilisation radii to evaluate.
+
+    Returns:
+        One row per radius with ``radius_h``, ``usable``, ``yield_frac``,
+        ``surviving_runs``, ``marginal_rows_per_h`` and ``elasticity``.
+    """
+    lens = np.asarray(run_lens, dtype=np.int64)
+    observed = int(lens.sum())
+    rows = []
+    for radius in np.asarray(radii_h, dtype=np.int64):
+        usable = int(np.maximum(0, lens - radius).sum())
+        marginal = surviving_runs(lens, radius)
+        rows.append(
+            {
+                "radius_h": int(radius),
+                "observed": observed,
+                "usable": usable,
+                "yield_frac": float(usable / observed) if observed else float("nan"),
+                "surviving_runs": marginal,
+                "marginal_rows_per_h": float(marginal),
+                "elasticity": (float(radius * marginal / usable) if usable else float("nan")),
+            }
+        )
+    return pd.DataFrame(rows)

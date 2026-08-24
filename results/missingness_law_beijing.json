@@ -7,12 +7,12 @@
     "source": "wanliu (101 cells at R=192)",
     "form": "usable = observed * exp(beta0 - alpha * radius_h * n_gaps / observed)"
   },
-  "alpha_predicted_from_ffill": 0.14175506268081003,
+  "alpha_predicted_from_ffill": 0.1111111111111111,
   "alpha_predicted_ci": [
-    0.12740533060372045,
-    0.15742942245674207
+    0.07308754224143643,
+    0.1653867339272865
   ],
-  "n_raw_gaps": 2074,
+  "n_raw_gaps": 180,
   "alpha_within_ci": true,
   "max_ffill_hours": 3,
   "radius_h": 192,

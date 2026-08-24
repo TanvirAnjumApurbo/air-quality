@@ -29,7 +29,7 @@ dependencies installed and fails at `import pandas`.
 .\make.ps1 replication     # cross-donor comparison only (needs `ablation` + `donors`)
 .\make.ps1 stability       # tier-3 selection stability; reads existing runs, no refit
 .\make.ps1 everything      # all + beijing + cross-city + ablation + report
-.\make.ps1 law             # amplification law + availability audit; free, seconds
+.\make.ps1 law             # law, availability audit, decision rule; free, seconds
 .\make.ps1 frontier        # lookback frontier; TRAINS, then scores it
 .\make.ps1 lookback-configs # generate config/lookback/*.yaml
 .\make.ps1 mediation       # arm gap against radius (needs the radius grids)
@@ -37,6 +37,13 @@ dependencies installed and fails at `import pandas`.
 
 `stability` (19) must precede `report` (11), which renders its subsection; `all`
 and both Beijing chains already order them.
+
+`law` (20) trains nothing and can run at any point, but it is not order-free.
+`fig16`'s third panel is the *measured* payoff, read from **both** cities'
+`availability_frontier*.json`, so 20 must follow 22 on both cities to draw it --
+and it is omitted rather than invented when the arms have not run. 20 must also
+be re-run per city before `report`, because its payload is per-city and 11 reads
+its own city's copy.
 
 **`donors` is the expensive target: budget ~3 h per donor**, measured — the
 101-cell grid took 154 min (Dingling) and 162 min (Dongsi), plus ~23 min of tier-2
@@ -54,7 +61,7 @@ annotations on public functions are enforced by `D` and `ANN` rules):
 .venv/Scripts/python.exe -m ruff format src scripts tests     # writes
 ```
 
-Tests — all 43 live in `tests/test_leakage.py`:
+Tests — all 81 live in `tests/test_leakage.py`:
 
 ```powershell
 .venv/Scripts/python.exe -m pytest tests -q
@@ -180,7 +187,9 @@ is a conjunction. It does not currently reject: the sequence tier separates from
 17_ablation_analys -> same file, analysis{}          (ALWAYS re-run after 16)
 18_donor_replicat  -> results/donor_replication.json (needs >=2 donor grids)
 19_selection_stab  -> results.json selection_stability[]  (before 11; §3 renders it)
-20_missingness_law -> results/missingness_law.json  FREE, no training
+20_missingness_law -> results/missingness_law{suffix}.json  FREE, no training
+                      + fig16_decision_rule + tables/decision_rule.*
+                      (reads 22's payload for its outcome panel; run it after)
 21_lookback_front  -> results.json runs[] tagged experiment=lookback_frontier
                       + results/lookback_frontier{,_predictions}.{json,npz}   TRAINS
 22_availability    -> results/availability_frontier.json  (needs 21)
@@ -273,6 +282,18 @@ and nothing else, so configurations sharing a radius share a run. This also mean
 a naive lookback sweep is a trap: at the ablation's 48-hour window, caps of 48, 24
 and 12 all collapse onto the same experiment.
 
+**`20_missingness_law.py`'s default glob matches the mediation grids, and they
+are not extra donors.** `ablation_gap_injection_wanliu_R{48,72}.json` are the
+*fitting* station rebuilt at a shorter radius, so every cell must be scored at
+the radius its own grid records in `sterilisation_radius_h` — which is why
+`predict_usable` takes a per-cell `radius_h`. Scored at the fitted radius
+instead, the held-out R² reads 0.461 and the law looks like one that does not
+replicate; scored correctly it is 0.982, and those cells become the strongest
+evidence in the section, because they are the only ones that test whether R is a
+factor of the form rather than a scale the constants absorbed. The fit itself
+must stay at one radius; `20` refuses to run if the fit donor's cells span more
+than one.
+
 **Two radii that share a window will resume each other's checkpoints unless the
 cell tree is separated.** `train_one` resumes by `(run_tag, run_id)` and `run_id`
 encodes the window but not the lookback, while the cell directory derives from
@@ -314,9 +335,18 @@ cannot drift from the city the run belongs to: `results.json` gives `""` and
 `paths.results`. `ablation.gap_injection.output_name` is the older solution to the
 same problem and is why the donor grids never collided.
 
+The sixth instance was `20_missingness_law.py`, which wrote `missingness_law.json`
+bare while `11_make_report.py` read it bare -- so §9 of the primary city's report
+was rendered from whichever city had run 20 last.
+
 Two tests guard it: one asserts the bare name genuinely collides (so the control
-cannot rot into a tautology) and one greps the frontier scripts for bare
-artefact names.
+cannot rot into a tautology) and one checks scripts 11, 20, 21 and 22 for a
+literal filename joined onto the shared results directory with no suffix in it.
+The guard is written against the *join expression* rather than a list of names,
+because 20 legitimately names both cities' frontier payloads: its decision figure
+is drawn across records, so it reads the pair by name from a table and joins each
+through a variable. `donor_replication.json` is allowlisted -- it is a property of
+the donor family, not of the reading city, and both reports render it.
 
 ### Side experiments write into `results.json` and must not reach the headline
 
@@ -342,7 +372,7 @@ Every run record carries a `tier`, and selection logic branches on it:
 ### Figures are sized for the printed column and carry no titles
 
 `src/viz/figures.py::setup_style` is the only place figure typography is set, and
-every figure script calls it. Three conventions hold across all 13 figures:
+every figure script calls it. Three conventions hold across all 17 figures:
 
 - **No `set_title` and no `suptitle`.** The title goes in the LaTeX caption. A title
   drawn into the artefact is a second, unversioned copy that drifts from the caption.

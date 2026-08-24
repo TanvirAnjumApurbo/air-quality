@@ -94,7 +94,7 @@ Targets:
   donor-list  Print the donor slugs parsed from donors.yaml
   donors      Replication donors: prep + gap injection for each (needs 'beijing')
   replication Cross-donor comparison only (needs 'ablation' and 'donors')
-  law         Amplification law + availability audit (no training, seconds)
+  law         Law, availability audit, decision rule (free; best run after frontier)
   frontier    Lookback frontier: refits tier 2 and tier 3 per arm (TRAINS)
   frontier-analysis  Score the frontier honestly (needs 'frontier')
   lookback-configs   Generate config/lookback/*.yaml for the mediation grid

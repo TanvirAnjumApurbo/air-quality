@@ -1768,18 +1768,111 @@ def test_control_a_bare_frontier_filename_would_collide():
 
 @pytest.mark.leakage
 def test_frontier_scripts_do_not_write_bare_filenames():
-    """No new artefact may be written to paths.results under a bare name."""
+    """No per-city artefact may be joined onto paths.results under a bare name.
+
+    The guard is written against the *join expression* rather than against a list
+    of filenames, because ``20_missingness_law.py`` legitimately names both
+    cities' frontier payloads: its decision figure is drawn across records, so it
+    reads the pair by explicit name from a table and joins each through a
+    variable. What must never appear is a literal filename joined directly onto
+    the shared results directory with no suffix in it -- that is the shape of the
+    write that has destroyed five artefacts in this repository.
+
+    ``11_make_report.py`` is included because it only ever reads: a bare name
+    there is how the primary city's report came to present the comparison city's
+    numbers as its own.
+    """
+    import re
     from pathlib import Path
 
+    #: Artefacts that are deliberately one file for every city. The donor
+    #: replication is a property of the donor family, not of the reading city,
+    #: and both reports render the same claim from it.
+    shared = {"donor_replication.json"}
+
     root = Path(__file__).resolve().parents[1]
+    join = re.compile(
+        r'(?:results_dir\w*|path_for\("results"\)|paths\.results"\)\)\))\s*/\s*f?"([^"]*)"'
+    )
     offenders = []
-    for name in ("21_lookback_frontier.py", "22_availability_frontier.py"):
+    for name in (
+        "11_make_report.py",
+        "20_missingness_law.py",
+        "21_lookback_frontier.py",
+        "22_availability_frontier.py",
+    ):
         text = (root / "scripts" / name).read_text(encoding="utf-8")
-        for artefact in (
-            '"lookback_frontier.json"',
-            '"availability_frontier.json"',
-            '"lookback_frontier_predictions.npz"',
-        ):
-            if artefact in text:
-                offenders.append(f"{name}: {artefact}")
-    assert not offenders, f"bare per-city artefact names: {offenders}"
+        for literal in join.findall(text):
+            if literal in shared:
+                continue
+            if "{suffix}" not in literal and "{city_suffix(" not in literal:
+                offenders.append(f"{name}: {literal!r}")
+    assert not offenders, f"artefact names without a city suffix: {offenders}"
+
+
+def test_marginal_cost_of_reach_is_the_number_of_surviving_runs():
+    """One more hour of reach costs exactly the runs still longer than it.
+
+    ``usable(R) = sum(max(0, run_len - R))`` is a sum of hinges, so its
+    difference in ``R`` is minus the count of runs strictly longer than ``R``.
+    ``fig16`` prices a backward reach off that derivative and reports the
+    elasticity as its dimensionless form, so a disagreement between the two
+    columns would have the nomogram reading one quantity and labelling it
+    another. Unlike the survival law this needs no fit and has no error term,
+    which is why the decision rule is stated on it.
+    """
+    import numpy as np
+    from src.eval.missingness_law import decision_curve, surviving_runs
+
+    lens = np.array([1, 5, 12, 12, 40, 97, 400, 401], dtype=np.int64)
+    curve = decision_curve(lens, np.arange(0, 420))
+
+    usable = curve["usable"].to_numpy()
+    assert np.array_equal(-np.diff(usable), curve["surviving_runs"].to_numpy()[:-1])
+    assert usable[0] == lens.sum(), "at zero reach every observed hour is usable"
+    assert usable[-1] == 0, "past the longest run nothing survives"
+
+    # The count against a definition sharing no code with the implementation.
+    for radius in (0, 1, 12, 40, 400, 401):
+        assert surviving_runs(lens, radius) == sum(1 for run in lens if run > radius)
+
+    # And the elasticity is that price made dimensionless: -dlnU/dlnR.
+    at = curve.set_index("radius_h")
+    for radius in (60, 100, 200):
+        finite = -(np.log(at.loc[radius + 1, "usable"]) - np.log(at.loc[radius, "usable"])) / (
+            np.log(radius + 1) - np.log(radius)
+        )
+        assert at.loc[radius, "elasticity"] == pytest.approx(finite, rel=0.02)
+
+
+def test_the_law_predicts_at_the_radius_each_cell_was_built_with():
+    """``predict_usable`` takes a per-cell radius, and it is not decoration.
+
+    ``20_missingness_law.py`` globs every ``ablation_gap_injection*.json`` under
+    ``paths.results``, which matches the mediation grids — the *fitting* station
+    rebuilt at R = 48 and R = 72, not two extra donors. Scoring those at the
+    fitted radius treats R as a scale the constants had absorbed rather than a
+    factor of the form, and it silently turned a law with held-out R² = 0.98
+    into one reading 0.46. Each grid records its own ``sterilisation_radius_h``
+    and every cell is scored at it.
+    """
+    import numpy as np
+    from src.eval.missingness_law import LawFit, predict_usable
+
+    fit = LawFit(alpha=0.1555, beta0=-0.1596, radius_h=192, n_fit=101, source="test")
+    obs = np.array([30000.0, 30000.0])
+    gaps = np.array([100.0, 100.0])
+
+    default = predict_usable(fit, obs, gaps)
+    assert np.allclose(default, predict_usable(fit, obs, gaps, 192)), (
+        "omitting the radius must evaluate at the radius the law was fitted at"
+    )
+
+    shorter = predict_usable(fit, obs, gaps, np.array([48.0, 72.0]))
+    assert (shorter > default).all(), "a shorter reach sterilises less and must predict more rows"
+    assert shorter[0] > shorter[1], "the radius must apply elementwise, not broadcast from one"
+
+    # The form is a factor in R, so halving the exponent's radius squares the
+    # surviving share. Checked against the closed form, not against itself.
+    share = predict_usable(fit, obs, gaps, np.array([96.0, 192.0])) / obs
+    assert share[0] ** 2 == pytest.approx(share[1] * np.exp(fit.beta0), rel=1e-9)
