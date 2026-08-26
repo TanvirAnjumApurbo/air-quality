@@ -29,7 +29,7 @@ CONFIG_B := config_beijing.yaml
         classify green eval figures stability report all lint fmt clean clean-results \
         beijing beijing-post cross-city tune ablation donor-configs donors \
         replication donor-list everything law frontier frontier-analysis \
-        lookback-configs lookback-list mediation
+        lookback-configs lookback-list mediation arch-figure
 
 help:  ## List available targets
 	@echo "Targets:"
@@ -46,6 +46,7 @@ help:  ## List available targets
 	@echo "  green       Phase 5: complexity, latency, energy, CO2e"
 	@echo "  eval        Phase 5: stratified eval, skill scores, Diebold-Mariano"
 	@echo "  figures     Phase 6: all figures (png + pdf, 300 dpi)"
+	@echo "  arch-figure Phase 6: architecture schematic drawn from the record (needs features)"
 	@echo "  report      Phase 6: RESULTS.md + abstract_facts.json"
 	@echo "  all         Everything above, in order"
 	@echo "  beijing     Cross-city: whole pipeline again on the Beijing record"
@@ -96,6 +97,12 @@ eval:  ## Phase 5 stratified evaluation + significance tests
 
 figures:  ## Phase 6 figures
 	$(PY) $(SCRIPTS)/10_make_figures.py --config $(CONFIG)
+
+# Deliberately outside `all`: the schematic is drawn from the feature matrix and
+# the configs, never from results.json, so it is valid before a single model has
+# been fitted and a completed sweep does not change it. Seconds, and no training.
+arch-figure:  ## Phase 6 architecture schematic; needs 'features', trains nothing
+	$(PY) $(SCRIPTS)/24_architecture_figure.py --config $(CONFIG)
 
 stability:  ## Phase 6 tier-3 selection stability (reads existing runs, no refit)
 	$(PY) $(SCRIPTS)/19_selection_stability.py --config $(CONFIG)

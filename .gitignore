@@ -48,3 +48,22 @@ notebooks/scratch/
 
 # Claude session scratch, kept on the project drive rather than C:
 /.scratch/
+
+# --- LaTeX build artefacts (regenerate on every compile) ---
+# Scoped to the paper folder on purpose: an unanchored *.log would also drop
+# results/logs/, which this repo tracks deliberately.
+PM2point5/*.aux
+PM2point5/*.fdb_latexmk
+PM2point5/*.fls
+PM2point5/*.log
+PM2point5/*.out
+PM2point5/*.synctex.gz
+PM2point5/*.bbl
+PM2point5/*.blg
+PM2point5/*.toc
+
+# --- paper submission bundle (built from PM2point5/, not a source) ---
+PM2point5.zip
+
+# --- Claude Code per-machine settings (the skill files are tracked) ---
+.claude/settings.local.json

@@ -82,6 +82,7 @@ Targets:
   green       Phase 5: complexity, latency, energy, CO2e
   eval        Phase 5: stratified eval, skill scores, Diebold-Mariano
   figures     Phase 6: all figures (png + pdf, 300 dpi)
+  arch-figure Phase 6: architecture schematic drawn from the record (needs 'features')
   stability   Phase 6: tier-3 selection stability (no retraining)
   report      Phase 6: RESULTS.md + abstract_facts.json
   all         Everything above, in order
@@ -123,6 +124,7 @@ Targets:
     'green'     { Invoke-Step '08_green_measure.py'   $common }
     'eval'      { Invoke-Step '09_evaluate.py'        $common }
     'figures'   { Invoke-Step '10_make_figures.py'    $common }
+    'arch-figure' { Invoke-Step '24_architecture_figure.py' $common }
     'stability' { Invoke-Step '19_selection_stability.py' $common }
     'report'    { Invoke-Step '11_make_report.py'     $common }
     'beijing' {

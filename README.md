@@ -159,6 +159,7 @@ same targets:
 | 5 | `.\make.ps1 green` | `08_green_measure.py` | params, MACs, latency, energy, CO₂e |
 | 5 | `.\make.ps1 eval` | `09_evaluate.py` | stratified metrics + Diebold-Mariano |
 | 6 | `.\make.ps1 figures` | `10_make_figures.py` | all figures, 300 dpi PNG + PDF |
+| 6 | `.\make.ps1 arch-figure` | `24_architecture_figure.py` | `fig00_architecture` — the study schematic, drawn from the record; needs `features`, **trains nothing** |
 | 6 | `.\make.ps1 stability` | `19_selection_stability.py` | tier-3 selection stability — reads existing runs, no refit |
 | 6 | `.\make.ps1 report` | `11_make_report.py` | `RESULTS.md`, `abstract_facts.json` |
 

@@ -194,6 +194,11 @@ is a conjunction. It does not currently reject: the sequence tier separates from
                       + results/lookback_frontier{,_predictions}.{json,npz}   TRAINS
 22_availability    -> results/availability_frontier.json  (needs 21)
 23_mediation       -> results/mediation_<slug>.json  (needs >=2 radius grids)
+24_architecture    -> results/figures/fig00_architecture.{png,pdf}
+                      the study schematic. Reads features.parquet and the configs,
+                      never results.json, so it is valid before anything is fitted
+                      and a finished sweep does not change it. The donor's matrix
+                      is optional: without it the injection arms are omitted.
 ```
 
 `features.parquet` is the handoff. It carries every predictor, a `split` column, and
