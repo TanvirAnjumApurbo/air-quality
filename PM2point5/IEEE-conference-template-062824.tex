@@ -9,11 +9,57 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{array}
+\usepackage{booktabs}
 \usepackage{url}
+
+% A rule between every data row costs height, and the paper is capped at six
+% pages. Trimming booktabs' default separation (0.4ex/0.65ex) keeps the rules
+% visibly open while buying back the space the extra ~30 of them consume.
+\setlength{\aboverulesep}{0.25ex}
+\setlength{\belowrulesep}{0.35ex}
+
+% Justified table notes. The width has to be the tabular's own, so the tabular is
+% typeset into a box first and measured: a note set to \columnwidth would overhang
+% a narrower table, and a note hand wrapped into \multicolumn rows cannot justify
+% at all, which is what these two notes did before.
+\newsavebox{\tablebox}
+\newcommand{\tablenote}[1]{%
+  \par\vspace{2pt}%
+  \parbox{\wd\tablebox}{\footnotesize #1\par}}
 % hyperref last: makes \cite, \ref and URLs clickable
 \usepackage[hidelinks,breaklinks=true]{hyperref}
 
 \newcommand{\ugm}{$\mu$g\,m$^{-3}$}
+
+% Table captions on one centred line, "TABLE I: Text", roman rather than small
+% caps. This is IEEEtran's own \@makecaption with the table branch rewritten and
+% the figure branch copied verbatim, so figures keep the house format and the
+% caption package -- which warns that it does not know this class -- stays out.
+\makeatletter
+\long\def\@makecaption#1#2{%
+\ifx\@captype\@IEEEtablestring
+  \footnotesize\bgroup\par\centering\@IEEEtabletopskipstrut
+  \setbox\@tempboxa\hbox{\normalfont\footnotesize #1: #2}%
+  \ifdim\wd\@tempboxa>\hsize
+    \parbox[t]{\hsize}{\normalfont\footnotesize\centering #1: #2\par}%
+  \else
+    \box\@tempboxa
+  \fi
+  \par\addvspace{0.5\baselineskip}\egroup
+  \@IEEEtablecaptionsepspace
+\else
+  \@IEEEfigurecaptionsepspace
+  \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace #2}%
+  \ifdim\wd\@tempboxa>\hsize
+    \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace}%
+    \parbox[t]{\hsize}{\normalfont\footnotesize\noindent\unhbox\@tempboxa#2}%
+  \else
+    \ifCLASSOPTIONconference \hbox to\hsize{\normalfont\footnotesize\hfil\box\@tempboxa\hfil}%
+    \else \hbox to\hsize{\normalfont\footnotesize\box\@tempboxa\hfil}%
+    \fi
+  \fi
+\fi}
+\makeatother
 
 \begin{document}
 
@@ -266,24 +312,33 @@ here. We therefore make claims about tiers, not about architectures.
 \label{tab:headline}
 \centering
 \footnotesize
-\begin{tabular}{l r c r c}
-\hline
+\sbox{\tablebox}{%
+\begin{tabular}{l c c c c}
+\toprule
 \textbf{Model} & \textbf{RMSE} & \textbf{95\% CI} & \textbf{Skill} & \textbf{MCS} \\
-\hline
+\midrule
 GRU (16{,}193 par.) & 57.24 & [52.38, 62.17] & $+0.218$ & yes \\
+\midrule
 Random forest       & 58.50 & [53.45, 63.49] & $+0.207$ & yes \\
+\midrule
 XGBoost             & 58.70 & [53.64, 63.73] & $+0.204$ & yes \\
+\midrule
 LightGBM            & 59.02 & [54.03, 64.19] & $+0.200$ & yes \\
+\midrule
 Ridge               & 59.37 & [54.30, 64.34] & $+0.195$ & yes \\
+\midrule
 Climatology         & 65.43 & [60.52, 70.45] & $+0.113$ & no \\
-Seasonal naive      & 73.76 & [67.77, 79.86] & $\;\;\;0.000$ & no \\
-Persistence         & 73.76 & [67.77, 79.86] & $\;\;\;0.000$ & no \\
+\midrule
+Seasonal naive      & 73.76 & [67.77, 79.86] & $\phantom{+}0.000$ & no \\
+\midrule
+Persistence         & 73.76 & [67.77, 79.86] & $\phantom{+}0.000$ & no \\
+\midrule
 SARIMAX             & 81.36 & [74.83, 87.93] & $-0.103$ & no \\
-\hline
-\multicolumn{5}{l}{\footnotesize RMSE in \ugm. The GRU row is the validation selected seed, whose}\\
-\multicolumn{5}{l}{\footnotesize predictions enter the paired tests; the five seed mean is $57.70\pm0.44$.}\\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular}}
+\usebox{\tablebox}
+\tablenote{RMSE in \ugm. The GRU row is the validation selected seed, whose
+predictions enter the paired tests; the five seed mean is $57.70\pm0.44$.}
 \end{table}
 
 \subsection{The observational contrast identifies nothing}
@@ -348,21 +403,27 @@ predicts, and the pooled test averages it away.
 \label{tab:arm}
 \centering
 \footnotesize
+\sbox{\tablebox}{%
 \begin{tabular}{l r c c r r r c r c}
-\hline
+\toprule
 & \multicolumn{3}{c}{\textbf{Pooled paired test}} & \multicolumn{4}{c}{\textbf{Per donor arm gap}} & \multicolumn{2}{c}{\textbf{Dose response}} \\
-\cline{2-4}\cline{5-8}\cline{9-10}
+\cmidrule(lr){2-4}\cmidrule(lr){5-8}\cmidrule(lr){9-10}
 \textbf{Family} & \textbf{Mean gap} & \textbf{95\% CI} & \textbf{$p$ (Holm)} & \textbf{Wanliu} & \textbf{Dingling} & \textbf{Dongsi} & \textbf{Replicates} & \textbf{Slope} & \textbf{$p$ (Holm)} \\
-\hline
+\midrule
 Sequence       & $-0.0394$ & $[-0.0565,\,-0.0236]$ & $<0.0001$ & $-0.0394^{*}$ & $-0.0200^{*}$ & $-0.0273^{*}$ & \textbf{yes} & $-0.0226$ & $0.016$ \\
+\midrule
 Climatological & $-0.0357$ & $[-0.0609,\,-0.0138]$ & $0.0115$  & $-0.0357^{*}$ & $-0.0017$     & $-0.0206^{*}$ & no           & $-0.0247$ & $0.062$ \\
+\midrule
 Trees          & $-0.0263$ & $[-0.0393,\,-0.0125]$ & $0.0003$  & $-0.0263^{*}$ & $-0.0120$     & $-0.0179^{*}$ & no           & $-0.0052$ & $0.164$ \\
+\midrule
 Linear         & $-0.0016$ & $[-0.0081,\,+0.0047]$ & $0.9542$  & $-0.0016$     & $-0.0356^{*}$ & $-0.0225^{*}$ & no           & $-0.0173$ & $0.019$ \\
-\hline
-\multicolumn{10}{l}{\footnotesize Fifty matched pairs per family per donor; representatives are fixed on the undegraded record. Differencing families within matched triples does}\\
-\multicolumn{10}{l}{\footnotesize not separate sequence from trees ($-0.0102$, $p=0.15$), so the comparative claim is withheld.}\\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular}}
+\usebox{\tablebox}
+\tablenote{Fifty matched pairs per family per donor; representatives are fixed on
+the undegraded record. Differencing families within matched triples does not
+separate sequence from trees ($-0.0102$, $p=0.15$), so the comparative claim is
+withheld.}
 \end{table*}
 
 \subsection{The backward reach carries the effect}
@@ -394,14 +455,17 @@ no penalty to mediate and shows no mediation.
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{l r r r r r}
-\hline
+\toprule
 \textbf{Family} & \textbf{$R{=}192$} & \textbf{$R{=}48$} & \textbf{Change} & \textbf{Med.} & \textbf{$p$ (Holm)} \\
-\hline
+\midrule
 Sequence       & $-0.0394$ & $-0.0012$ & $+0.0383$ & 97\,\% & $<0.0001$ \\
+\midrule
 Climatological & $-0.0357$ & $-0.0005$ & $+0.0351$ & 99\,\% & $0.0097$ \\
+\midrule
 Trees          & $-0.0263$ & $-0.0072$ & $+0.0191$ & 73\,\% & $0.0017$ \\
+\midrule
 Linear         & $-0.0016$ & $+0.0021$ & $+0.0037$ & ---    & $0.2605$ \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -479,18 +543,20 @@ Availability rather than rows orders the two correctly.
 \label{tab:avail}
 \centering
 \footnotesize
-\begin{tabular}{l r r r r r}
-\hline
+\begin{tabular}{l r r r r}
+\toprule
 & \multicolumn{2}{c}{\textbf{Availability}} & \textbf{Ampl.} & \textbf{Elast.} \\
-\cline{2-3}
+\cmidrule(lr){2-3}
 \textbf{Record} & \textbf{$R{=}192$} & \textbf{$R{=}48$} & \textbf{(\texttimes)} & \textbf{at 192} \\
-\hline
+\midrule
 Dhaka             & 76.4\,\% & 87.2\,\% & 2.3  & 0.372 \\
+\midrule
 Beijing Wanliu    & 72.5\,\% & 85.5\,\% & 34.2 & 0.139 \\
+\midrule
 Beijing Dingling  & 64.4\,\% & 80.9\,\% & 14.0 & 0.213 \\
+\midrule
 Beijing Dongsi    & 64.3\,\% & 81.2\,\% & 10.4 & 0.168 \\
-\hline
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
