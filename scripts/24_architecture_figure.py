@@ -50,7 +50,7 @@ from src.viz.figures import COL_DOUBLE, save_figure, series_colour, setup_style
 # and \includegraphics[width=\linewidth] then rescales the type this style set
 # was sized against.
 FIG_W_IN = COL_DOUBLE
-FIG_H_IN = 2.28
+FIG_H_IN = 2.56
 X_UNITS = 100.0
 MARGIN_U = 1.0
 Y_UNITS = (X_UNITS + 2 * MARGIN_U) * FIG_H_IN / FIG_W_IN
@@ -61,32 +61,40 @@ LOST = "#DCDCDC"  # hours no model can be scored on
 MUTED = "#6E6E6E"
 SPLIT_SHADES = ("#3F3F3F", "#8E8E8E", "#C6C6C6")
 
-FS_STAGE = 7.2
-FS_LABEL = 6.2
-FS_TICK = 5.6
+# Type is set against the 9 pt body of the template rather than chosen freely,
+# so the figure reads as part of the page it sits on. The drawing unit is fixed
+# by the printed width -- 102 units to 7.16 in, so one unit is 5.05 pt -- and
+# every vertical clearance below is quoted against these three sizes.
+FS_STAGE = 8.5  # base - 0.5, bold: the four stage names
+FS_LABEL = 7.5  # base - 1.5: element names, tier names, horizons
+FS_TICK = 6.5  # base - 2.5: text inside a strip, and the note under a name
 
 # Stage columns.
 COL_RECORD = (0.0, 25.0)
 COL_SUPERVISION = (28.5, 56.0)
 COL_MODELS = (59.5, 81.0)
 COL_FORECAST = (84.5, 100.0)
-GUTTER_U = 6.4  # width reserved for element names, left of every stack
+GUTTER_U = 8.1  # width reserved for element names, left of every stack;
+# set by the longest of them, 'fragmented', which at FS_LABEL is 7.4 units
+# wide and would otherwise be written off the left edge of the plane.
 
 # Rows, top down. Every stage is drawn inside one band and centred on one axis,
 # so each arrow between stages -- and the fan of horizons the last one opens --
 # sits at the middle of the stage it leaves and of the stage it enters.
-STAGE_Y = 30.9
-ROW_A = (24.2, 28.4)
-ROW_B = (19.8, 22.6)
-ROW_C = (16.3, 18.4)
+STAGE_Y = 34.9
+ROW_A = (27.5, 32.3)
+ROW_B = (22.25, 25.25)
+ROW_C = (17.6, 20.0)
 BAND = (ROW_C[0], ROW_A[1])
 MID_Y = 0.5 * (BAND[0] + BAND[1])
 FLOW_Y = MID_Y
-RIBBON_H = 3.0  # observed and scoreable: equal, because the pair is a comparison
-BOX_H = 3.2  # one height for every tier box, set by the two-line one
-BAND_LBL = 11.4
-BAND_A = (6.2, 8.5)
-BAND_B = (2.4, 4.7)
+RIBBON_H = 3.4  # observed and scoreable: equal, because the pair is a comparison
+BOX_H = 4.0  # one height for every tier box, set by the two-line one
+LEADING_U = 0.85  # half the baseline separation of a name over its note
+NAME_DROP = 1.9  # baseline of a size label below the thing it measures
+BAND_LBL = 12.5
+BAND_A = (6.8, 9.4)
+BAND_B = (2.6, 5.2)
 
 # A 420-hour excerpt holds a gap and the whole sterilised stretch behind it. The
 # window is chosen by rule: the first in the training split with exactly one gap
@@ -192,7 +200,7 @@ def gutter(canvas: Axes, x: float, row: tuple[float, float], text: str) -> None:
         text: The name.
     """
     canvas.text(
-        x - 1.1,
+        x - 1.3,
         0.5 * (row[0] + row[1]),
         text,
         ha="right",
@@ -209,7 +217,7 @@ def arrow(canvas: Axes, start: tuple[float, float], end: tuple[float, float], co
             start,
             end,
             arrowstyle="-|>",
-            mutation_scale=5.5,
+            mutation_scale=6.5,
             linewidth=0.75,
             color=colour,
             shrinkA=0.0,
@@ -415,7 +423,7 @@ def draw_record(fig: Figure, canvas: Axes, data: dict[str, object]) -> None:
     ax.set_ylim(-0.5, 0.5)
 
     first, last = data["years"]
-    tick_y = ROW_C[0] - 1.7
+    tick_y = ROW_C[0] - NAME_DROP
     canvas.text(x0, tick_y, str(first), ha="left", va="baseline", fontsize=FS_TICK, color=MUTED)
     canvas.text(x1, tick_y, str(last), ha="right", va="baseline", fontsize=FS_TICK, color=MUTED)
 
@@ -446,7 +454,7 @@ def draw_supervision(fig: Figure, canvas: Axes, data: dict[str, object], accent:
     unit = (x1 - x0) / len(observed)
     left = x0 + gap * unit
     right = x0 + min(len(observed), gap + span) * unit
-    stem = bottom[0] - 0.9
+    stem = bottom[0] - 1.0
     canvas.plot(
         [left, left, right, right],
         [stem + 0.7, stem, stem, stem + 0.7],
@@ -455,7 +463,7 @@ def draw_supervision(fig: Figure, canvas: Axes, data: dict[str, object], accent:
     )
     canvas.text(
         0.5 * (left + right),
-        stem - 1.8,
+        stem - 2.0,
         f"$R$ = {data['radius']} h",
         ha="center",
         va="baseline",
@@ -481,7 +489,7 @@ def draw_models(
     pitch = 0.5 * (BAND[1] - BAND[0] - BOX_H)
     seq_mid, ml_mid, stat_mid = MID_Y + pitch, MID_Y, MID_Y - pitch
     row_mid = 0.5 * (ml_mid + stat_mid)
-    row_y0, row_y1 = row_mid - 0.6, row_mid + 0.6
+    row_y0, row_y1 = row_mid - 0.7, row_mid + 0.7
 
     # The window a recurrent model consumes, and the row a tabular model sees.
     for i in range(7):
@@ -491,7 +499,7 @@ def draw_models(
         yj = ROW_A[0] + j * (ROW_A[1] - ROW_A[0]) / 4
         canvas.plot([x0, grid_x1], [yj, yj], color=RULE, linewidth=0.4)
     grid_mid_x = 0.5 * (x0 + grid_x1)
-    label(canvas, grid_mid_x, ROW_A[0] - 1.7, f"{window} $\\times$ {data['n_channels']}")
+    label(canvas, grid_mid_x, ROW_A[0] - NAME_DROP, f"{window} $\\times$ {data['n_channels']}")
 
     canvas.add_patch(
         Rectangle(
@@ -506,7 +514,7 @@ def draw_models(
     for i in range(1, 8):
         xi = x0 + i * (grid_x1 - x0) / 8
         canvas.plot([xi, xi], [row_y0, row_y1], color=RULE, linewidth=0.4)
-    label(canvas, grid_mid_x, row_y0 - 1.7, f"1 $\\times$ {data['n_tabular']}")
+    label(canvas, grid_mid_x, row_y0 - NAME_DROP, f"1 $\\times$ {data['n_tabular']}")
 
     tiers = (
         ("Sequence", seq_mid, f"$\\leq${budget}k params"),
@@ -530,7 +538,7 @@ def draw_models(
         # pair puts the descenders of the name into the note under it.
         canvas.text(
             text_x,
-            mid + (0.72 if note else 0.0),
+            mid + (LEADING_U if note else 0.0),
             name,
             ha="center",
             va="center",
@@ -539,7 +547,13 @@ def draw_models(
         )
         if note:
             canvas.text(
-                text_x, mid - 0.72, note, ha="center", va="center", fontsize=FS_TICK, color=MUTED
+                text_x,
+                mid - LEADING_U,
+                note,
+                ha="center",
+                va="center",
+                fontsize=FS_TICK,
+                color=MUTED,
             )
         # Every tier joins one bus, so the forecast reads as the tiers' output
         # and not as the output of whichever box the flow arrow lines up with.
@@ -563,21 +577,29 @@ def draw_forecast(canvas: Axes, horizons: list[int]) -> None:
     """Stage four: one model per horizon, no rollout."""
     x0, x1 = COL_FORECAST
     origin = (x0, FLOW_Y)
-    canvas.plot(*origin, marker="o", markersize=1.8, color=INK, zorder=6)
-    canvas.text(x0, FLOW_Y - 2.2, "$t$", ha="center", va="baseline", fontsize=FS_LABEL, color=MUTED)
+    canvas.plot(*origin, marker="o", markersize=2.1, color=INK, zorder=6)
+    canvas.text(x0, FLOW_Y - 2.4, "$t$", ha="center", va="baseline", fontsize=FS_LABEL, color=MUTED)
 
     reach = 0.5 * (BAND[1] - BAND[0]) - 0.4
     tops = np.linspace(MID_Y + reach, MID_Y - reach, len(horizons))
     for h, y in zip(horizons, tops, strict=True):
         arrow(canvas, origin, (x1 - 4.8, y), RULE)
-        canvas.plot(x1 - 4.6, y, marker="s", markersize=2.0, color=INK)
+        canvas.plot(x1 - 4.6, y, marker="s", markersize=2.3, color=INK)
         canvas.text(x1 - 3.9, y, f"+{h} h", ha="left", va="center", fontsize=FS_LABEL, color=INK)
 
 
 def draw_injection(
-    fig: Figure, canvas: Axes, arms: dict[str, np.ndarray] | None, accent: str
+    fig: Figure, canvas: Axes, arms: dict[str, np.ndarray] | None, accent: str, entry_x: float
 ) -> None:
-    """The controlled experiment: the same hours gone, arranged two ways."""
+    """The controlled experiment: the same hours gone, arranged two ways.
+
+    Args:
+        fig: Target figure.
+        canvas: The drawing plane.
+        arms: Each arm's observed mask, or ``None`` if the donor is not built.
+        accent: Colour of the return arrow.
+        entry_x: Where the degraded record re-enters, on the split bar above.
+    """
     if arms is None:
         return  # name nothing that is not drawn: no donor matrix, no band at all
     canvas.text(
@@ -612,8 +634,11 @@ def draw_injection(
         color=INK,
         linespacing=1.3,
     )
-    # The degraded record goes back in at the top of the pipeline.
-    arrow(canvas, (11.5, BAND_A[1] + 1.6), (11.5, ROW_C[0] - 0.5), accent)
+    # The degraded record goes back in at the top of the pipeline, and it enters
+    # on the training segment because that is the only split the arms degrade.
+    # Pointing it at the middle of that segment also carries it clear of the
+    # stage name to its left, which the segment's own width now guarantees.
+    arrow(canvas, (entry_x, BAND_A[1] + 1.6), (entry_x, ROW_C[0] - 0.5), accent)
 
 
 def check_glyphs(fig: Figure) -> None:
@@ -677,7 +702,10 @@ def main() -> int:
         accent,
     )
     draw_forecast(canvas, [int(h) for h in cfg.get("task.horizons_h")])
-    draw_injection(fig, canvas, arms, accent)
+    sizes = data["split_sizes"]
+    record_x0 = COL_RECORD[0] + GUTTER_U
+    train_mid = record_x0 + 0.5 * sizes[0] / sum(sizes) * (COL_RECORD[1] - record_x0)
+    draw_injection(fig, canvas, arms, accent, train_mid)
 
     for left, right in (
         (COL_RECORD, COL_SUPERVISION),
