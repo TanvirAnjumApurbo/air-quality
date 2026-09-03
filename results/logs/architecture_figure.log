@@ -64,3 +64,13 @@
 01:05:56 | INFO    | architecture_figure | contiguous arm: 7357 hours removed in 24 gaps; excerpt at 2015-08-29 is 25.0% removed in 3 gaps
 01:05:57 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.png
 01:05:57 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.pdf
+00:50:40 | INFO    | architecture_figure | supervision excerpt 2017-04-06..2017-04-24: 95.2% observed, 49.5% scoreable at h=24
+00:50:40 | INFO    | architecture_figure | fragmented arm: 7357 hours removed in 174 gaps; excerpt at 2013-04-01 is 25.0% removed in 25 gaps
+00:50:40 | INFO    | architecture_figure | contiguous arm: 7357 hours removed in 24 gaps; excerpt at 2015-08-29 is 25.0% removed in 3 gaps
+00:50:42 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.png
+00:50:42 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.pdf
+03:17:05 | INFO    | architecture_figure | supervision excerpt 2017-04-06..2017-04-24: 95.2% observed, 49.5% scoreable at h=24
+03:17:05 | INFO    | architecture_figure | fragmented arm: 7357 hours removed in 174 gaps; excerpt at 2013-04-01 is 25.0% removed in 25 gaps
+03:17:05 | INFO    | architecture_figure | contiguous arm: 7357 hours removed in 24 gaps; excerpt at 2015-08-29 is 25.0% removed in 3 gaps
+03:17:08 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.png
+03:17:08 | INFO    | architecture_figure | wrote F:\BUP\results\figures\fig00_architecture.pdf

@@ -72,12 +72,18 @@ COL_MODELS = (59.5, 81.0)
 COL_FORECAST = (84.5, 100.0)
 GUTTER_U = 6.4  # width reserved for element names, left of every stack
 
-# Rows, top down.
+# Rows, top down. Every stage is drawn inside one band and centred on one axis,
+# so each arrow between stages -- and the fan of horizons the last one opens --
+# sits at the middle of the stage it leaves and of the stage it enters.
 STAGE_Y = 30.9
 ROW_A = (24.2, 28.4)
 ROW_B = (19.8, 22.6)
 ROW_C = (16.3, 18.4)
-FLOW_Y = 22.2
+BAND = (ROW_C[0], ROW_A[1])
+MID_Y = 0.5 * (BAND[0] + BAND[1])
+FLOW_Y = MID_Y
+RIBBON_H = 3.0  # observed and scoreable: equal, because the pair is a comparison
+BOX_H = 3.2  # one height for every tier box, set by the two-line one
 BAND_LBL = 11.4
 BAND_A = (6.2, 8.5)
 BAND_B = (2.4, 4.7)
@@ -168,8 +174,8 @@ def ribbon(ax: Axes, values: np.ndarray, *, high: str, low: str) -> None:
 def label(
     canvas: Axes, x: float, y: float, text: str, *, colour: str = MUTED, size: float = FS_LABEL
 ) -> None:
-    """Name one drawn element."""
-    canvas.text(x, y, text, ha="left", va="baseline", fontsize=size, color=colour)
+    """Name one drawn element, centred under it; ``x`` is the element's midpoint."""
+    canvas.text(x, y, text, ha="center", va="baseline", fontsize=size, color=colour)
 
 
 def gutter(canvas: Axes, x: float, row: tuple[float, float], text: str) -> None:
@@ -421,8 +427,11 @@ def draw_supervision(fig: Figure, canvas: Axes, data: dict[str, object], accent:
     observed = np.asarray(data["observed"])
     scoreable = np.asarray(data["scoreable"])
 
-    top = (ROW_A[0] + 2.0, ROW_A[1])
-    bottom = (ROW_B[0], ROW_B[1] - 0.4)
+    # The pair fills the band and is symmetric about the axis, so the stage is
+    # as deep as the record beside it and the flow arrows arrive between the two
+    # ribbons rather than on the edge of the lower one.
+    top = (BAND[1] - RIBBON_H, BAND[1])
+    bottom = (BAND[0], BAND[0] + RIBBON_H)
     for name, row, values, low in (
         ("observed", top, observed, "white"),
         ("scoreable", bottom, scoreable, LOST),
@@ -437,7 +446,7 @@ def draw_supervision(fig: Figure, canvas: Axes, data: dict[str, object], accent:
     unit = (x1 - x0) / len(observed)
     left = x0 + gap * unit
     right = x0 + min(len(observed), gap + span) * unit
-    stem = bottom[0] - 1.0
+    stem = bottom[0] - 0.9
     canvas.plot(
         [left, left, right, right],
         [stem + 0.7, stem, stem, stem + 0.7],
@@ -446,7 +455,7 @@ def draw_supervision(fig: Figure, canvas: Axes, data: dict[str, object], accent:
     )
     canvas.text(
         0.5 * (left + right),
-        stem - 2.0,
+        stem - 1.8,
         f"$R$ = {data['radius']} h",
         ha="center",
         va="baseline",
@@ -462,6 +471,17 @@ def draw_models(
     """Stage three: what reads the record, and in which shape."""
     x0, x1 = COL_MODELS
     grid_x1 = x0 + 6.6
+    box_x0, box_x1 = x0 + 10.2, x1 - 1.6
+
+    # The three tiers fill the band at one pitch and straddle the axis, so this
+    # stage stands as deep as the two before it and the flow arrow arrives at
+    # its middle. Every connector into a box is level, and that is what fixes
+    # the tabular row's height: the row is placed from the tiers it feeds rather
+    # than the other way round, its own height carrying nothing.
+    pitch = 0.5 * (BAND[1] - BAND[0] - BOX_H)
+    seq_mid, ml_mid, stat_mid = MID_Y + pitch, MID_Y, MID_Y - pitch
+    row_mid = 0.5 * (ml_mid + stat_mid)
+    row_y0, row_y1 = row_mid - 0.6, row_mid + 0.6
 
     # The window a recurrent model consumes, and the row a tabular model sees.
     for i in range(7):
@@ -470,9 +490,9 @@ def draw_models(
     for j in range(5):
         yj = ROW_A[0] + j * (ROW_A[1] - ROW_A[0]) / 4
         canvas.plot([x0, grid_x1], [yj, yj], color=RULE, linewidth=0.4)
-    label(canvas, x0, ROW_A[0] - 1.7, f"{window} $\\times$ {data['n_channels']}")
+    grid_mid_x = 0.5 * (x0 + grid_x1)
+    label(canvas, grid_mid_x, ROW_A[0] - 1.7, f"{window} $\\times$ {data['n_channels']}")
 
-    row_y0, row_y1 = ROW_C[1] - 1.2, ROW_C[1]
     canvas.add_patch(
         Rectangle(
             (x0, row_y0),
@@ -486,45 +506,57 @@ def draw_models(
     for i in range(1, 8):
         xi = x0 + i * (grid_x1 - x0) / 8
         canvas.plot([xi, xi], [row_y0, row_y1], color=RULE, linewidth=0.4)
-    label(canvas, x0, row_y0 - 1.7, f"1 $\\times$ {data['n_tabular']}")
+    label(canvas, grid_mid_x, row_y0 - 1.7, f"1 $\\times$ {data['n_tabular']}")
 
-    box_x0, box_x1 = x0 + 10.2, x1 - 1.6
     tiers = (
-        ("Sequence", ROW_A[1] - 2.9, f"$\\leq${budget}k params", True),
-        ("Classical ML", ROW_B[1] - 3.2, None, False),
-        ("Statistical", ROW_C[1] - 2.9, None, False),
+        ("Sequence", seq_mid, f"$\\leq${budget}k params"),
+        ("Classical ML", ml_mid, None),
+        ("Statistical", stat_mid, None),
     )
-    for name, y, note, from_window in tiers:
+    text_x = 0.5 * (box_x0 + box_x1)
+    for name, mid, note in tiers:
         canvas.add_patch(
             FancyBboxPatch(
-                (box_x0, y),
+                (box_x0, mid - 0.5 * BOX_H),
                 box_x1 - box_x0,
-                2.9,
+                BOX_H,
                 boxstyle="round,pad=0,rounding_size=0.55",
                 facecolor="white",
                 edgecolor=RULE,
                 linewidth=0.7,
             )
         )
+        # A full line of leading between the two: at 6.2 pt over 5.6 pt a closer
+        # pair puts the descenders of the name into the note under it.
         canvas.text(
-            box_x0 + 0.8,
-            y + (1.85 if note else 1.45),
+            text_x,
+            mid + (0.72 if note else 0.0),
             name,
-            ha="left",
+            ha="center",
             va="center",
             fontsize=FS_LABEL,
             color=INK,
         )
         if note:
             canvas.text(
-                box_x0 + 0.8, y + 0.85, note, ha="left", va="center", fontsize=FS_TICK, color=MUTED
+                text_x, mid - 0.72, note, ha="center", va="center", fontsize=FS_TICK, color=MUTED
             )
-        source = (grid_x1 + 0.4, ROW_A[0] + 2.0) if from_window else (grid_x1 + 0.4, row_y0 + 0.6)
-        arrow(canvas, source, (box_x0 - 0.3, y + 1.45), accent if from_window else RULE)
         # Every tier joins one bus, so the forecast reads as the tiers' output
         # and not as the output of whichever box the flow arrow lines up with.
-        canvas.plot([box_x1, x1], [y + 1.45, y + 1.45], color=RULE, linewidth=0.6)
-    canvas.plot([x1, x1], [ROW_C[1] - 1.45, ROW_A[1] - 1.45], color=RULE, linewidth=0.6)
+        canvas.plot([box_x1, x1], [mid, mid], color=RULE, linewidth=0.6)
+    canvas.plot([x1, x1], [stat_mid, seq_mid], color=RULE, linewidth=0.6)
+
+    # The inputs are drawn as the outputs are. The window enters the sequence
+    # tier level, and the tabular row leaves on a stub that meets a riser
+    # centred on itself, so the two arrows off it are mirror images. A fan of
+    # diagonals could not be symmetric here -- one row cannot be both the
+    # midpoint of two boxes and the source of a level arrow to a third.
+    split_x = grid_x1 + 1.5
+    arrow(canvas, (grid_x1 + 0.4, seq_mid), (box_x0 - 0.3, seq_mid), accent)
+    canvas.plot([grid_x1 + 0.4, split_x], [row_mid, row_mid], color=RULE, linewidth=0.75)
+    canvas.plot([split_x, split_x], [stat_mid, ml_mid], color=RULE, linewidth=0.75)
+    for mid in (ml_mid, stat_mid):
+        arrow(canvas, (split_x, mid), (box_x0 - 0.3, mid), RULE)
 
 
 def draw_forecast(canvas: Axes, horizons: list[int]) -> None:
@@ -534,7 +566,8 @@ def draw_forecast(canvas: Axes, horizons: list[int]) -> None:
     canvas.plot(*origin, marker="o", markersize=1.8, color=INK, zorder=6)
     canvas.text(x0, FLOW_Y - 2.2, "$t$", ha="center", va="baseline", fontsize=FS_LABEL, color=MUTED)
 
-    tops = np.linspace(ROW_A[1] - 0.4, ROW_C[0] + 0.4, len(horizons))
+    reach = 0.5 * (BAND[1] - BAND[0]) - 0.4
+    tops = np.linspace(MID_Y + reach, MID_Y - reach, len(horizons))
     for h, y in zip(horizons, tops, strict=True):
         arrow(canvas, origin, (x1 - 4.8, y), RULE)
         canvas.plot(x1 - 4.6, y, marker="s", markersize=2.0, color=INK)
@@ -624,10 +657,10 @@ def main() -> int:
         (COL_FORECAST, "Forecast"),
     ):
         canvas.text(
-            column[0],
+            0.5 * (column[0] + column[1]),
             STAGE_Y,
             name,
-            ha="left",
+            ha="center",
             va="baseline",
             fontsize=FS_STAGE,
             fontweight="bold",
