@@ -46,8 +46,8 @@ paths:
   data_interim: data/interim/beijing
   data_processed: data/processed/beijing
   results: results
-  tables: results/tables/beijing
-  figures: results/figures/beijing
+  tables: results/tables/lookback/wanliu_R48
+  figures: results/figures/lookback/wanliu_R48
   logs: results/logs
   results_json: results/results_beijing.json
   reports: reports

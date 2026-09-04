@@ -61,7 +61,7 @@ annotations on public functions are enforced by `D` and `ANN` rules):
 .venv/Scripts/python.exe -m ruff format src scripts tests     # writes
 ```
 
-Tests — all 81 live in `tests/test_leakage.py`:
+Tests — all 83 live in `tests/test_leakage.py`:
 
 ```powershell
 .venv/Scripts/python.exe -m pytest tests -q
@@ -70,7 +70,7 @@ Tests — all 81 live in `tests/test_leakage.py`:
 ```
 
 Markers are declared in `pyproject.toml` under `--strict-markers`: `leakage`,
-`slow`, `network`. Seven tests (`def test_control_*`) are negative controls — they
+`slow`, `network`. Twenty tests (`def test_control_*`) are negative controls — they
 inject the forbidden mistake and assert the guard fires. If you relax a guard,
 those fail, which is the point. When you add a guard, add its negative control in
 the same commit; a guard with no control is untested and will silently rot.
@@ -306,6 +306,26 @@ encodes the window but not the lookback, while the cell directory derives from
 `ablation_R{radius}` and leaves an uncapped run on the historical `ablation` path
 so existing grids still resume. Removing that would let the shorter radius
 continue from the longer one's weights, silently.
+
+**A radius config writes more than its grid, and the rest was inherited.** The
+seventh instance of the shared-artefact defect, and the first that reached print:
+`config/lookback/*.yaml` are derived from `config_beijing.yaml`, so they inherited
+`paths.figures` and `paths.tables` while only `output_name` was made distinct.
+`17_ablation_analysis.py` writes `fig11_gap_injection` and nine `ablation_*`
+tables into those two directories, so running it on a radius config overwrote the
+donor's headline figure and tables in place. The IEEE paper then shipped the R=48
+experiment as its Fig. 2 -- sequence and contiguous arms nearly coincident, arm gap
+-0.001 -- under a caption describing the R=192 grid, while Table II beside it
+quoted the R=192 numbers (-0.0394). The grid JSON was never wrong; only the
+artefacts drawn from it were. `15_make_lookback_configs.py` now redirects both
+directories to `results/{figures,tables}/lookback/<slug>_R<radius>` and refuses to
+write a config that shares any of the three with its base.
+`paths.results_json` stays inherited on purpose -- `16_gap_injection.py` reads the
+tuned tier-2 hyperparameters out of it, so it is a read dependency on the donor
+city, not a write target.
+
+The general lesson, which `paths.results` already taught six times: **naming the
+payload is not enough if the stage that reads it also writes beside it.**
 
 ### Availability is a first-class metric, and RMSE across arms is not comparable
 

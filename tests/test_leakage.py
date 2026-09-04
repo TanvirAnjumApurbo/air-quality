@@ -1573,6 +1573,76 @@ def test_every_mediation_config_has_a_distinct_output_and_matching_radius():
         )
 
 
+@pytest.mark.leakage
+def test_every_mediation_config_writes_its_figures_and_tables_elsewhere():
+    """A radius run writes more than its grid, and the rest was inherited.
+
+    ``17_ablation_analysis.py`` writes ``fig11_gap_injection`` and nine
+    ``ablation_*`` tables into ``paths.figures`` and ``paths.tables``. The grid
+    was named per radius from the start, so a collision there fails loudly. These
+    two were not, so a radius run overwrote the donor city's figure and tables in
+    place, and the paper shipped the R=48 experiment under the R=192 caption
+    while its own table quoted R=192.
+
+    ``paths.results_json`` is excluded on purpose: ``16_gap_injection.py`` reads
+    the tuned tier-2 hyperparameters out of it, so it is a read dependency on the
+    donor city rather than a write target.
+    """
+    from pathlib import Path
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    configs = sorted((root / "config" / "lookback").glob("*.yaml"))
+    if not configs:
+        pytest.skip("mediation configs not generated")
+
+    base = yaml.safe_load((root / "config_beijing.yaml").read_text(encoding="utf-8"))
+    seen: dict[str, str] = {}
+    for path in configs:
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        for key in ("figures", "tables"):
+            value = str(raw["paths"][key])
+            assert value != str(base["paths"][key]), (
+                f"{path.name} writes its {key} into the donor's directory"
+            )
+            token = f"{key}:{value}"
+            assert token not in seen, f"{path.name} shares {key} {value} with {seen[token]}"
+            seen[token] = path.name
+
+
+@pytest.mark.leakage
+def test_control_a_radius_config_without_the_redirect_overwrites_the_donor():
+    """Negative control: put the inherited value back and see where the write lands.
+
+    The omission is injected through the same edit primitive the generator uses,
+    so the control cannot rot into a tautology about string literals -- it fails
+    the moment the collision stops being reachable.
+    """
+    from pathlib import Path
+
+    import yaml
+    from src.config_edit import replace_scalar
+
+    root = Path(__file__).resolve().parents[1]
+    configs = sorted((root / "config" / "lookback").glob("*.yaml"))
+    if not configs:
+        pytest.skip("mediation configs not generated")
+
+    base = yaml.safe_load((root / "config_beijing.yaml").read_text(encoding="utf-8"))
+    donor_fig = Path(str(base["paths"]["figures"])) / "fig11_gap_injection.pdf"
+    for path in configs:
+        text = path.read_text(encoding="utf-8")
+        lapsed = replace_scalar(
+            text, "figures", str(base["paths"]["figures"]), indent=2, section="paths"
+        )
+        landed = Path(str(yaml.safe_load(lapsed)["paths"]["figures"])) / "fig11_gap_injection.pdf"
+        assert landed == donor_fig, "the control must reproduce the collision it guards against"
+
+        current = Path(str(yaml.safe_load(text)["paths"]["figures"])) / "fig11_gap_injection.pdf"
+        assert current != donor_fig, f"{path.name} still writes fig11 over the donor's"
+
+
 # ---------------------------------------------------------------------------
 # A --force run must stay resumable if it dies partway
 # ---------------------------------------------------------------------------

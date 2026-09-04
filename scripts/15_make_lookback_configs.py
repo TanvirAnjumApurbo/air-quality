@@ -25,6 +25,20 @@ and ``16_gap_injection.py`` keys its resume on ``(arm, coverage, seed)`` alone -
 it knows nothing about the radius, so a shared path would make every cell read as
 already recorded and report a complete grid for a radius it never ran.
 
+It must override ``paths.figures`` and ``paths.tables`` for the same reason, and
+that one was learned the expensive way. The grid file was named per radius from
+the start; the two directories that ``17_ablation_analysis.py`` writes alongside
+it were not. Running 17 on a radius config therefore overwrote the donor city's
+``fig11_gap_injection.pdf`` and every ``ablation_*`` table with the shortened-reach
+numbers, and the paper shipped the R=48 experiment under the R=192 caption while
+its own table quoted R=192. A shared grid name fails loudly; a shared output
+directory fails silently, which is worse.
+
+``paths.results_json`` is deliberately left inherited. ``16_gap_injection.py``
+reads the tuned tier-2 hyperparameters out of it, so it is a read dependency on
+the donor city rather than a write target, and redirecting it would break the
+grid rather than isolate it.
+
 Run::
 
     python scripts/15_make_lookback_configs.py --base config_beijing.yaml
@@ -41,7 +55,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import yaml
-from src.config_edit import replace_scalar, section_span, verify_overrides
+from src.config_edit import flatten, replace_scalar, section_span, verify_overrides
 
 #: (lookback_h, window_h) pairs and the radius each produces at h=24.
 #:
@@ -110,10 +124,19 @@ def build_config(
     """
     radius = max(lookback_h, window_h - 1) + horizon_h
     output_name = f"ablation_gap_injection_{slug}_R{radius}.json"
+    figures = f"results/figures/lookback/{slug}_R{radius}"
+    tables = f"results/tables/lookback/{slug}_R{radius}"
 
     text = replace_scalar(base_text, "lookback_h", str(lookback_h), indent=2, section="features")
     text = set_all_windows(text, window_h)
     text = replace_scalar(text, "output_name", output_name, indent=4, section="ablation")
+    # 17_ablation_analysis.py writes a figure and nine tables next to the grid it
+    # analyses. Those go to paths.figures and paths.tables, which are inherited,
+    # so without these two lines a radius run lands them in the donor city's
+    # directories and destroys the headline versions in place. Scoped to `paths`
+    # because both keys also exist at this indent under `output`.
+    text = replace_scalar(text, "figures", figures, indent=2, section="paths")
+    text = replace_scalar(text, "tables", tables, indent=2, section="paths")
 
     # The sequence specs are a list of mappings, so verify_overrides sees them as
     # one leaf. Declare the whole edited list rather than leaving the change
@@ -122,6 +145,8 @@ def build_config(
     specs = yaml.safe_load(text)["ablation"]["gap_injection"]["sequence_models"]
     expected: dict[str, object] = {
         "features.lookback_h": lookback_h,
+        "paths.figures": figures,
+        "paths.tables": tables,
         "ablation.gap_injection.output_name": output_name,
         "ablation.gap_injection.sequence_models": specs,
     }
@@ -161,10 +186,21 @@ def main() -> int:
         if windows != {window_h}:
             problems.append(f"sequence windows are {sorted(windows)}, expected all {window_h}")
 
-        # A shared output name silently destroys the grid it collides with.
-        base_out = base_parsed["ablation"]["gap_injection"]["output_name"]
-        if parsed["ablation"]["gap_injection"]["output_name"] == base_out:
-            problems.append("output_name was not overridden; this grid would overwrite the base")
+        # Every path a radius run writes to must differ from the base's. The grid
+        # is the loud case, since a shared name makes resume report a complete
+        # grid for a radius it never ran; the figure and table directories are
+        # the quiet one, and the quiet one is what corrupted the paper's fig11.
+        base_flat = flatten(base_parsed)
+        derived_flat = flatten(parsed)
+        for key, artefact in (
+            ("ablation.gap_injection.output_name", "grid"),
+            ("paths.figures", "figures"),
+            ("paths.tables", "tables"),
+        ):
+            if derived_flat.get(key) == base_flat.get(key):
+                problems.append(
+                    f"{key} was not overridden; this radius would overwrite the base {artefact}"
+                )
 
         if problems:
             problems_total += len(problems)

@@ -88,3 +88,7 @@
 01:47:16 | INFO    | 20_missingness_law | wrote fig14_missingness_amplification.png, fig14_missingness_amplification.pdf
 01:47:16 | INFO    | 20_missingness_law | wrote fig16_decision_rule.png, fig16_decision_rule.pdf
 01:47:16 | INFO    | 20_missingness_law | wrote F:\BUP\results\missingness_law_beijing.json
+15:35:31 | INFO    | 20_missingness_law | loaded 505 cells from 5 donor grid(s)
+15:35:34 | INFO    | 20_missingness_law | wrote fig14_missingness_amplification.png, fig14_missingness_amplification.pdf
+15:35:35 | INFO    | 20_missingness_law | wrote fig16_decision_rule.png, fig16_decision_rule.pdf
+15:35:35 | INFO    | 20_missingness_law | wrote F:\BUP\results\missingness_law.json

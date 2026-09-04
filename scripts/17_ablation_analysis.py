@@ -148,8 +148,13 @@ def main() -> int:
         .groupby(["arm", "target_coverage", "family"], as_index=False)
         .first()
     )
-    grouped.to_csv(cfg.path_for("tables") / "ablation_by_model.csv", index=False)
-    best.to_csv(cfg.path_for("tables") / "ablation_by_family.csv", index=False)
+    # write_table creates this directory; these two go out through to_csv, which
+    # does not. A radius config writes to a directory no earlier stage has made,
+    # because the mediation arms run 16 and 17 and nothing else.
+    tables_dir = cfg.path_for("tables")
+    tables_dir.mkdir(parents=True, exist_ok=True)
+    grouped.to_csv(tables_dir / "ablation_by_model.csv", index=False)
+    best.to_csv(tables_dir / "ablation_by_family.csv", index=False)
 
     # ---- the key figure ----------------------------------------------------
     palette = setup_style(cfg)

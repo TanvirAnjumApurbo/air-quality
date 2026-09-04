@@ -125,16 +125,19 @@ def setup_style(cfg: Config) -> list[str]:
     return palette
 
 
-def panel_label(ax: Axes, text: str, *, x: float = 0.0, y: float = 1.015) -> None:
+def panel_label(ax: Axes, text: str, *, x: float = 0.5, y: float = 1.015) -> None:
     """Tag a panel with ``(a)``-style identifier the caption can refer to.
 
     The label sits above the axes rather than inside it, so it never lands on a
-    mark, and it is the only text this project draws where a title would go.
+    mark, and it is the only text this project draws where a title would go. It
+    is centred on the axes for the same reason a title would be: flush left it
+    reads as belonging to the y-axis label under it rather than to the panel,
+    and in a two-panel figure the pair sits off the figure's own symmetry.
 
     Args:
         ax: Target axes.
         text: Label text, e.g. ``"(a)"`` or ``"(a) Tier 1 -- baselines"``.
-        x: Horizontal position in axes fraction.
+        x: Horizontal position in axes fraction, at the midpoint by default.
         y: Vertical position in axes fraction.
     """
     ax.text(
@@ -142,7 +145,7 @@ def panel_label(ax: Axes, text: str, *, x: float = 0.0, y: float = 1.015) -> Non
         y,
         text,
         transform=ax.transAxes,
-        ha="left",
+        ha="center",
         va="bottom",
         fontsize=plt.rcParams["axes.labelsize"],
         fontweight="bold",
