@@ -65,5 +65,9 @@ PM2point5/*.toc
 # --- paper submission bundle (built from PM2point5/, not a source) ---
 PM2point5.zip
 
-# --- Claude Code per-machine settings (the skill files are tracked) ---
-.claude/settings.local.json
+# --- editor / agent local state (not part of the pipeline) ---
+.claude/
+.vscode/
+
+# --- contest scratch (working material, not a pipeline input) ---
+/contest/
