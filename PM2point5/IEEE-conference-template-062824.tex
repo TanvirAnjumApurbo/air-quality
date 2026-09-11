@@ -78,25 +78,23 @@
 \begin{abstract}
 Short horizon PM\textsubscript{2.5} forecasting is benchmarked almost entirely on accuracy, on
 records whose gaps are treated as a preprocessing detail. This paper asks whether the
-fragmentation of the monitoring record, rather than the model class, decides which method
-wins. Nine years of hourly observations from Dhaka (7.44 usable years, 82.3 per cent hourly
-coverage) are fused with reanalysis meteorology into 102 predictors, and compact sequence
-models under a 100{,}000 parameter budget are compared against tree ensembles, linear models
-and the classical baselines air quality work often omits, at horizons from 1 to 24 hours. At
-24 hours the validation selected recurrent model (16{,}193 parameters) attains an RMSE of
-57.70 \ugm{} against the best classical model at 58.50, with a Holm adjusted Diebold and
-Mariano $p$ of 0.037; a 95 per cent model confidence set nonetheless retains five of nine
-candidates, so the finding is about tiers and not architectures. A controlled gap injection
-experiment then degrades a near complete record two ways that remove identical numbers of
-observed hours and differ only in arrangement. The sequence tier loses 0.0394 skill to
-arrangement alone (50 matched pairs, Holm $p<0.0001$) and is the only family whose loss is
-significant on all three donor stations, although it is not separable from tree ensembles when
-families are differenced within matched triples. Because a scored row needs unbroken history, a
-gap costs the hours it removes plus the backward reach behind them. Shortening that reach from
-192 to 48 hours removes 97 per cent of the penalty, and a closed form for usable rows fitted on
-101 cells predicts 404 held out cells at $R^2=0.982$. Availability is therefore reported as a
-first class metric, since the configured reach answers only 76.4 per cent of test hours and
-shortening it costs no measurable accuracy.
+fragmentation of the monitoring record, rather than the model class, decides which method wins.
+Nine years of hourly observations from Dhaka (82.3 per cent hourly coverage) are fused with
+reanalysis meteorology into 102 predictors, and compact sequence models under a 100{,}000
+parameter budget are compared against tree ensembles, linear models and the classical baselines
+air quality work often omits, at five horizons. At 24 hours the validation selected recurrent
+model attains an RMSE of 57.70 \ugm{} against 58.50 for the best classical competitor, with a
+Holm adjusted Diebold and Mariano $p$ of 0.037, yet a 95 per cent model confidence set retains
+five of nine candidates, so the finding is about tiers and not architectures. A controlled gap
+injection experiment then degrades a near complete record two ways that remove identical hour
+counts and differ only in arrangement. The sequence tier loses 0.0394 skill to arrangement
+alone (50 matched pairs, Holm $p<0.0001$), the only family whose loss is significant on all
+three donor stations. Because a scored row needs unbroken history, a gap costs the hours it
+removes plus the backward reach behind them. Shortening that reach from 192 to 48 hours removes
+97 per cent of the penalty, and a closed form for usable rows fitted on 101 cells predicts 404
+held out cells at $R^2=0.982$. Availability is therefore reported as a first class metric, since
+the configured reach answers only 76.4 per cent of test hours and shortening it costs no
+measurable accuracy.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -125,19 +123,18 @@ method a benchmark recommends?
 
 The question cannot be settled by comparing cities, because two records drawn from different
 places differ in climate, instrument, span, pollution regime and continuity at once, so a
-ranking that moves between them is attributable to everything simultaneously. What is needed
-is a counterfactual on a single record. This paper builds one. We assemble a leakage
-controlled pipeline over nine years of hourly PM\textsubscript{2.5} from Dhaka fused with
-reanalysis meteorology, benchmark three tiers of method at five horizons, and then hold the
-record fixed while manipulating only the arrangement of its absences. Fig.~\ref{fig:arch}
-shows the design. Our contributions are as follows.
+ranking that moves between them is attributable to everything at once. What is needed is a
+counterfactual on a single record. This paper builds one. We assemble a leakage controlled
+pipeline over nine years of hourly PM\textsubscript{2.5} from Dhaka fused with reanalysis
+meteorology, benchmark three tiers of method at five horizons, and then hold the record fixed
+while manipulating only the arrangement of its absences. Fig.~\ref{fig:arch} shows the design.
 
 \begin{enumerate}
 \item \textbf{A controlled gap injection experiment} in which two arms remove identical hour
 counts and differ only in contiguity. Arrangement alone costs the sequence tier 0.0394 skill,
 the only family significant on all three donor stations.
 \item \textbf{A mechanism, fixed by design rather than by regression.} A scored row needs
-unbroken history over a sterilisation radius; shortening it from 192 to 48 hours removes
+unbroken history over a sterilisation radius, and shortening it from 192 to 48 hours removes
 97 per cent of the penalty.
 \item \textbf{A closed form for usable supervision}, fitted on 101 cells and predicting 404
 held out cells at $R^2=0.982$ across two further stations and a quartered radius.
@@ -163,8 +160,7 @@ concentrations reports gains over feedforward and statistical competitors \cite{
 Subsequent work has broadened the architecture space without broadening the comparison much.
 Recent evidence that a single linear layer matches or exceeds transformer forecasters
 \cite{zeng2023dlinear} makes the choice of baseline, rather than of architecture, the load
-bearing decision, which is why both proposed linear models enter here as first class
-competitors.
+bearing decision, so both linear models enter here as first class competitors.
 
 Missing data in air quality series is normally addressed as imputation, and comparative studies
 conclude by recommending one \cite{karnati2025}. That framing assumes filled values restore the
@@ -183,11 +179,6 @@ is read as a ranking.
 
 \section{Study Design}
 
-Four components are described in turn below. Two hourly records supply the target and its
-drivers. A gap aware rule decides which rows may be scored at all, and it governs everything
-after it. Three tiers of method are then compared under a selection rule that never consults
-test error, and a controlled degradation makes fragmentation the manipulated variable.
-
 \subsection{Records and predictors}
 
 The primary target is hourly PM\textsubscript{2.5} from the United States Embassy monitor in
@@ -204,9 +195,9 @@ Feature construction yields 102 predictors covering lagged concentrations, rolli
 meteorological history and calendar terms. The sequence tier does not receive them. It receives
 18 contemporaneous channels over a window, because a lag feature at time $t$ is by construction
 the same channel at $t$ minus the lag, already inside the window. Supplying both produced a
-heavily collinear input and handicapped the tier against competitors the same columns help.
+collinear input and handicapped the tier against competitors those columns help.
 
-\subsection{What counts as a scored row}
+\subsection{Scored rows and the sterilisation radius}
 
 Five rules are enforced structurally rather than by convention. Meteorology is never read
 beyond the forecast origin. Splits are chronological and scalers are fitted on training data
@@ -235,9 +226,8 @@ the two linear forecasters of \cite{zeng2023dlinear} under a 100{,}000 parameter
 five seeds each, with two larger configurations excluded rather than the budget relaxed.
 
 No model is selected on test error. Tier three is ranked by mean validation loss across seeds
-and tier two by cross validation score. Tier one is ranked on test error only because it has
-no hyperparameters and therefore nothing to bias. The rule has a measurable cost, which we
-report rather than assume away.
+and tier two by cross validation score. Tier one is ranked on test error only because it has no
+hyperparameters and therefore nothing to bias.
 
 \subsection{The gap injection experiment}
 
@@ -249,29 +239,27 @@ seasonal composition. The grid is 101 cells, five coverage levels by two arms by
 seeds plus an undegraded reference, and each cell is a full refit.
 
 Three controls make the comparison mean what it claims. Both arms remove an identical hour
-count, so volume is held constant and no result is explained by there being less data. The
-evaluation period is never degraded, so every cell is scored on identical rows. The optimizer
-step budget, not the epoch budget, is equalised across cells, because fragmentation shrinks
-the training set and a fixed epoch count would leave a fragmented cell undertrained rather
-than damaged. Hyperparameters are frozen at the undegraded record's selections, as is each
-family's representative model, so a difference between arms cannot absorb a change of model.
+count, so no result is explained by there being less data. The evaluation period is never
+degraded, so every cell is scored on identical rows. The optimizer step budget, not the epoch
+budget, is equalised across cells, because fragmentation shrinks the training set and a fixed
+epoch count would leave a fragmented cell undertrained rather than damaged. Hyperparameters and
+each family's representative are frozen at the undegraded record's selections, so no difference
+between arms can absorb a change of model.
 
 \subsection{Forecast availability}
 
 Every accuracy figure in this literature is conditional on the model being able to forecast at
-all, and that condition is rarely reported. We define forecast availability as the share of
-evaluation hours a configuration can answer. Because a model that declines the hard hours
-flatters itself on the hours it accepts, error on the served set is never compared across
-configurations of differing availability. The two valid comparisons are the common subset
-served by every arm and an all hours score, over a fixed universe, in which an unanswered hour
-falls back to persistence.
+all, a condition rarely reported. We define forecast availability as the share of evaluation
+hours a configuration can answer. Because a model that declines the hard hours flatters itself
+on the hours it accepts, error on the served set is never compared across configurations of
+differing availability. The two valid comparisons are the common subset served by every arm and
+an all hours score, over a fixed universe, in which an unanswered hour falls back to
+persistence.
 
 \section{Results}
 
-Results follow the order the argument requires rather than the order of their strength. The
-benchmark comes first, because its limits motivate everything after it. The two city contrast
-follows and fails to identify anything, the controlled experiment then supplies what that
-contrast cannot, and the mechanism, the closed form and the decision rule close the section.
+Results follow the order the argument requires rather than the order of their strength,
+beginning with the benchmark whose limits motivate everything after it.
 
 \begin{figure*}[!t]
 \centerline{\includegraphics[width=\linewidth]{fig11_gap_injection.pdf}}
@@ -283,29 +271,27 @@ is created purely by arrangement.}
 \label{fig:injection}
 \end{figure*}
 
-\subsection{The benchmark, and what it can separate}
+\subsection{Benchmark accuracy and its limits}
 
 Table~\ref{tab:headline} reports the 24 hour horizon. The validation selected recurrent model,
 a single layer GRU with 16{,}193 parameters over a 24 hour window, reaches an RMSE of 57.70
 \ugm{} averaged over five seeds against 73.76 for persistence, a skill score of $+0.218$. The
 best classical competitor is random forest at 58.50, and the paired test on the selected seed
-rejects equality with a Holm adjusted $p$ of 0.037. Intervals there are a moving block
-bootstrap with 1{,}000 resamples over 24 hour blocks, taken in blocks because consecutive
-hourly errors are correlated.
+rejects equality with a Holm adjusted $p$ of 0.037. Intervals are a moving block bootstrap
+of 1{,}000 resamples, blocked at 24 hours because consecutive hourly errors are correlated.
 
 That is the strongest reading the data support, and it is weaker than it looks. The 95 per
 cent model confidence set retains five of the nine candidates, so the recurrent model, the
 three tree ensembles and ridge are not separable at this horizon. The horizon is a choice
 rather than a finding. Across the five horizons tested, LightGBM beats the sequence tier
 significantly at 1 hour and at 12 hours, and the sequence tier wins significantly only at 24.
-Any single horizon headline is therefore a selection, and we report the four horizons that do
-not support ours next to the one that does.
+Any single horizon headline is therefore itself a selection.
 
 The identity of the winner is also unstable. Re running the selection rule on 2{,}000 resamples
 of the seed set returns the reported configuration 45 per cent of the time and ten distinct
-candidates win at least once, yet the consequence is bounded, because the candidates validation
-cannot separate are near ties. Selecting on validation rather than on test costs $+0.05$ \ugm{}
-here. We therefore make claims about tiers, not about architectures.
+candidates win at least once, yet the consequence is bounded, since selecting on validation
+rather than on test costs only $+0.05$ \ugm{} here. We therefore make claims about tiers, not
+about architectures.
 
 \begin{table}[!t]
 \caption{Test performance at the 24 hour horizon.}
@@ -341,20 +327,20 @@ SARIMAX             & 81.36 & [74.83, 87.93] & $-0.103$ & no \\
 predictions enter the paired tests; the five seed mean is $57.70\pm0.44$.}
 \end{table}
 
-\subsection{The observational contrast identifies nothing}
+\subsection{The cross city contrast}
 
 Running the identical pipeline on the Beijing record gives a rank correlation between the two
 cities' method orderings of only $+0.20$, so a benchmark run on either city alone would
-recommend a different method. The comparison is nevertheless uninformative about fragmentation,
-in two ways. First, the comparison city cannot support a ranking at all, because its own
+recommend a different method. The comparison is nevertheless uninformative about
+fragmentation. First, the comparison city cannot support a ranking at all, because its own
 confidence set retains nine of nine candidates, persistence included. Second, the observational
 gradient runs the wrong way. The sequence tier ranks first on the more fragmented record and
 third on the near complete one, the opposite of what a fragmentation account predicts, and the
 pair also confounds fragmentation with a harder problem, a shorter evaluation period and a
-seasonal transition. We report this rather than set it aside, and treat it as the reason to
-build a counterfactual.
+seasonal transition. We report it rather than set it aside, and treat it as the reason to build
+a counterfactual.
 
-\subsection{Arrangement costs skill at constant volume}
+\subsection{The cost of arrangement at constant volume}
 
 Fig.~\ref{fig:injection} shows the experiment, and panel (b) is the mechanism in one line. At
 every coverage level the two arms have removed exactly the same number of observed hours, and
@@ -364,24 +350,22 @@ and an injection seed gives one matched observation, so each family contributes 
 write the \emph{arm gap} for fragmented minus contiguous skill within such a pair, so a
 negative value means fragmentation costs that family more than removing the same hours
 contiguously. Table~\ref{tab:arm} reports the signed rank test, Holm corrected across
-families. The
-sequence tier loses 0.0394 skill to arrangement alone, and it is not alone in losing
-something. The climatological and tree families also move, and only the linear family is
-indistinguishable from zero, so the honest summary is that fragmentation is costly to most of
-the methods considered and most costly to the one that reads windows.
+families. The sequence tier loses 0.0394 skill to arrangement alone, and it is not alone. The
+climatological and tree families also move, and only the linear family is indistinguishable
+from zero, so fragmentation is costly to most of the methods considered and most costly to the
+one that reads windows.
 
-
-\subsection{Replication, and the contrast that does not survive}
+\subsection{Replication across donor stations}
 
 One record cannot distinguish a property of fragmentation from a property of a station, so
 the experiment was repeated on two further stations of the same archive. We adopt a strict
 replication rule, requiring the same sign and Holm significance on every donor.
 Table~\ref{tab:arm} reports the outcome, an asterisk marking Holm significance within that
 donor. Only the sequence tier replicates. The climatological
-family is instructive here and is the reason more than one donor was run. On the first donor
-alone its penalty collapses to $-0.096$ at the severest degradation, which read in isolation
-would have argued that fragmentation degrades anything estimated from the record. It does not
-survive the other two stations, so that collapse is a property of that station.
+family is the reason more than one donor was run. On the first donor alone its penalty collapses
+to $-0.096$ at the severest degradation, which read in isolation would have argued that
+fragmentation degrades anything estimated from the record. It does not survive the other two
+stations, so that collapse is a property of that station.
 
 Significance against a family's own null on every donor is not, however, a contrast between
 families. The stronger claim, that the sequence tier suffers \emph{most}, requires differencing
@@ -389,8 +373,8 @@ families within matched triples of coverage level, injection seed and donor. Und
 intersection union test, correct here because the claim is a conjunction, it fails. The
 sequence tier separates from the linear and climatological families but not from the tree
 ensembles, where the difference is $-0.0102$ with $p=0.15$. We therefore withhold the
-comparative claim and state the narrower one that survives, namely that the sequence tier's
-penalty is the only one appearing reliably across records and the largest in mean.
+comparative claim. The narrower one survives, that the sequence tier's penalty is the only one
+appearing reliably across records and the largest in mean.
 
 What does discriminate is the shape of the penalty in coverage. A cost flat in coverage is a
 fixed toll, whereas one that steepens is a mechanism. Fitting one slope per injection seed and
@@ -426,14 +410,14 @@ separate sequence from trees ($-0.0102$, $p=0.15$), so the comparative claim is
 withheld.}
 \end{table*}
 
-\subsection{The backward reach carries the effect}
+\subsection{Mediation by the backward reach}
 
 The account in \eqref{eq:radius} predicts something falsifiable. If the penalty is caused by
 sterilised history rather than by lost hours, shortening the reach should shrink it. Because
-the reach is set by configuration rather than inferred from a regression, this is a stronger
-design than a regression based mediation and needs no ignorability assumption. The injection
-is deterministic in arm, coverage and seed and runs before any feature is built, so the same
-degraded series appears at every reach and each draw is a repeated measure.
+the reach is set by configuration rather than inferred from a regression, the design needs no
+ignorability assumption. The injection is deterministic in arm, coverage and seed and runs
+before any feature is built, so the same degraded series appears at every reach and each draw is
+a repeated measure.
 
 The mediator moves first. Relative to the contiguous arm at an identical removed hour count,
 the fragmented arm loses 8{,}056 usable training rows at $R=192$, 4{,}415 at $R=72$ and
@@ -490,10 +474,10 @@ $R^2$ to 0.461, which is what the radius term carries.
 The constant $\alpha$ is not free either. It should equal the share of gaps outliving the
 short forward fill, which is 0.1418 across this record's 2{,}074 gaps with a 95 per cent
 interval of $[0.1274, 0.1574]$. The fitted value falls inside that interval, so the constant
-is the imputation policy rather than a fitted parameter. The practical consequence is that a
-near complete record is not a well supervised one. Amplification, being usable hours destroyed
-per hour missing, runs at 2.3 on the primary record and at 34.2, 14.0 and 10.4 on the three
-near complete stations, because it follows the number of gaps and not their total length.
+is the imputation policy rather than a fitted parameter. A near complete record is therefore not
+a well supervised one. Amplification, being usable hours destroyed per hour missing, runs at 2.3
+on the primary record and at 34.2, 14.0 and 10.4 on the three near complete stations, because it
+follows the number of gaps and not their total length.
 
 \begin{figure*}[!t]
 \centerline{\includegraphics[width=\linewidth]{fig14_missingness_amplification.pdf}}
@@ -504,7 +488,7 @@ stations at the fitted radius and one across radii on the fitting station.}
 \label{fig:law}
 \end{figure*}
 
-\subsection{What the reach costs, and what shortening it buys}
+\subsection{The price of the backward reach}
 
 Anyone holding a record can price a reach exactly, with no fitted constants at all. A run of
 length $l$ supports $\max(0,\,l-R)$ scored rows, so
@@ -515,11 +499,11 @@ U(R)=\sum_{\mathrm{runs}}\max(0,\,l-R),
 \label{eq:identity}
 \end{equation}
 One further hour of backward reach costs exactly the number of runs still longer than it.
-Divided through by $U/R$ this becomes an elasticity, the only form of the price comparable
-across records of different sizes. Table~\ref{tab:avail} gives it. At the configured radius the
-primary record pays 0.372 against the donor's 0.139, so a reach one per cent deeper costs it
-2.7 times as large a share of its supervision. The same table shows why coverage is the wrong
-summary statistic. Hourly coverage runs 82.3 per cent on the primary record against 98.9 on the
+Divided by $U/R$ it becomes an elasticity, the only form of the price comparable across records
+of different sizes. Table~\ref{tab:avail} gives it. At the configured radius the primary record
+pays 0.372 against the donor's 0.139, so a reach one per cent deeper costs it 2.7 times as large
+a share of its supervision. The same table shows why coverage is the wrong summary statistic.
+Hourly coverage runs 82.3 per cent on the primary record against 98.9 on the
 donor, and yet availability runs 76.4 against 72.5, because the primary record's absences are
 clustered into a few long outages while the near complete stations' are scattered. Coverage is
 what a custodian reports. Availability is what a forecaster gets.
@@ -533,10 +517,10 @@ worth $+0.0154$ median skill, $+0.0204$ for the best model.
 
 Two qualifications keep this honest. The gain is not the rescue of catastrophic hours, because
 the unserved hours are \emph{easier} than the served ones, persistence scoring 56.90 there
-against 73.76. It is a model beating persistence over a large block of ordinary hours. And the
-free price sizes the opportunity without promising the payoff, since the primary record recovers
-48 per cent of its training rows against the donor's 9 per cent and gains less skill.
-Availability rather than rows orders the two correctly.
+against 73.76. It is a model beating persistence over a large block of ordinary hours. The free
+price also sizes the opportunity without promising the payoff, since the primary record recovers
+48 per cent of its training rows against the donor's 9 per cent and yet gains less skill.
+Availability, not rows, orders the two correctly.
 
 \begin{table}[!t]
 \caption{Availability and the price of the backward reach.}
@@ -569,18 +553,17 @@ and that the resulting loss of supervision is predictable from two counts a cust
 holds. A benchmark reporting accuracy without availability reports a conditional quantity as
 though it were unconditional.
 
-Several limits are worth stating rather than leaving to a referee. The injection experiment runs
-at one horizon with one injected gap length distribution, and its three donors are stations of a
-single archive covering one four year window and one weather regime. That makes it a station
-robustness check, able to falsify a station specific effect but not evidence of generality
-across cities. The comparative claim that the sequence tier suffers most does not survive an
-intersection union test and is not made, and the mediation result is established only on the
-record where the penalty was measured. The target series comes from a single monitor, so
-results describe that site rather than Dhaka as a whole. Ridge is structurally disadvantaged by
-a logarithmic target with raw scale history and should be read as a linear floor rather than a
-tuned competitor. Finally, inverting that logarithmic scale returns something nearer a
-conditional median, so every model here underpredicts the largest episodes. The bias is common
-to all of them, so between model comparisons remain valid.
+Several limits are worth stating. The injection experiment runs at one horizon with one injected
+gap length distribution, and its three donors are stations of a single archive covering one four
+year window and one weather regime. That makes it a station robustness check, able to falsify a
+station specific effect but not evidence of generality across cities. The comparative claim that
+the sequence tier suffers most does not survive an intersection union test and is not made, and
+the mediation result is established only on the record where the penalty was measured. The
+target series comes from a single monitor, so results describe that site rather than Dhaka as a
+whole. Ridge, disadvantaged by a logarithmic target with raw scale history, is a linear floor
+rather than a tuned competitor. Inverting that logarithmic scale finally returns something
+nearer a conditional median, so every model here underpredicts the largest episodes. The bias is
+common to all of them, so between model comparisons remain valid.
 
 \section{Conclusion}
 
@@ -590,8 +573,8 @@ and that is the only family whose loss replicates across three stations. The mec
 backward reach a scored row demands. Quartering that reach removes 97 per cent of the penalty,
 and the supervision a record can support follows a closed form in observed hours, gap count and
 reach that predicts 404 held out cells at $R^2=0.982$. Price the reach before choosing it,
-because here the configured 168 hour reach bought no accuracy and cost fourteen points of the
-hours a forecast could be issued at all.
+because here the configured reach bought no accuracy and cost fourteen points of the hours a
+forecast could be issued at all.
 
 \begin{thebibliography}{00}
 \bibitem{who2021} World Health Organization, \emph{WHO Global Air Quality Guidelines}. Geneva, Switzerland: WHO, 2021.
